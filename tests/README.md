@@ -1,7 +1,8 @@
 # tests
 
 - [ ] match
+- [ ] softclip
 - [ ] substitution
 - [ ] insertion
 - [ ] deletion
-- [ ] splicing
+- [ ] splicing (large deletion)

@@ -1,0 +1,4 @@
+@SQ	SN:random_100bp	LN:100
+@PG	ID:minimap2	PN:minimap2	VN:2.23-r1111	CL:minimap2 -ax map-ont --cs=long tests/data/random_100bp.fa tests/data/softclip/softclip.fq
+left-10bp	0	random_100bp	11	60	90M	*	0	0	ATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	NM:i:0	ms:i:180	AS:i:180	nn:i:0	tp:A:P	cm:i:13	s1:i:82	s2:i:0	de:f:0	cs:Z:=ATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC	rl:i:0
+right-10bp	0	random_100bp	1	60	90M	*	0	0	ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAA	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	NM:i:0	ms:i:180	AS:i:180	nn:i:0	tp:A:P	cm:i:13	s1:i:80	s2:i:0	de:f:0	cs:Z:=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAA	rl:i:0

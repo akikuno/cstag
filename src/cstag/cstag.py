@@ -1,9 +1,9 @@
 def shorten():
-    """テストです
+    """Convert long format of cs tag into short format
     """
     print("Hello!!")
 
 def lengthen():
-    """テストです
+    """Convert short format of cs tag into long format
     """
     print("こんにちは")
