@@ -1,0 +1,4 @@
+@SQ	SN:random_100bp	LN:100
+@PG	ID:minimap2	PN:minimap2	VN:2.22-r1101	CL:minimap2 -ax map-ont --cs tests/random_100bp.fa tests/substitution/sub.fq
+control	0	random_100bp	1	60	100M	*	0	0	ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	NM:i:0	ms:i:200	AS:i:200	nn:i:0	tp:A:P	cm:i:15	s1:i:95	s2:i:0	de:f:0	cs:Z::100	rl:i:0
+sub-1nt	0	random_100bp	1	60	100M	*	0	0	ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTGGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	NM:i:1	ms:i:194	AS:i:194	nn:i:0	tp:A:P	cm:i:11	s1:i:87	s2:i:0	de:f:0.0100	cs:Z::49*ag:50	rl:i:0

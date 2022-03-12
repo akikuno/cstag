@@ -1,10 +1,9 @@
 def shorten():
     """テストです
     """
-    print("Hello!")
+    print("Hello!!")
 
 def lengthen():
     """テストです
     """
     print("こんにちは")
-    

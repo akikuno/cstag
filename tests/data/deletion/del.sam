@@ -1,0 +1,4 @@
+@SQ	SN:random_100bp	LN:100
+@PG	ID:minimap2	PN:minimap2	VN:2.22-r1101	CL:minimap2 -ax map-ont tests/random_100bp.fa tests/deletion/del.fq
+control	0	random_100bp	1	60	100M	*	0	0	ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	NM:i:0	ms:i:200	AS:i:200	nn:i:0	tp:A:P	cm:i:15	s1:i:95	s2:i:0	de:f:0	rl:i:0
+del-10nt	0	random_100bp	1	60	39M10D51M	*	0	0	ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!	NM:i:10	ms:i:169	AS:i:156	nn:i:0	tp:A:P	cm:i:11	s1:i:79	s2:i:0	de:f:0.0110	rl:i:0
