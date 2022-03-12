@@ -5,9 +5,13 @@ def shorten(sam: list) -> list:
         sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **long** form
 
     Returns:
-        sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **short** form
+        List of SAM including a cs tag in **short** form
 
     Example:
+        >>> import cstag
+        >>> sam = [hoge]
+        >>> cstag.shorten(sam)
+        [hoge]
     """
     print("Hello!!")
 
@@ -17,6 +21,12 @@ def lengthen(sam: list) -> list:
         sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **short** form
 
     Returns:
-        sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **long** form
+        List of SAM including a cs tag in **long** form
+
+    Example:
+        >>> import cstag
+        >>> sam = [hoge]
+        >>> cstag.lengthen(sam)
+        [hoge]
     """
     print("こんにちは")
