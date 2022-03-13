@@ -8,3 +8,12 @@
 - [x] deletion
 - [x] substitution/insertion/deletion
 - [x] splicing (large deletion)
+
+## Lengthen
+- [x] match
+- [x] softclip
+- [x] substitution
+- [x] insertion
+- [x] deletion
+- [x] substitution/insertion/deletion
+- [x] splicing (large deletion)
