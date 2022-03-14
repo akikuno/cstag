@@ -4,4 +4,4 @@
 
 from .cstag import shorten as shorten
 from .cstag import lengthen as lengthen
-from .test import hello
+from .hello import hello
