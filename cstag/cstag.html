@@ -36,7 +36,7 @@ def shorten(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
         - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        cs tag in **short** form
+        - cs tag in **short** form
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;cs:Z:=ACGT*ag=CGT&#34;
@@ -70,7 +70,7 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
         - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        cs tag in **long** form
+        - cs tag in **long** form
 
     Example:
         &gt;&gt;&gt; import cstag
@@ -128,7 +128,9 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
 <li>SEQ (str): segment sequence (10th column in SAM file)</li>
 </ul>
 <h2 id="returns">Returns</h2>
-<p>cs tag in <strong>long</strong> form</p>
+<ul>
+<li>cs tag in <strong>long</strong> form</li>
+</ul>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs = &quot;cs:Z::4*ag:3&quot;
@@ -148,7 +150,7 @@ cs:Z:=ACGT*ag=CGT
         - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        cs tag in **long** form
+        - cs tag in **long** form
 
     Example:
         &gt;&gt;&gt; import cstag
@@ -199,7 +201,9 @@ cs:Z:=ACGT*ag=CGT
 <li>SEQ (str): segment sequence (10th column in SAM file)</li>
 </ul>
 <h2 id="returns">Returns</h2>
-<p>cs tag in <strong>short</strong> form</p>
+<ul>
+<li>cs tag in <strong>short</strong> form</li>
+</ul>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs = &quot;cs:Z:=ACGT*ag=CGT&quot;
@@ -219,7 +223,7 @@ cs:Z::4*ag:3
         - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        cs tag in **short** form
+        - cs tag in **short** form
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;cs:Z:=ACGT*ag=CGT&#34;
