@@ -29,7 +29,7 @@
 <pre><code class="python">import re
 import sys
 
-def shorten(CSTAG: str, SEQ: str) -&gt; str:
+def shorten(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **long** form
@@ -43,6 +43,23 @@ def shorten(CSTAG: str, SEQ: str) -&gt; str:
         &gt;&gt;&gt; cstag.lengthen(cstag, seq)
         cs:Z::4*ag:3
     &#34;&#34;&#34;
+    cstag = re.split(r&#39;([-+*~=])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
+    cstag = iter(cstag)
+    cstag = [i+j for i,j in zip(cstag, cstag)]
+
+    clips = re.sub(r&#34;^(\d)[SH].*&#34;, r&#34;\1&#34;, CIGAR)
+    idx = int(clips) if clips.isdigit() else 0
+
+    csshort = []
+    for cs in cstag:
+        if cs[0] == &#34;=&#34;:
+            csshort.append(&#34;:&#34; + str(len(cs)-1))
+            continue
+        csshort.append(cs)
+
+    return &#34;cs:Z:&#34; + &#34;&#34;.join(csshort)
+
+
 
 def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert short format of cs tag into long format
@@ -169,7 +186,7 @@ cs:Z:=ACGT*ag=CGT
 </details>
 </dd>
 <dt id="cstag.cstag.shorten"><code class="name flex">
-<span>def <span class="ident">shorten</span></span>(<span>CSTAG: str, SEQ: str) ‑> str</span>
+<span>def <span class="ident">shorten</span></span>(<span>CSTAG: str, CIGAR: str, SEQ: str) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert long format of cs tag into short format</p>
@@ -191,7 +208,7 @@ cs:Z::4*ag:3
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def shorten(CSTAG: str, SEQ: str) -&gt; str:
+<pre><code class="python">def shorten(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **long** form
@@ -204,7 +221,22 @@ cs:Z::4*ag:3
         &gt;&gt;&gt; cstag = &#34;cs:Z:=ACGT*ag=CGT&#34;
         &gt;&gt;&gt; cstag.lengthen(cstag, seq)
         cs:Z::4*ag:3
-    &#34;&#34;&#34;</code></pre>
+    &#34;&#34;&#34;
+    cstag = re.split(r&#39;([-+*~=])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
+    cstag = iter(cstag)
+    cstag = [i+j for i,j in zip(cstag, cstag)]
+
+    clips = re.sub(r&#34;^(\d)[SH].*&#34;, r&#34;\1&#34;, CIGAR)
+    idx = int(clips) if clips.isdigit() else 0
+
+    csshort = []
+    for cs in cstag:
+        if cs[0] == &#34;=&#34;:
+            csshort.append(&#34;:&#34; + str(len(cs)-1))
+            continue
+        csshort.append(cs)
+
+    return &#34;cs:Z:&#34; + &#34;&#34;.join(csshort)</code></pre>
 </details>
 </dd>
 </dl>
