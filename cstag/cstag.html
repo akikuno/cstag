@@ -26,7 +26,10 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def shorten(sam: list) -&gt; list:
+<pre><code class="python">import re
+import sys
+
+def shorten(sam: list) -&gt; list:
     &#34;&#34;&#34;Convert long format of cs tag into short format
 
     Args:
@@ -43,7 +46,7 @@
     &#34;&#34;&#34;
     print(&#34;Hello!!&#34;)
 
-def lengthen(sam: list) -&gt; list:
+def lengthen(CSTAG: chr, SEQ: chr) -&gt; chr:
     &#34;&#34;&#34;Convert short format of cs tag into long format
     Args:
         sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **short** form
@@ -57,7 +60,27 @@ def lengthen(sam: list) -&gt; list:
         &gt;&gt;&gt; cstag.lengthen(sam)
         [hoge]
     &#34;&#34;&#34;
-    print(&#34;こんにちは&#34;)</code></pre>
+    cstag = re.split(&#39;([-+*~:])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
+    cstag = iter(cstag)
+    cstag = [i+j for i,j in zip(cstag, cstag)]
+
+    idx = 0
+    cslong = []
+    for cs in cstag:
+        if cs == &#34;&#34;:
+            continue
+        if cs[0] == &#34;:&#34;:
+            cs = int(cs[1:]) + idx
+            cslong.append(&#34;:&#34; + SEQ[idx:cs])
+            idx += cs
+            continue
+        cslong.append(cs)
+        if cs[0] == &#34;*&#34;:
+            idx += 1
+        if cs[0] == &#34;+&#34;:
+            idx += len(cs)-1
+
+    return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -68,7 +91,7 @@ def lengthen(sam: list) -&gt; list:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="cstag.cstag.lengthen"><code class="name flex">
-<span>def <span class="ident">lengthen</span></span>(<span>sam: list) ‑> list</span>
+<span>def <span class="ident">lengthen</span></span>(<span>CSTAG: <built-in function chr>, SEQ: <built-in function chr>) ‑> <built-in function chr></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert short format of cs tag into long format</p>
@@ -89,7 +112,7 @@ def lengthen(sam: list) -&gt; list:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def lengthen(sam: list) -&gt; list:
+<pre><code class="python">def lengthen(CSTAG: chr, SEQ: chr) -&gt; chr:
     &#34;&#34;&#34;Convert short format of cs tag into long format
     Args:
         sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **short** form
@@ -103,7 +126,27 @@ def lengthen(sam: list) -&gt; list:
         &gt;&gt;&gt; cstag.lengthen(sam)
         [hoge]
     &#34;&#34;&#34;
-    print(&#34;こんにちは&#34;)</code></pre>
+    cstag = re.split(&#39;([-+*~:])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
+    cstag = iter(cstag)
+    cstag = [i+j for i,j in zip(cstag, cstag)]
+
+    idx = 0
+    cslong = []
+    for cs in cstag:
+        if cs == &#34;&#34;:
+            continue
+        if cs[0] == &#34;:&#34;:
+            cs = int(cs[1:]) + idx
+            cslong.append(&#34;:&#34; + SEQ[idx:cs])
+            idx += cs
+            continue
+        cslong.append(cs)
+        if cs[0] == &#34;*&#34;:
+            idx += 1
+        if cs[0] == &#34;+&#34;:
+            idx += len(cs)-1
+
+    return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
 </details>
 </dd>
 <dt id="cstag.cstag.shorten"><code class="name flex">
