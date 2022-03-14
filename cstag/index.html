@@ -35,17 +35,23 @@
 </code></pre>
 <pre><code class="language-bash">conda install -c bioconda cstag
 </code></pre>
-<h2 id="usage">Usage</h2>
-<pre><code class="language-python">import cstag
-cstag.shorten()
-cstag.lengthen()
+<h2 id="example">Example</h2>
+<pre><code class="language-python"># Convert short format of cs tag into long format
+import cstag
+cstag = &quot;cs:Z::4*ag:3&quot;
+cigar = &quot;8M&quot;
+seq = &quot;ACGTACGT&quot;
+cstag.lengthen(cstag, cigar, seq)
+# cs:Z:=ACGT*ag=CGT
 </code></pre>
+<h2 id="documentation">Documentation</h2>
+<p><a href="https://akikuno.github.io/cstag/cstag/cstag.html">https://akikuno.github.io/cstag/cstag/cstag.html</a></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-.. include:: ../README.md
+.. include:: ../../README.md
 &#34;&#34;&#34;
 
 from .cstag import shorten as shorten
@@ -79,7 +85,8 @@ from .test import hello</code></pre>
 <ul>
 <li><a href="#cstag">cstag</a><ul>
 <li><a href="#installation-underdevelopment">Installation (Underdevelopment👷🚧)</a></li>
-<li><a href="#usage">Usage</a></li>
+<li><a href="#example">Example</a></li>
+<li><a href="#documentation">Documentation</a></li>
 </ul>
 </li>
 </ul>
