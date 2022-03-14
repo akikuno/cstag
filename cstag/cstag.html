@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>src.cstag API documentation</title>
+<title>cstag.cstag API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>src.cstag</code></h1>
+<h1 class="title">Module <code>cstag.cstag</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -97,7 +97,7 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="src.cstag.lengthen"><code class="name flex">
+<dt id="cstag.cstag.lengthen"><code class="name flex">
 <span>def <span class="ident">lengthen</span></span>(<span>CSTAG: str, CIGAR: str, SEQ: str) ‑> str</span>
 </code></dt>
 <dd>
@@ -168,7 +168,7 @@ cs:Z:=ACGT*ag=CGT
     return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
 </details>
 </dd>
-<dt id="src.cstag.shorten"><code class="name flex">
+<dt id="cstag.cstag.shorten"><code class="name flex">
 <span>def <span class="ident">shorten</span></span>(<span>CSTAG: str, SEQ: str) ‑> str</span>
 </code></dt>
 <dd>
@@ -220,13 +220,13 @@ cs:Z::4*ag:3
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="src" href="index.html">src</a></code></li>
+<li><code><a title="cstag" href="index.html">cstag</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="src.cstag.lengthen" href="#src.cstag.lengthen">lengthen</a></code></li>
-<li><code><a title="src.cstag.shorten" href="#src.cstag.shorten">shorten</a></code></li>
+<li><code><a title="cstag.cstag.lengthen" href="#cstag.cstag.lengthen">lengthen</a></code></li>
+<li><code><a title="cstag.cstag.shorten" href="#cstag.cstag.shorten">shorten</a></code></li>
 </ul>
 </li>
 </ul>
