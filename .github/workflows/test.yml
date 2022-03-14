@@ -42,14 +42,6 @@ jobs:
         run: poetry install --no-interaction
       # pytest を実行する
       - name: Run Tests
-        run: poetry run pytest test --cov=./cstag --cov-report=xml
+        run: poetry run pytest tests/
       - name: Upload coverage to Codecov
-        # 上記のstepsが全て完了した場合にcodecovへupload
-        # 今回はpublic repositoryのためKEYは不要だが、privateなら必要なので注意
-        if: ${{ matrix.python-version==3.8 }}
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./coverage.xml
-          name: codecov-umbrella
-          fail_ci_if_error: true
 
