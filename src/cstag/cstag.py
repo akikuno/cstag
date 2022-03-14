@@ -8,7 +8,7 @@ def shorten(CSTAG: str, CIGAR: str, SEQ: str) -> str:
         - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        cs tag in **short** form
+        - cs tag in **short** form
     Example:
         >>> import cstag
         >>> cs = "cs:Z:=ACGT*ag=CGT"
@@ -42,7 +42,7 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
         - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        cs tag in **long** form
+        - cs tag in **long** form
 
     Example:
         >>> import cstag

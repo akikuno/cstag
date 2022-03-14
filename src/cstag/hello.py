@@ -1,4 +1,4 @@
 def hello():
-    """テストです
+    """Say hello
     """
     print("Hello!")
