@@ -1,4 +1,4 @@
-from src.cstag import lengthen
+from cstag.cstag import lengthen
 
 def test_softclip():
     SEQ = "ATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
