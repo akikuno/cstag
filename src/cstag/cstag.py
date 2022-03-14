@@ -1,7 +1,7 @@
 import re
 import sys
 
-def shorten(CSTAG: str, SEQ: str) -> str:
+def shorten(CSTAG: str, CIGAR: str, SEQ: str) -> str:
     """Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **long** form
@@ -15,6 +15,23 @@ def shorten(CSTAG: str, SEQ: str) -> str:
         >>> cstag.lengthen(cstag, seq)
         cs:Z::4*ag:3
     """
+    cstag = re.split(r'([-+*~=])', CSTAG.replace("cs:Z:", ""))[1:]
+    cstag = iter(cstag)
+    cstag = [i+j for i,j in zip(cstag, cstag)]
+
+    clips = re.sub(r"^(\d)[SH].*", r"\1", CIGAR)
+    idx = int(clips) if clips.isdigit() else 0
+
+    csshort = []
+    for cs in cstag:
+        if cs[0] == "=":
+            csshort.append(":" + str(len(cs)-1))
+            continue
+        csshort.append(cs)
+
+    return "cs:Z:" + "".join(csshort)
+
+
 
 def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
     """Convert short format of cs tag into long format
