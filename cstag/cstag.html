@@ -44,19 +44,22 @@ def shorten(CSTAG: str, SEQ: str) -&gt; str:
         cs:Z::4*ag:3
     &#34;&#34;&#34;
 
-def lengthen(CSTAG: str, SEQ: str) -&gt; str:
+def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert short format of cs tag into long format
     Args:
         - CSTAG (str): cs tag in **short** form
+        - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
+        # - POS (int): 1-based leftmost mapping position (4th column in SAM file)
     Returns:
         cs tag in **long** form
 
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
         &gt;&gt;&gt; cstag = &#34;cs:Z::4*ag:3&#34;
-        &gt;&gt;&gt; cstag.lengthen(cstag, seq)
+        &gt;&gt;&gt; cigar = &#34;8M&#34;
+        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
+        &gt;&gt;&gt; cstag.lengthen(cstag, cigar, seq)
         cs:Z:=ACGT*ag=CGT
     &#34;&#34;&#34;
     if re.search(r&#34;[ACGT]&#34;, CSTAG):
@@ -65,14 +68,18 @@ def lengthen(CSTAG: str, SEQ: str) -&gt; str:
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
     idx = 0
+    softclip = re.sub(r&#34;^(\d)S.*&#34;, r&#34;\1&#34;, CIGAR)
+    if softclip.isdigit():
+        idx = int(softclip)
     cslong = []
     for cs in cstag:
         if cs == &#34;&#34;:
             continue
         if cs[0] == &#34;:&#34;:
             cs = int(cs[1:]) + idx
+            print(idx, cs)
             cslong.append(&#34;:&#34; + SEQ[idx:cs])
-            idx += cs
+            idx = cs
             continue
         cslong.append(cs)
         if cs[0] == &#34;*&#34;:
@@ -90,41 +97,47 @@ def lengthen(CSTAG: str, SEQ: str) -&gt; str:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="cstag.cstag.lengthen"><code class="name flex">
-<span>def <span class="ident">lengthen</span></span>(<span>CSTAG: str, SEQ: str) ‑> str</span>
+<span>def <span class="ident">lengthen</span></span>(<span>CSTAG: str, CIGAR: str, SEQ: str) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert short format of cs tag into long format</p>
 <h2 id="args">Args</h2>
 <ul>
 <li>CSTAG (str): cs tag in <strong>short</strong> form</li>
+<li>CIGAR (str): CIGAR string (6th column in SAM file)</li>
 <li>SEQ (str): segment sequence (10th column in SAM file)</li>
 </ul>
+<h1 id="-pos-int-1-based-leftmost-mapping-position-4th-column-in-sam-file">- POS (int): 1-based leftmost mapping position (4th column in SAM file)</h1>
 <h2 id="returns">Returns</h2>
 <p>cs tag in <strong>long</strong> form</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; seq = &quot;ACGTACGT&quot;
 &gt;&gt;&gt; cstag = &quot;cs:Z::4*ag:3&quot;
-&gt;&gt;&gt; cstag.lengthen(cstag, seq)
+&gt;&gt;&gt; cigar = &quot;8M&quot;
+&gt;&gt;&gt; seq = &quot;ACGTACGT&quot;
+&gt;&gt;&gt; cstag.lengthen(cstag, cigar, seq)
 cs:Z:=ACGT*ag=CGT
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def lengthen(CSTAG: str, SEQ: str) -&gt; str:
+<pre><code class="python">def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert short format of cs tag into long format
     Args:
         - CSTAG (str): cs tag in **short** form
+        - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
+        # - POS (int): 1-based leftmost mapping position (4th column in SAM file)
     Returns:
         cs tag in **long** form
 
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
         &gt;&gt;&gt; cstag = &#34;cs:Z::4*ag:3&#34;
-        &gt;&gt;&gt; cstag.lengthen(cstag, seq)
+        &gt;&gt;&gt; cigar = &#34;8M&#34;
+        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
+        &gt;&gt;&gt; cstag.lengthen(cstag, cigar, seq)
         cs:Z:=ACGT*ag=CGT
     &#34;&#34;&#34;
     if re.search(r&#34;[ACGT]&#34;, CSTAG):
@@ -133,14 +146,18 @@ cs:Z:=ACGT*ag=CGT
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
     idx = 0
+    softclip = re.sub(r&#34;^(\d)S.*&#34;, r&#34;\1&#34;, CIGAR)
+    if softclip.isdigit():
+        idx = int(softclip)
     cslong = []
     for cs in cstag:
         if cs == &#34;&#34;:
             continue
         if cs[0] == &#34;:&#34;:
             cs = int(cs[1:]) + idx
+            print(idx, cs)
             cslong.append(&#34;:&#34; + SEQ[idx:cs])
-            idx += cs
+            idx = cs
             continue
         cslong.append(cs)
         if cs[0] == &#34;*&#34;:
