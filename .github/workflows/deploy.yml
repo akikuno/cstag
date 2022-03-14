@@ -19,7 +19,7 @@ jobs:
       - name: Build
         run: |
           pip install pdoc3
-          pdoc --html --output-dir tmp --force src/cstag
+          pdoc --html --output-dir tmp --force cstag/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
