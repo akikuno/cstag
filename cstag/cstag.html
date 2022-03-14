@@ -29,41 +29,41 @@
 <pre><code class="python">import re
 import sys
 
-def shorten(sam: list) -&gt; list:
+def shorten(CSTAG: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
-
     Args:
-        sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **long** form
-
+        - CSTAG (str): cs tag in **long** form
+        - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        List of SAM including a cs tag in **short** form
-
+        cs tag in **short** form
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; sam = [hoge]
-        &gt;&gt;&gt; cstag.shorten(sam)
-        [hoge]
+        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
+        &gt;&gt;&gt; cstag = &#34;cs:Z:=ACGT*ag=CGT&#34;
+        &gt;&gt;&gt; cstag.lengthen(cstag, seq)
+        cs:Z::4*ag:3
     &#34;&#34;&#34;
-    print(&#34;Hello!!&#34;)
 
-def lengthen(CSTAG: chr, SEQ: chr) -&gt; chr:
+def lengthen(CSTAG: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert short format of cs tag into long format
     Args:
-        sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **short** form
-
+        - CSTAG (str): cs tag in **short** form
+        - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        List of SAM including a cs tag in **long** form
+        cs tag in **long** form
 
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; sam = [hoge]
-        &gt;&gt;&gt; cstag.lengthen(sam)
-        [hoge]
+        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
+        &gt;&gt;&gt; cstag = &#34;cs:Z::4*ag:3&#34;
+        &gt;&gt;&gt; cstag.lengthen(cstag, seq)
+        cs:Z:=ACGT*ag=CGT
     &#34;&#34;&#34;
+    if re.search(r&#34;[ACGT]&#34;, CSTAG):
+        raise Exception(&#34;Error: input cs tag is not short format&#34;)
     cstag = re.split(&#39;([-+*~:])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
-
     idx = 0
     cslong = []
     for cs in cstag:
@@ -79,7 +79,6 @@ def lengthen(CSTAG: chr, SEQ: chr) -&gt; chr:
             idx += 1
         if cs[0] == &#34;+&#34;:
             idx += len(cs)-1
-
     return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
 </details>
 </section>
@@ -91,45 +90,48 @@ def lengthen(CSTAG: chr, SEQ: chr) -&gt; chr:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="cstag.cstag.lengthen"><code class="name flex">
-<span>def <span class="ident">lengthen</span></span>(<span>CSTAG: <built-in function chr>, SEQ: <built-in function chr>) ‑> <built-in function chr></span>
+<span>def <span class="ident">lengthen</span></span>(<span>CSTAG: str, SEQ: str) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert short format of cs tag into long format</p>
 <h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>sam</code></strong> :&ensp;<code>list</code></dt>
-<dd>List of SAM (Sequence Alignment/Map Format) including a cs tag in <strong>short</strong> form</dd>
-</dl>
+<ul>
+<li>CSTAG (str): cs tag in <strong>short</strong> form</li>
+<li>SEQ (str): segment sequence (10th column in SAM file)</li>
+</ul>
 <h2 id="returns">Returns</h2>
-<p>List of SAM including a cs tag in <strong>long</strong> form</p>
+<p>cs tag in <strong>long</strong> form</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; sam = [hoge]
-&gt;&gt;&gt; cstag.lengthen(sam)
-[hoge]
+&gt;&gt;&gt; seq = &quot;ACGTACGT&quot;
+&gt;&gt;&gt; cstag = &quot;cs:Z::4*ag:3&quot;
+&gt;&gt;&gt; cstag.lengthen(cstag, seq)
+cs:Z:=ACGT*ag=CGT
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def lengthen(CSTAG: chr, SEQ: chr) -&gt; chr:
+<pre><code class="python">def lengthen(CSTAG: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert short format of cs tag into long format
     Args:
-        sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **short** form
-
+        - CSTAG (str): cs tag in **short** form
+        - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        List of SAM including a cs tag in **long** form
+        cs tag in **long** form
 
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; sam = [hoge]
-        &gt;&gt;&gt; cstag.lengthen(sam)
-        [hoge]
+        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
+        &gt;&gt;&gt; cstag = &#34;cs:Z::4*ag:3&#34;
+        &gt;&gt;&gt; cstag.lengthen(cstag, seq)
+        cs:Z:=ACGT*ag=CGT
     &#34;&#34;&#34;
+    if re.search(r&#34;[ACGT]&#34;, CSTAG):
+        raise Exception(&#34;Error: input cs tag is not short format&#34;)
     cstag = re.split(&#39;([-+*~:])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
-
     idx = 0
     cslong = []
     for cs in cstag:
@@ -145,48 +147,46 @@ def lengthen(CSTAG: chr, SEQ: chr) -&gt; chr:
             idx += 1
         if cs[0] == &#34;+&#34;:
             idx += len(cs)-1
-
     return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
 </details>
 </dd>
 <dt id="cstag.cstag.shorten"><code class="name flex">
-<span>def <span class="ident">shorten</span></span>(<span>sam: list) ‑> list</span>
+<span>def <span class="ident">shorten</span></span>(<span>CSTAG: str, SEQ: str) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert long format of cs tag into short format</p>
 <h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>sam</code></strong> :&ensp;<code>list</code></dt>
-<dd>List of SAM (Sequence Alignment/Map Format) including a cs tag in <strong>long</strong> form</dd>
-</dl>
+<ul>
+<li>CSTAG (str): cs tag in <strong>long</strong> form</li>
+<li>SEQ (str): segment sequence (10th column in SAM file)</li>
+</ul>
 <h2 id="returns">Returns</h2>
-<p>List of SAM including a cs tag in <strong>short</strong> form</p>
+<p>cs tag in <strong>short</strong> form</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; sam = [hoge]
-&gt;&gt;&gt; cstag.shorten(sam)
-[hoge]
+&gt;&gt;&gt; seq = &quot;ACGTACGT&quot;
+&gt;&gt;&gt; cstag = &quot;cs:Z:=ACGT*ag=CGT&quot;
+&gt;&gt;&gt; cstag.lengthen(cstag, seq)
+cs:Z::4*ag:3
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def shorten(sam: list) -&gt; list:
+<pre><code class="python">def shorten(CSTAG: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
-
     Args:
-        sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **long** form
-
+        - CSTAG (str): cs tag in **long** form
+        - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        List of SAM including a cs tag in **short** form
-
+        cs tag in **short** form
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; sam = [hoge]
-        &gt;&gt;&gt; cstag.shorten(sam)
-        [hoge]
-    &#34;&#34;&#34;
-    print(&#34;Hello!!&#34;)</code></pre>
+        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
+        &gt;&gt;&gt; cstag = &#34;cs:Z:=ACGT*ag=CGT&#34;
+        &gt;&gt;&gt; cstag.lengthen(cstag, seq)
+        cs:Z::4*ag:3
+    &#34;&#34;&#34;</code></pre>
 </details>
 </dd>
 </dl>
