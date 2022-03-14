@@ -1,7 +1,7 @@
 import re
 import sys
 
-file = "tests/data/splicing/splicing_cs.sam"
+file = "tests/data/subindel/subindel_cs.sam"
 # file = "tests/data/softclip/softclip_no_cs.sam"
 with open(file) as f:
     sam = [x.strip() for x in f.readlines()]

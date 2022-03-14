@@ -1,41 +1,41 @@
 import re
 import sys
 
-def shorten(sam: list) -> list:
+def shorten(CSTAG: str, SEQ: str) -> str:
     """Convert long format of cs tag into short format
-
     Args:
-        sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **long** form
-
+        - CSTAG (str): cs tag in **long** form
+        - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        List of SAM including a cs tag in **short** form
-
+        cs tag in **short** form
     Example:
         >>> import cstag
-        >>> sam = [hoge]
-        >>> cstag.shorten(sam)
-        [hoge]
+        >>> seq = "ACGTACGT"
+        >>> cstag = "cs:Z:=ACGT*ag=CGT"
+        >>> cstag.lengthen(cstag, seq)
+        cs:Z::4*ag:3
     """
-    print("Hello!!")
 
-def lengthen(CSTAG: chr, SEQ: chr) -> chr:
+def lengthen(CSTAG: str, SEQ: str) -> str:
     """Convert short format of cs tag into long format
     Args:
-        sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **short** form
-
+        - CSTAG (str): cs tag in **short** form
+        - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
-        List of SAM including a cs tag in **long** form
+        cs tag in **long** form
 
     Example:
         >>> import cstag
-        >>> sam = [hoge]
-        >>> cstag.lengthen(sam)
-        [hoge]
+        >>> seq = "ACGTACGT"
+        >>> cstag = "cs:Z::4*ag:3"
+        >>> cstag.lengthen(cstag, seq)
+        cs:Z:=ACGT*ag=CGT
     """
+    if re.search(r"[ACGT]", CSTAG):
+        raise Exception("Error: input cs tag is not short format")
     cstag = re.split('([-+*~:])', CSTAG.replace("cs:Z:", ""))[1:]
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
-
     idx = 0
     cslong = []
     for cs in cstag:
@@ -51,5 +51,4 @@ def lengthen(CSTAG: chr, SEQ: chr) -> chr:
             idx += 1
         if cs[0] == "+":
             idx += len(cs)-1
-
     return "cs:Z:" + "".join(cslong).replace(":", "=")
