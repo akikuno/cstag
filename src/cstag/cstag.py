@@ -41,10 +41,8 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
 
-    idx = 0
     clips = re.sub(r"^(\d)[SH].*", r"\1", CIGAR)
-    if clips.isdigit():
-        idx = int(clips)
+    idx = int(clips) if clips.isdigit() else 0
 
     cslong = []
     for cs in cstag:
