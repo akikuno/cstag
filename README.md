@@ -7,9 +7,9 @@
 
 `cstag` is a Python module to convert a [minimap2's CS tag](https://github.com/lh3/minimap2#cs) from short to long format, vice versa.
 
-<!-- ## Installation (Underdevelopment👷🚧)
+## Installation (Underdevelopment👷🚧)
 
-You can install `cstag` using pip or conda:
+<!-- You can install `cstag` using pip or conda:
 
 ```bash
 pip install cstag
