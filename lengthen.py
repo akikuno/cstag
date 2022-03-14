@@ -12,7 +12,7 @@ header = [s.split("\t") for s in sam  if re.search(r"^@", s)]
 contents = [s for s in sam  if not re.search(r"^@", s)]
 
 # ここからfor-loop
-content = contents[1]
+content = contents[-3]
 # for content in contents:
 
 if not "cs:Z" in content:
