@@ -22,7 +22,6 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
         - CSTAG (str): cs tag in **short** form
         - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
-        # - POS (int): 1-based leftmost mapping position (4th column in SAM file)
     Returns:
         cs tag in **long** form
 
@@ -34,22 +33,25 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
         >>> cstag.lengthen(cstag, cigar, seq)
         cs:Z:=ACGT*ag=CGT
     """
+
     if re.search(r"[ACGT]", CSTAG):
         raise Exception("Error: input cs tag is not short format")
-    cstag = re.split('([-+*~:])', CSTAG.replace("cs:Z:", ""))[1:]
+
+    cstag = re.split(r'([-+*~:])', CSTAG.replace("cs:Z:", ""))[1:]
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
+
     idx = 0
     softclip = re.sub(r"^(\d)S.*", r"\1", CIGAR)
     if softclip.isdigit():
         idx = int(softclip)
+
     cslong = []
     for cs in cstag:
         if cs == "":
             continue
         if cs[0] == ":":
             cs = int(cs[1:]) + idx
-            print(idx, cs)
             cslong.append(":" + SEQ[idx:cs])
             idx = cs
             continue
@@ -58,4 +60,5 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
             idx += 1
         if cs[0] == "+":
             idx += len(cs)-1
+
     return "cs:Z:" + "".join(cslong).replace(":", "=")
