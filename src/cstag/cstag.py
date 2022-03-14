@@ -1,3 +1,6 @@
+import re
+import sys
+
 def shorten(sam: list) -> list:
     """Convert long format of cs tag into short format
 
@@ -15,7 +18,7 @@ def shorten(sam: list) -> list:
     """
     print("Hello!!")
 
-def lengthen(sam: list) -> list:
+def lengthen(CSTAG: chr, SEQ: chr) -> chr:
     """Convert short format of cs tag into long format
     Args:
         sam (list): List of SAM (Sequence Alignment/Map Format) including a cs tag in **short** form
@@ -29,4 +32,24 @@ def lengthen(sam: list) -> list:
         >>> cstag.lengthen(sam)
         [hoge]
     """
-    print("こんにちは")
+    cstag = re.split('([-+*~:])', CSTAG.replace("cs:Z:", ""))[1:]
+    cstag = iter(cstag)
+    cstag = [i+j for i,j in zip(cstag, cstag)]
+
+    idx = 0
+    cslong = []
+    for cs in cstag:
+        if cs == "":
+            continue
+        if cs[0] == ":":
+            cs = int(cs[1:]) + idx
+            cslong.append(":" + SEQ[idx:cs])
+            idx += cs
+            continue
+        cslong.append(cs)
+        if cs[0] == "*":
+            idx += 1
+        if cs[0] == "+":
+            idx += len(cs)-1
+
+    return "cs:Z:" + "".join(cslong).replace(":", "=")
