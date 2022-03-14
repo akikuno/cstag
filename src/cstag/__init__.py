@@ -1,5 +1,5 @@
 """
-.. include:: ../README.md
+.. include:: ../../README.md
 """
 
 from .cstag import shorten as shorten
