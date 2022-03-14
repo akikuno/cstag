@@ -29,23 +29,17 @@
 <!-- [![Bioconda](https://img.shields.io/badge/Install%20with-Bioconda-brightgreen.svg)](https://anaconda.org/bioconda/calcs) -->
 <h1 id="cstag">cstag</h1>
 <p><code><a title="cstag.cstag" href="cstag.html">cstag.cstag</a></code> is a Python module to convert a <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tag</a> from short to long format, vice versa.</p>
-<h2 id="installation-underdevelopment">Installation (Underdevelopment🚧)</h2>
+<h2 id="install">Install</h2>
 <p>You can install <code><a title="cstag.cstag" href="cstag.html">cstag.cstag</a></code> using pip or conda:</p>
 <pre><code class="language-bash">pip install cstag
 </code></pre>
 <pre><code class="language-bash">conda install -c bioconda cstag
 </code></pre>
-<h2 id="example">Example</h2>
-<pre><code class="language-python"># Convert short format of cs tag into long format
-import cstag
-cstag = &quot;cs:Z::4*ag:3&quot;
-cigar = &quot;8M&quot;
-seq = &quot;ACGTACGT&quot;
-cstag.lengthen(cstag, cigar, seq)
-# cs:Z:=ACGT*ag=CGT
+<h2 id="usage">Usage</h2>
+<pre><code class="language-python">import cstag
+cstag.shorten()
+cstag.lengthen()
 </code></pre>
-<h2 id="documentation">Documentation</h2>
-<p><a href="https://akikuno.github.io/cstag/cstag/cstag.html">https://akikuno.github.io/cstag/cstag/cstag.html</a></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -84,9 +78,8 @@ from .test import hello</code></pre>
 <div class="toc">
 <ul>
 <li><a href="#cstag">cstag</a><ul>
-<li><a href="#installation-underdevelopment">Installation (Underdevelopment🚧)</a></li>
-<li><a href="#example">Example</a></li>
-<li><a href="#documentation">Documentation</a></li>
+<li><a href="#install">Install</a></li>
+<li><a href="#usage">Usage</a></li>
 </ul>
 </li>
 </ul>
