@@ -1,4 +1,4 @@
-[![Licence](https://img.shields.io/badge/License-MIT-blue.svg&style=flat-square)](https://choosealicense.com/licenses/mit/)
+[![Licence](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://choosealicense.com/licenses/mit/)
 [![Test](https://img.shields.io/github/workflow/status/akikuno/cstag/Pytest?json&label=test&style=flat-square)](https://github.com/akikuno/cstag/actions)
 [![PyPI](https://img.shields.io/pypi/v/cstag.svg?color=brightgreen&style=flat-square)](https://pypi.org/project/cstag/)
 <!-- [![Bioconda](https://img.shields.io/badge/Install%20with-Bioconda-brightgreen.svg)](https://anaconda.org/bioconda/cstag) -->
