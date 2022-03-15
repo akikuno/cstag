@@ -29,7 +29,7 @@
 <pre><code class="python">import re
 import sys
 
-def shorten(CSTAG: str, SEQ: str) -&gt; str:
+def shorten(CSTAG: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **short** form
@@ -39,8 +39,7 @@ def shorten(CSTAG: str, SEQ: str) -&gt; str:
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;cs:Z:=ACGT*ag=CGT&#34;
-        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
-        &gt;&gt;&gt; cstag.shorten(cs, cigar, seq)
+        &gt;&gt;&gt; cstag.shorten(cs)
         cs:Z::4*ag:3
     &#34;&#34;&#34;
     cstag = re.split(r&#39;([-+*~=])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
@@ -185,7 +184,7 @@ cs:Z:=ACGT*ag=CGT
 </details>
 </dd>
 <dt id="cstag.cstag.shorten"><code class="name flex">
-<span>def <span class="ident">shorten</span></span>(<span>CSTAG: str, SEQ: str) ‑> str</span>
+<span>def <span class="ident">shorten</span></span>(<span>CSTAG: str) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert long format of cs tag into short format</p>
@@ -201,15 +200,14 @@ cs:Z:=ACGT*ag=CGT
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs = &quot;cs:Z:=ACGT*ag=CGT&quot;
-&gt;&gt;&gt; seq = &quot;ACGTACGT&quot;
-&gt;&gt;&gt; cstag.shorten(cs, cigar, seq)
+&gt;&gt;&gt; cstag.shorten(cs)
 cs:Z::4*ag:3
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def shorten(CSTAG: str, SEQ: str) -&gt; str:
+<pre><code class="python">def shorten(CSTAG: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **short** form
@@ -219,8 +217,7 @@ cs:Z::4*ag:3
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;cs:Z:=ACGT*ag=CGT&#34;
-        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
-        &gt;&gt;&gt; cstag.shorten(cs, cigar, seq)
+        &gt;&gt;&gt; cstag.shorten(cs)
         cs:Z::4*ag:3
     &#34;&#34;&#34;
     cstag = re.split(r&#39;([-+*~=])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
