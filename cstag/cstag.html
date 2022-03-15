@@ -29,18 +29,16 @@
 <pre><code class="python">import re
 import sys
 
-def shorten(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
+def shorten(CSTAG: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **short** form
-        - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
         - cs tag in **short** form
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;cs:Z:=ACGT*ag=CGT&#34;
-        &gt;&gt;&gt; cigar = &#34;8M&#34;
         &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
         &gt;&gt;&gt; cstag.shorten(cs, cigar, seq)
         cs:Z::4*ag:3
@@ -48,9 +46,6 @@ def shorten(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
     cstag = re.split(r&#39;([-+*~=])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
-
-    softclip = re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, CIGAR)
-    idx = int(softclip) if softclip.isdigit() else 0
 
     csshort = []
     for cs in cstag:
@@ -190,14 +185,13 @@ cs:Z:=ACGT*ag=CGT
 </details>
 </dd>
 <dt id="cstag.cstag.shorten"><code class="name flex">
-<span>def <span class="ident">shorten</span></span>(<span>CSTAG: str, CIGAR: str, SEQ: str) ‑> str</span>
+<span>def <span class="ident">shorten</span></span>(<span>CSTAG: str, SEQ: str) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert long format of cs tag into short format</p>
 <h2 id="args">Args</h2>
 <ul>
 <li>CSTAG (str): cs tag in <strong>short</strong> form</li>
-<li>CIGAR (str): CIGAR string (6th column in SAM file)</li>
 <li>SEQ (str): segment sequence (10th column in SAM file)</li>
 </ul>
 <h2 id="returns">Returns</h2>
@@ -207,7 +201,6 @@ cs:Z:=ACGT*ag=CGT
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs = &quot;cs:Z:=ACGT*ag=CGT&quot;
-&gt;&gt;&gt; cigar = &quot;8M&quot;
 &gt;&gt;&gt; seq = &quot;ACGTACGT&quot;
 &gt;&gt;&gt; cstag.shorten(cs, cigar, seq)
 cs:Z::4*ag:3
@@ -216,18 +209,16 @@ cs:Z::4*ag:3
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def shorten(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
+<pre><code class="python">def shorten(CSTAG: str, SEQ: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **short** form
-        - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
         - cs tag in **short** form
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;cs:Z:=ACGT*ag=CGT&#34;
-        &gt;&gt;&gt; cigar = &#34;8M&#34;
         &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
         &gt;&gt;&gt; cstag.shorten(cs, cigar, seq)
         cs:Z::4*ag:3
@@ -235,9 +226,6 @@ cs:Z::4*ag:3
     cstag = re.split(r&#39;([-+*~=])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
-
-    softclip = re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, CIGAR)
-    idx = int(softclip) if softclip.isdigit() else 0
 
     csshort = []
     for cs in cstag:

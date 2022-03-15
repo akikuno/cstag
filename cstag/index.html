@@ -25,15 +25,19 @@
 <section id="section-intro">
 <p><a href="https://choosealicense.com/licenses/mit/"><img alt="Licence" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
 <a href="https://github.com/akikuno/cstag/actions/workflows/test.yml?query=workflow%3APytest"><img alt="Test" src="https://github.com/akikuno/cstag/actions/workflows/test.yml/badge.svg"></a></p>
-<!-- [![PyPI](https://img.shields.io/badge/Install%20with-PyPI-brightgreen.svg)](https://pypi.org/project/calcs/) -->
-<!-- [![Bioconda](https://img.shields.io/badge/Install%20with-Bioconda-brightgreen.svg)](https://anaconda.org/bioconda/calcs) -->
+<!-- [![PyPI](https://img.shields.io/badge/Install%20with-PyPI-brightgreen.svg)](https://pypi.org/project/cstag/) -->
+<!-- [![Bioconda](https://img.shields.io/badge/Install%20with-Bioconda-brightgreen.svg)](https://anaconda.org/bioconda/cstag) -->
 <h1 id="cstag">cstag</h1>
 <p><code><a title="cstag.cstag" href="cstag.html">cstag.cstag</a></code> is a Python module to convert a <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tag</a> from short to long format, vice versa.</p>
-<h2 id="installation-underdevelopment">Installation (Underdevelopment👷🚧)</h2>
-<p>&lt;!&ndash; You can install <code><a title="cstag.cstag" href="cstag.html">cstag.cstag</a></code> using pip or conda:</p>
+<h2 id="installation">Installation</h2>
+<p>From <a href="https://pypi.org/project/cstag/">PyPI</a>:</p>
 <pre><code class="language-bash">pip install cstag
 </code></pre>
-<pre><code class="language-bash">conda install -c bioconda cstag
+<p>&lt;!&ndash; From <a href="https://anaconda.org/bioconda/cstag">Bioconda</a></p>
+<pre><code class="language-bash">conda config --add channels defaults
+conda config --add channels conda-forge
+conda config --add channels bioconda
+conda install -c bioconda cstag
 ``` --&gt;
 
 ## Example
@@ -82,7 +86,7 @@ from .cstag import lengthen as lengthen</code></pre>
 <div class="toc">
 <ul>
 <li><a href="#cstag">cstag</a><ul>
-<li><a href="#installation-underdevelopment">Installation (Underdevelopment👷🚧)</a></li>
+<li><a href="#installation">Installation</a></li>
 <li><a href="#documentation">Documentation</a></li>
 </ul>
 </li>
