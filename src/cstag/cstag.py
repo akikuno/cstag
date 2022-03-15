@@ -1,18 +1,16 @@
 import re
 import sys
 
-def shorten(CSTAG: str, CIGAR: str, SEQ: str) -> str:
+def shorten(CSTAG: str, SEQ: str) -> str:
     """Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **short** form
-        - CIGAR (str): CIGAR string (6th column in SAM file)
         - SEQ (str): segment sequence (10th column in SAM file)
     Returns:
         - cs tag in **short** form
     Example:
         >>> import cstag
         >>> cs = "cs:Z:=ACGT*ag=CGT"
-        >>> cigar = "8M"
         >>> seq = "ACGTACGT"
         >>> cstag.shorten(cs, cigar, seq)
         cs:Z::4*ag:3
@@ -20,9 +18,6 @@ def shorten(CSTAG: str, CIGAR: str, SEQ: str) -> str:
     cstag = re.split(r'([-+*~=])', CSTAG.replace("cs:Z:", ""))[1:]
     cstag = iter(cstag)
     cstag = [i+j for i,j in zip(cstag, cstag)]
-
-    softclip = re.sub(r"^([0-9]+)S.*", r"\1", CIGAR)
-    idx = int(softclip) if softclip.isdigit() else 0
 
     csshort = []
     for cs in cstag:
