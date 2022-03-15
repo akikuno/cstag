@@ -1,7 +1,7 @@
 import re
 import sys
 
-def shorten(CSTAG: str, SEQ: str) -> str:
+def shorten(CSTAG: str) -> str:
     """Convert long format of cs tag into short format
     Args:
         - CSTAG (str): cs tag in **short** form
@@ -11,8 +11,7 @@ def shorten(CSTAG: str, SEQ: str) -> str:
     Example:
         >>> import cstag
         >>> cs = "cs:Z:=ACGT*ag=CGT"
-        >>> seq = "ACGTACGT"
-        >>> cstag.shorten(cs, cigar, seq)
+        >>> cstag.shorten(cs)
         cs:Z::4*ag:3
     """
     cstag = re.split(r'([-+*~=])', CSTAG.replace("cs:Z:", ""))[1:]
