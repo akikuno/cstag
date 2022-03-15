@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="cstag",
-    version="0.0.2",
+    version="0.0.3",
     author="Akihiro Kuno",
     author_email="akuno@md.tsukuba.ac.jp",
     description="Convert cstag format from short to long, vice versa",
