@@ -2,5 +2,5 @@
 .. include:: ../../README.md
 """
 
-from .cstag import shorten as shorten
-from .cstag import lengthen as lengthen
+from .length import shorten, lengthen
+from .cons import consensus
