@@ -3,11 +3,24 @@ from itertools import chain
 from collections import deque, Counter
 
 def consensus(CSTAG: list, CIGAR: list, POS: list) -> str:
-    """
-    ###
+    """generate consensus of cs tags
+    Args:
+        - CSTAG (list): cs tags in **long** format
+    Returns:
+        - a consensus of cs tag in **long** format
+    Example:
+        >>> import cstag
+        >>> cs = ["cs:Z:=ACGT", "cs:Z:=AC*gt=T", "cs:Z:=C*gt=T", "cs:Z:=C*gt=T", "cs:Z:=ACT+ccc=T"]
+        >>> cigar = ["4M","4M","1S3M", "3M", "3M3I1M"]
+        >>> pos = [6,6,6,7,6]
+        >>> cstag.consensus(cs, cigar, pos)
+        cs:Z:=AC*gt*T
     """
     if not (len(CSTAG) == len(CIGAR) == len(POS)):
         raise Exception("Error: Element numbers of each argument must be the same")
+
+    if not all(re.search(r"[ACGT]", cs) for cs in CSTAG):
+        raise Exception("Error: cs tag must be a long format")
 
     pos_min = min(POS)
     pos = [pos - pos_min for pos in POS]
