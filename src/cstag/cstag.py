@@ -14,8 +14,7 @@ def shorten(CSTAG: str) -> str:
         cs:Z::4*ag:3
     """
     cstags = re.split(r'([-+*~=])', CSTAG.replace("cs:Z:", ""))[1:]
-    cstags = iter(cstags)
-    cstags = [i+j for i,j in zip(cstags, cstags)]
+    cstags = [i+j for i,j in zip(cstags[0::2], cstags[1::2])]
 
     csshort = []
     for cs in cstags:
@@ -50,8 +49,7 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
         raise Exception("Error: input cs tag is not short format")
 
     cstags = re.split(r'([-+*~:])', CSTAG.replace("cs:Z:", ""))[1:]
-    cstags = iter(cstags)
-    cstags = [i+j for i,j in zip(cstags, cstags)]
+    cstags = [i+j for i,j in zip(cstags[0::2], cstags[1::2])]
 
     softclip = re.sub(r"^([0-9]+)S.*", r"\1", CIGAR)
     idx = int(softclip) if softclip.isdigit() else 0
