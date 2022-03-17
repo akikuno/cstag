@@ -28,7 +28,14 @@
 <a href="https://pypi.org/project/cstag/"><img alt="PyPI" src="https://img.shields.io/pypi/v/cstag.svg?color=brightgreen&amp;style=flat-square"></a></p>
 <!-- [![Bioconda](https://img.shields.io/badge/Install%20with-Bioconda-brightgreen.svg)](https://anaconda.org/bioconda/cstag) -->
 <h1 id="cstag">cstag</h1>
-<p><code><a title="cstag.cstag" href="cstag.html">cstag.cstag</a></code> is a Python module to convert a <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tag</a> from short to long format, vice versa.</p>
+<p><code><a title="cstag" href="#cstag">cstag</a></code> is a Python module to manipulate <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tag</a>.</p>
+<ul>
+<li><code>cstag.shorten()</code>: to convert a cs tag from long to short format</li>
+<li><code>cstag.lengthen()</code>: to convert a cs tag from short to long format</li>
+<li><code>cstag.to_consensus()</code>: to generate a consensus cs tag from multiple cs tags (under-development:construction_worker:)</li>
+<li><code>cstag.to_html()</code>: to output html report (under-development:construction_worker:)</li>
+<li><code>cstag.to_mids()</code>: to convert cs tag into <a href="https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.">compressed MIDS format</a> (under-development:construction_worker:)</li>
+</ul>
 <h2 id="installation">Installation</h2>
 <p>From <a href="https://pypi.org/project/cstag/">PyPI</a>:</p>
 <pre><code class="language-bash">pip install cstag
@@ -61,14 +68,18 @@ cstag.lengthen(cs, cigar, seq)
 .. include:: ../../README.md
 &#34;&#34;&#34;
 
-from .cstag import shorten as shorten
-from .cstag import lengthen as lengthen</code></pre>
+from .length import shorten, lengthen
+from .cons import consensus</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt><code class="name"><a title="cstag.cstag" href="cstag.html">cstag.cstag</a></code></dt>
+<dt><code class="name"><a title="cstag.cons" href="cons.html">cstag.cons</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="cstag.length" href="length.html">cstag.length</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -95,7 +106,8 @@ from .cstag import lengthen as lengthen</code></pre>
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
-<li><code><a title="cstag.cstag" href="cstag.html">cstag.cstag</a></code></li>
+<li><code><a title="cstag.cons" href="cons.html">cstag.cons</a></code></li>
+<li><code><a title="cstag.length" href="length.html">cstag.length</a></code></li>
 </ul>
 </li>
 </ul>
