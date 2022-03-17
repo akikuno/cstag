@@ -8,7 +8,7 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -> str:
         CSTAG (list): cs tags in the **long** format
         CIGAR (list): CIGAR strings (6th column in SAM file)
         POS (list): 1-based leftmost mapping position (4th column in SAM file)
-    Returns:
+    Return:
         str: a consensus of cs tag in the **long** format
     Example:
         >>> import cstag

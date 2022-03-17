@@ -5,7 +5,7 @@ def shorten(CSTAG: str) -> str:
     """Convert long format of cs tag into short format
     Args:
         CSTAG (str): cs tag in the **long** format
-    Returns:
+    Return:
         str: cs tag in the **short** format
     Example:
         >>> import cstag
@@ -33,7 +33,7 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
         CSTAG (str): cs tag in **short** form
         CIGAR (str): CIGAR string (6th column in SAM file)
         SEQ (str): segment sequence (10th column in SAM file)
-    Returns:
+    Return:
         str: cs tag in **long** form
 
     Example:
