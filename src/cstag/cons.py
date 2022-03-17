@@ -5,9 +5,11 @@ from collections import deque, Counter
 def consensus(CSTAG: list, CIGAR: list, POS: list) -> str:
     """generate consensus of cs tags
     Args:
-        - CSTAG (list): cs tags in **long** format
+        CSTAG (list): cs tags in the **long** format
+        CIGAR (list): CIGAR strings (6th column in SAM file)
+        POS (list): 1-based leftmost mapping position (4th column in SAM file)
     Returns:
-        - a consensus of cs tag in **long** format
+        str: a consensus of cs tag in the **long** format
     Example:
         >>> import cstag
         >>> cs = ["cs:Z:=ACGT", "cs:Z:=AC*gt=T", "cs:Z:=C*gt=T", "cs:Z:=C*gt=T", "cs:Z:=ACT+ccc=T"]
