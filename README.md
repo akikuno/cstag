@@ -11,7 +11,7 @@
 
 - `cstag.shorten()`: to convert a cs tag from long to short format
 - `cstag.lengthen()`: to convert a cs tag from short to long format
-- `cstag.to_consensus()`: to generate a consensus cs tag from multiple cs tags
+- `cstag.consensus()`: to generate a consensus cs tag from multiple cs tags
 - `cstag.to_html()`: to output html report (under-development:construction_worker:)
 - `cstag.to_mids()`: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:)
 
