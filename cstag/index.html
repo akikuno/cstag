@@ -52,15 +52,34 @@ conda install -c bioconda cstag
 ## Example
 
 ```python
+import cstag
+
+&quot;&quot;&quot;
+Convert long format of cs tag into short format
+&quot;&quot;&quot;
+cs = &quot;cs:Z:=ACGT*ag=CGT&quot;
+cstag.shorten(cs)
+# =&gt; cs:Z::4*ag:3
+
+
 &quot;&quot;&quot;
 Convert short format of cs tag into long format
 &quot;&quot;&quot;
-import cstag
 cs = &quot;cs:Z::4*ag:3&quot;
 cigar = &quot;8M&quot;
 seq = &quot;ACGTACGT&quot;
 cstag.lengthen(cs, cigar, seq)
-# cs:Z:=ACGT*ag=CGT
+# =&gt; cs:Z:=ACGT*ag=CGT
+
+
+&quot;&quot;&quot;
+Generate consensus of multiple cs tags
+&quot;&quot;&quot;
+cs_list = [&quot;cs:Z:=ACGT&quot;, &quot;cs:Z:=AC*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=ACT+ccc=T&quot;]
+cigar_list = [&quot;4M&quot;, &quot;4M&quot;, &quot;1S3M&quot;, &quot;3M&quot;, &quot;3M3I1M&quot;]
+pos_list = [1, 1, 1, 2, 1]
+cstag.consensus(cs_list, cigar_list, pos)
+# =&gt; cs:Z:=AC*gt*T
 </code></pre>
 <details class="source">
 <summary>

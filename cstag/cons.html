@@ -40,10 +40,10 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -&gt; str:
         str: a consensus of cs tag in the **long** format
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; cs = [&#34;cs:Z:=ACGT&#34;, &#34;cs:Z:=AC*gt=T&#34;, &#34;cs:Z:=C*gt=T&#34;, &#34;cs:Z:=C*gt=T&#34;, &#34;cs:Z:=ACT+ccc=T&#34;]
-        &gt;&gt;&gt; cigar = [&#34;4M&#34;,&#34;4M&#34;,&#34;1S3M&#34;, &#34;3M&#34;, &#34;3M3I1M&#34;]
-        &gt;&gt;&gt; pos = [6,6,6,7,6]
-        &gt;&gt;&gt; cstag.consensus(cs, cigar, pos)
+        &gt;&gt;&gt; cs_list = [&#34;cs:Z:=ACGT&#34;, &#34;cs:Z:=AC*gt=T&#34;, &#34;cs:Z:=C*gt=T&#34;, &#34;cs:Z:=C*gt=T&#34;, &#34;cs:Z:=ACT+ccc=T&#34;]
+        &gt;&gt;&gt; cigar_list = [&#34;4M&#34;,&#34;4M&#34;,&#34;1S3M&#34;, &#34;3M&#34;, &#34;3M3I1M&#34;]
+        &gt;&gt;&gt; pos_list = [6,6,6,7,6]
+        &gt;&gt;&gt; cstag.consensus(cs_list, cigar_list, pos)
         cs:Z:=AC*gt*T
     &#34;&#34;&#34;
     if not (len(CSTAG) == len(CIGAR) == len(POS)):
@@ -123,10 +123,10 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -&gt; str:
 </dl>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; cs = [&quot;cs:Z:=ACGT&quot;, &quot;cs:Z:=AC*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=ACT+ccc=T&quot;]
-&gt;&gt;&gt; cigar = [&quot;4M&quot;,&quot;4M&quot;,&quot;1S3M&quot;, &quot;3M&quot;, &quot;3M3I1M&quot;]
-&gt;&gt;&gt; pos = [6,6,6,7,6]
-&gt;&gt;&gt; cstag.consensus(cs, cigar, pos)
+&gt;&gt;&gt; cs_list = [&quot;cs:Z:=ACGT&quot;, &quot;cs:Z:=AC*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=ACT+ccc=T&quot;]
+&gt;&gt;&gt; cigar_list = [&quot;4M&quot;,&quot;4M&quot;,&quot;1S3M&quot;, &quot;3M&quot;, &quot;3M3I1M&quot;]
+&gt;&gt;&gt; pos_list = [6,6,6,7,6]
+&gt;&gt;&gt; cstag.consensus(cs_list, cigar_list, pos)
 cs:Z:=AC*gt*T
 </code></pre></div>
 <details class="source">
@@ -143,10 +143,10 @@ cs:Z:=AC*gt*T
         str: a consensus of cs tag in the **long** format
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; cs = [&#34;cs:Z:=ACGT&#34;, &#34;cs:Z:=AC*gt=T&#34;, &#34;cs:Z:=C*gt=T&#34;, &#34;cs:Z:=C*gt=T&#34;, &#34;cs:Z:=ACT+ccc=T&#34;]
-        &gt;&gt;&gt; cigar = [&#34;4M&#34;,&#34;4M&#34;,&#34;1S3M&#34;, &#34;3M&#34;, &#34;3M3I1M&#34;]
-        &gt;&gt;&gt; pos = [6,6,6,7,6]
-        &gt;&gt;&gt; cstag.consensus(cs, cigar, pos)
+        &gt;&gt;&gt; cs_list = [&#34;cs:Z:=ACGT&#34;, &#34;cs:Z:=AC*gt=T&#34;, &#34;cs:Z:=C*gt=T&#34;, &#34;cs:Z:=C*gt=T&#34;, &#34;cs:Z:=ACT+ccc=T&#34;]
+        &gt;&gt;&gt; cigar_list = [&#34;4M&#34;,&#34;4M&#34;,&#34;1S3M&#34;, &#34;3M&#34;, &#34;3M3I1M&#34;]
+        &gt;&gt;&gt; pos_list = [6,6,6,7,6]
+        &gt;&gt;&gt; cstag.consensus(cs_list, cigar_list, pos)
         cs:Z:=AC*gt*T
     &#34;&#34;&#34;
     if not (len(CSTAG) == len(CIGAR) == len(POS)):
