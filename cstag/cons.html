@@ -36,7 +36,7 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -&gt; str:
         CSTAG (list): cs tags in the **long** format
         CIGAR (list): CIGAR strings (6th column in SAM file)
         POS (list): 1-based leftmost mapping position (4th column in SAM file)
-    Returns:
+    Return:
         str: a consensus of cs tag in the **long** format
     Example:
         &gt;&gt;&gt; import cstag
@@ -116,11 +116,8 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -&gt; str:
 <dt><strong><code>POS</code></strong> :&ensp;<code>list</code></dt>
 <dd>1-based leftmost mapping position (4th column in SAM file)</dd>
 </dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>str</code></dt>
-<dd>a consensus of cs tag in the <strong>long</strong> format</dd>
-</dl>
+<h2 id="return">Return</h2>
+<p>str: a consensus of cs tag in the <strong>long</strong> format</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs_list = [&quot;cs:Z:=ACGT&quot;, &quot;cs:Z:=AC*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=ACT+ccc=T&quot;]
@@ -139,7 +136,7 @@ cs:Z:=AC*gt*T
         CSTAG (list): cs tags in the **long** format
         CIGAR (list): CIGAR strings (6th column in SAM file)
         POS (list): 1-based leftmost mapping position (4th column in SAM file)
-    Returns:
+    Return:
         str: a consensus of cs tag in the **long** format
     Example:
         &gt;&gt;&gt; import cstag

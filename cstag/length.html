@@ -33,7 +33,7 @@ def shorten(CSTAG: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
         CSTAG (str): cs tag in the **long** format
-    Returns:
+    Return:
         str: cs tag in the **short** format
     Example:
         &gt;&gt;&gt; import cstag
@@ -61,7 +61,7 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
         CSTAG (str): cs tag in **short** form
         CIGAR (str): CIGAR string (6th column in SAM file)
         SEQ (str): segment sequence (10th column in SAM file)
-    Returns:
+    Return:
         str: cs tag in **long** form
 
     Example:
@@ -121,11 +121,8 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
 <dt><strong><code>SEQ</code></strong> :&ensp;<code>str</code></dt>
 <dd>segment sequence (10th column in SAM file)</dd>
 </dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>str</code></dt>
-<dd>cs tag in <strong>long</strong> form</dd>
-</dl>
+<h2 id="return">Return</h2>
+<p>str: cs tag in <strong>long</strong> form</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs = &quot;cs:Z::4*ag:3&quot;
@@ -144,7 +141,7 @@ cs:Z:=ACGT*ag=CGT
         CSTAG (str): cs tag in **short** form
         CIGAR (str): CIGAR string (6th column in SAM file)
         SEQ (str): segment sequence (10th column in SAM file)
-    Returns:
+    Return:
         str: cs tag in **long** form
 
     Example:
@@ -193,11 +190,8 @@ cs:Z:=ACGT*ag=CGT
 <dt><strong><code>CSTAG</code></strong> :&ensp;<code>str</code></dt>
 <dd>cs tag in the <strong>long</strong> format</dd>
 </dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>str</code></dt>
-<dd>cs tag in the <strong>short</strong> format</dd>
-</dl>
+<h2 id="return">Return</h2>
+<p>str: cs tag in the <strong>short</strong> format</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs = &quot;cs:Z:=ACGT*ag=CGT&quot;
@@ -212,7 +206,7 @@ cs:Z::4*ag:3
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
         CSTAG (str): cs tag in the **long** format
-    Returns:
+    Return:
         str: cs tag in the **short** format
     Example:
         &gt;&gt;&gt; import cstag

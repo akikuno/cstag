@@ -51,6 +51,7 @@ conda install -c bioconda cstag
 
 ## Example
 
+### Shorten/Lengthen
 ```python
 import cstag
 
@@ -70,17 +71,25 @@ cigar = &quot;8M&quot;
 seq = &quot;ACGTACGT&quot;
 cstag.lengthen(cs, cigar, seq)
 # =&gt; cs:Z:=ACGT*ag=CGT
-
-
-&quot;&quot;&quot;
-Generate consensus of multiple cs tags
-&quot;&quot;&quot;
+</code></pre>
+<h3 id="call-consensus">Call consensus</h3>
+<pre><code class="language-python">import cstag
 cs_list = [&quot;cs:Z:=ACGT&quot;, &quot;cs:Z:=AC*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=ACT+ccc=T&quot;]
 cigar_list = [&quot;4M&quot;, &quot;4M&quot;, &quot;1S3M&quot;, &quot;3M&quot;, &quot;3M3I1M&quot;]
 pos_list = [1, 1, 1, 2, 1]
 cstag.consensus(cs_list, cigar_list, pos)
 # =&gt; cs:Z:=AC*gt*T
 </code></pre>
+<h3 id="output-html-report">Output HTML report</h3>
+<pre><code class="language-python">import cstag
+cs = &quot;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
+output = &quot;report&quot;
+description = &quot;Example&quot;
+cstag.to_html(cs, output, description)
+# =&gt; Output &quot;report.html&quot;
+</code></pre>
+<p>The <code>report.html</code> is :point_down:</p>
+<p><img width="414" alt="example_report" src="https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png"></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -90,13 +99,18 @@ cstag.consensus(cs_list, cigar_list, pos)
 &#34;&#34;&#34;
 
 from .length import shorten, lengthen
-from .cons import consensus</code></pre>
+from .cons import consensus
+from .convert import to_html</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
 <dt><code class="name"><a title="cstag.cons" href="cons.html">cstag.cons</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="cstag.convert" href="convert.html">cstag.convert</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -118,7 +132,11 @@ from .cons import consensus</code></pre>
 <div class="toc">
 <ul>
 <li><a href="#cstag">cstag</a><ul>
-<li><a href="#installation">Installation</a></li>
+<li><a href="#installation">Installation</a><ul>
+<li><a href="#call-consensus">Call consensus</a></li>
+<li><a href="#output-html-report">Output HTML report</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -127,6 +145,7 @@ from .cons import consensus</code></pre>
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="cstag.cons" href="cons.html">cstag.cons</a></code></li>
+<li><code><a title="cstag.convert" href="convert.html">cstag.convert</a></code></li>
 <li><code><a title="cstag.length" href="length.html">cstag.length</a></code></li>
 </ul>
 </li>
