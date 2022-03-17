@@ -34,6 +34,7 @@ conda install -c bioconda cstag
 
 ## Example
 
+### Shorten/Lengthen
 ```python
 import cstag
 
@@ -53,14 +54,29 @@ cigar = "8M"
 seq = "ACGTACGT"
 cstag.lengthen(cs, cigar, seq)
 # => cs:Z:=ACGT*ag=CGT
+```
 
+### Call consensus
 
-"""
-Generate consensus of multiple cs tags
-"""
+```python
+import cstag
 cs_list = ["cs:Z:=ACGT", "cs:Z:=AC*gt=T", "cs:Z:=C*gt=T", "cs:Z:=C*gt=T", "cs:Z:=ACT+ccc=T"]
 cigar_list = ["4M", "4M", "1S3M", "3M", "3M3I1M"]
 pos_list = [1, 1, 1, 2, 1]
 cstag.consensus(cs_list, cigar_list, pos)
 # => cs:Z:=AC*gt*T
 ```
+
+### Output HTML report
+
+```python
+import cstag
+cs = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+output = "report"
+description = "Example"
+cstag.to_html(cs, output, description)
+# => Output "report.html"
+```
+The `report.html` is :point_down:
+
+<img width="414" alt="example_report" src="https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png">
