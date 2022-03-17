@@ -12,10 +12,10 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -> str:
         str: a consensus of cs tag in the **long** format
     Example:
         >>> import cstag
-        >>> cs = ["cs:Z:=ACGT", "cs:Z:=AC*gt=T", "cs:Z:=C*gt=T", "cs:Z:=C*gt=T", "cs:Z:=ACT+ccc=T"]
-        >>> cigar = ["4M","4M","1S3M", "3M", "3M3I1M"]
-        >>> pos = [6,6,6,7,6]
-        >>> cstag.consensus(cs, cigar, pos)
+        >>> cs_list = ["cs:Z:=ACGT", "cs:Z:=AC*gt=T", "cs:Z:=C*gt=T", "cs:Z:=C*gt=T", "cs:Z:=ACT+ccc=T"]
+        >>> cigar_list = ["4M","4M","1S3M", "3M", "3M3I1M"]
+        >>> pos_list = [6,6,6,7,6]
+        >>> cstag.consensus(cs_list, cigar_list, pos)
         cs:Z:=AC*gt*T
     """
     if not (len(CSTAG) == len(CIGAR) == len(POS)):
