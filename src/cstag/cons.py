@@ -41,12 +41,12 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -> str:
         cs = list(chain.from_iterable(cs))
         cs_list.append(deque(cs))
 
-    cs_maxlen = max(len(c) for c in cs_list)
+    cs_maxlen = max(len(cs)+start for cs, start in zip(cs_list, starts))
     for i, (cs, start) in enumerate(zip(cs_list, starts)):
         if start:
-            cs_list[i].appendleft("N" * start)
+            cs_list[i].extendleft(["N"] * start)
         if len(cs_list[i]) < cs_maxlen:
-            cs_list[i].append("N" * cs_maxlen - len(cs_list[i]))
+            cs_list[i].extend(["N"] * (cs_maxlen - len(cs_list[i])))
 
     def get_consensus(cs: tuple) -> str:
         """
@@ -62,4 +62,4 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -> str:
     cs_consensus = [get_consensus(cs) for cs in list(zip(*cs_list))]
     cs_consensus = "".join(cs_consensus)
 
-    return "cs:Z:" + re.sub(r"([ACGT]+)", r"=\1", cs_consensus)
+    return "cs:Z:" + re.sub(r"([ACGTN]+)", r"=\1", cs_consensus)
