@@ -56,18 +56,14 @@ conda install -c bioconda cstag
 ```python
 import cstag
 
-&quot;&quot;&quot;
-Convert long format of cs tag into short format
-&quot;&quot;&quot;
+# Convert a cs tag from long to short
 cs = &quot;cs:Z:=ACGT*ag=CGT&quot;
 
 cstag.shorten(cs)
 # =&gt; cs:Z::4*ag:3
 
 
-&quot;&quot;&quot;
-Convert short format of cs tag into long format
-&quot;&quot;&quot;
+# Convert a cs tag from short to long
 cs = &quot;cs:Z::4*ag:3&quot;
 cigar = &quot;8M&quot;
 seq = &quot;ACGTACGT&quot;
