@@ -3,7 +3,7 @@
 [![Test](https://img.shields.io/github/workflow/status/akikuno/cstag/Pytest?json&label=Test&color=brightgreen&style=flat-square)](https://github.com/akikuno/cstag/actions)
 [![Python](https://img.shields.io/pypi/pyversions/cstag.svg?label=Python&color=blue&style=flat-square)](https://pypi.org/project/cstag/)
 [![PyPI](https://img.shields.io/pypi/v/cstag.svg?label=PyPI&color=orange&style=flat-square)](https://pypi.org/project/cstag/)
-<!-- [![Bioconda](https://img.shields.io/badge/Install%20with-Bioconda-brightgreen.svg)](https://anaconda.org/bioconda/cstag) -->
+[![Bioconda](https://img.shields.io/conda/v/bioconda/cstag?label=Bioconda&color=orange&style=flat-square)](https://anaconda.org/bioconda/cstag)
 
 # cstag
 
@@ -23,14 +23,15 @@ From [PyPI](https://pypi.org/project/cstag/):
 pip install cstag
 ```
 
-<!-- From [Bioconda](https://anaconda.org/bioconda/cstag)
+From [Bioconda](https://anaconda.org/bioconda/cstag)
 
 ```bash
 conda config --add channels defaults
 conda config --add channels conda-forge
 conda config --add channels bioconda
-conda install -c bioconda cstag
-``` -->
+
+conda install cstag
+```
 
 ## Examples
 

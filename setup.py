@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.1.1",
     author="Akihiro Kuno",
     author_email="akuno@md.tsukuba.ac.jp",
-    description="Convert cstag format from short to long, vice versa",
+    description="Python module to manipulate the minimap2's CS tag",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/akikuno/cstag",
