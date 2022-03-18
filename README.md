@@ -43,6 +43,7 @@ import cstag
 Convert long format of cs tag into short format
 """
 cs = "cs:Z:=ACGT*ag=CGT"
+
 cstag.shorten(cs)
 # => cs:Z::4*ag:3
 
@@ -53,6 +54,7 @@ Convert short format of cs tag into long format
 cs = "cs:Z::4*ag:3"
 cigar = "8M"
 seq = "ACGTACGT"
+
 cstag.lengthen(cs, cigar, seq)
 # => cs:Z:=ACGT*ag=CGT
 ```
@@ -61,9 +63,11 @@ cstag.lengthen(cs, cigar, seq)
 
 ```python
 import cstag
+
 cs_list = ["cs:Z:=ACGT", "cs:Z:=AC*gt=T", "cs:Z:=C*gt=T", "cs:Z:=C*gt=T", "cs:Z:=ACT+ccc=T"]
 cigar_list = ["4M", "4M", "1S3M", "3M", "3M3I1M"]
 pos_list = [1, 1, 1, 2, 1]
+
 cstag.consensus(cs_list, cigar_list, pos)
 # => cs:Z:=AC*gt*T
 ```
@@ -72,9 +76,11 @@ cstag.consensus(cs_list, cigar_list, pos)
 
 ```python
 import cstag
+
 cs = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
 output = "report"
 description = "Example"
+
 cstag.to_html(cs, output, description)
 # => Output "report.html"
 ```
