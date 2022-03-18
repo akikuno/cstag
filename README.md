@@ -23,7 +23,7 @@ From [PyPI](https://pypi.org/project/cstag/):
 pip install cstag
 ```
 
-From [Bioconda](https://anaconda.org/bioconda/cstag)
+From [Bioconda](https://anaconda.org/bioconda/cstag):
 
 ```bash
 conda config --add channels defaults
