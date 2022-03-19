@@ -12,8 +12,11 @@
 - `cstag.shorten()`: to convert a cs tag from long to short format
 - `cstag.lengthen()`: to convert a cs tag from short to long format
 - `cstag.consensus()`: to generate a consensus cs tag from multiple cs tags
+- `cstag.mask()`: to mask low-quality bases in a cs tag
 - `cstag.to_html()`: to output html report
 <!-- - `cstag.to_mids()`: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:) -->
+
+See [documentation](https://akikuno.github.io/cstag/cstag/) for more information.
 
 ## Installation
 
@@ -67,6 +70,18 @@ pos_list = [1, 1, 1, 2, 1]
 
 cstag.consensus(cs_list, cigar_list, pos_list)
 # => cs:Z:=AC*gt*T
+```
+
+### Mask low-quality bases in a cs tag
+
+```python
+import cstag
+
+cs = "cs:Z:=ACGT*ac+gg-cc=T"
+qual = "AA!!!!AA"
+phred_threshold = 10
+cstag.mask(cs, qual, phred_threshold)
+# => cs:Z:=ACNN*an+ng-cc=T
 ```
 
 ### Output HTML report
