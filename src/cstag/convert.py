@@ -1,7 +1,7 @@
 import re
 
 def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
-    """Convert long format of cs tag into short format
+    """Output HTML file showing a sequence with mutations colored
     Args:
         CSTAG (str): cs tag in the **long** format
         OUTPUT_FILE_NAME (str): output file name
@@ -16,8 +16,6 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
         >>> cstag.to_html(CSTAG, OUTPUT, DESCRIPTION)
         https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
     """
-    import re
-
     if not re.search(r"[ACGT]", CSTAG):
         raise Exception("Error: cs tag must be a long format")
 
