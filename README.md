@@ -65,7 +65,7 @@ cs_list = ["cs:Z:=ACGT", "cs:Z:=AC*gt=T", "cs:Z:=C*gt=T", "cs:Z:=C*gt=T", "cs:Z:
 cigar_list = ["4M", "4M", "1S3M", "3M", "3M3I1M"]
 pos_list = [1, 1, 1, 2, 1]
 
-cstag.consensus(cs_list, cigar_list, pos)
+cstag.consensus(cs_list, cigar_list, pos_list)
 # => cs:Z:=AC*gt*T
 ```
 
