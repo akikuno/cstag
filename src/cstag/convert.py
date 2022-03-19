@@ -1,5 +1,6 @@
 import re
 
+
 def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
     """Output HTML file showing a sequence with mutations colored
     Args:
@@ -82,7 +83,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
     <body>
     """
 
-    html_legend ="""
+    html_legend = """
     <p class = "p_legend">
     Labels:
     <span class="Ins">Insertion</span>
@@ -94,7 +95,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
     <hr>
     """
 
-    html_footer ="""
+    html_footer = """
     </body>
     </html>
     """
@@ -104,8 +105,8 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
         description = f"<h1>{description}</h1>"
 
     cs = CSTAG.replace("cs:Z:", "")
-    list_cs = re.split(r'([-+*~=])', cs)[1:]
-    list_cs = [i+j for i,j in zip(list_cs[0::2], list_cs[1::2])]
+    list_cs = re.split(r"([-+*~=])", cs)[1:]
+    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
     html_cs = []
     for cs in list_cs:
@@ -124,17 +125,18 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
             right = cs[-2:].upper()
             html_cs.append(f"<span class='Splice'>{left + splice + right}</span>")
 
-
     html_cs = "".join(html_cs)
     html_cs = f"<p class='p_seq'>{html_cs}</p>"
 
-    report = "\n".join([
-        html_header,
-        description,
-        html_legend,
-        html_cs,
-        html_footer,
-    ])
+    report = "\n".join(
+        [
+            html_header,
+            description,
+            html_legend,
+            html_cs,
+            html_footer,
+        ]
+    )
 
-    with open(OUTPUT_FILE_NAME + '.html', 'w') as f:
+    with open(OUTPUT_FILE_NAME + ".html", "w") as f:
         f.write(report)

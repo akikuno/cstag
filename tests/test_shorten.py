@@ -1,6 +1,7 @@
 import re
 from src.cstag import shorten
 
+
 def test_softclip():
     CSTAG = "cs:Z:=ATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     CIGAR = "90M"
@@ -16,12 +17,14 @@ def test_substitution():
     csshort = "cs:Z::49*ag:50"
     assert shorten(CSTAG) == csshort
 
+
 def test_deletion():
     SEQ = "ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     csshort = "cs:Z::39-aagtgacgct:51"
     CIGAR = "39M10D51M"
     CSTAG = "cs:Z:=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCC-aagtgacgct=AGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     assert shorten(CSTAG) == csshort
+
 
 def test_insertion():
     SEQ = "ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTCCCCCCCCCCAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
@@ -30,6 +33,7 @@ def test_insertion():
     CSTAG = "cs:Z:=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCT+cccccccccc=AGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     assert shorten(CSTAG) == csshort
 
+
 def test_splicing():
     SEQ = "GTAGGTTGTGAGATGCGGGAGAGGTTCTCGATCTTCCCGTGGGACGTCAACCTTTCCCTTGATAAAGCATCCCGCTCGGGTATGGCAGTGAGTACGCCTTCTGAATTGTGCTATCCTTCGTCCTTATCAAAGCTTGCTACCAATAATTAGGATTATTGCCTTGCGACAGACTTCCTACTCACACTCCCTCACATTGAGCTACTCGATGGGCGATTAGCTTGACCCGCTCTGTAGGGTCGCGACTACGTGACTAAGAGTAGGCCGGGAGTGTAGACCTTTGGGGTTGAATAAATCTATTGTACTAATCGGCTTCAACGAGCCGTACAGGTGGCACCTCAGGAGGGGCCCGCAGGGAGGAAGTAAACTGCTATTCGTCGCCGTTGGTGGTAACTAATTGTGTTCCTTGCCACTACAATTGTATCTAAGCCGTGTAATGAGAACAACCACACCTTAGCGAATTGATGCGCCGCTTCGGAATACCGTTTTGGCTACCCGTTAC"
     csshort = "cs:Z::250~gc1001ag:249"
@@ -37,12 +41,14 @@ def test_splicing():
     CSTAG = "cs:Z:=GTAGGTTGTGAGATGCGGGAGAGGTTCTCGATCTTCCCGTGGGACGTCAACCTTTCCCTTGATAAAGCATCCCGCTCGGGTATGGCAGTGAGTACGCCTTCTGAATTGTGCTATCCTTCGTCCTTATCAAAGCTTGCTACCAATAATTAGGATTATTGCCTTGCGACAGACTTCCTACTCACACTCCCTCACATTGAGCTACTCGATGGGCGATTAGCTTGACCCGCTCTGTAGGGTCGCGACTACGTGA~gc1001ag=CTAAGAGTAGGCCGGGAGTGTAGACCTTTGGGGTTGAATAAATCTATTGTACTAATCGGCTTCAACGAGCCGTACAGGTGGCACCTCAGGAGGGGCCCGCAGGGAGGAAGTAAACTGCTATTCGTCGCCGTTGGTGGTAACTAATTGTGTTCCTTGCCACTACAATTGTATCTAAGCCGTGTAATGAGAACAACCACACCTTAGCGAATTGATGCGCCGCTTCGGAATACCGTTTTGGCTACCCGTTAC"
     assert shorten(CSTAG) == csshort
 
+
 def test_5bpIns_3bp_Del():
     SEQ = "ACTGTGCGGCATACTTAATGGGGGTATACATTTGAAACGCGCCCTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     csshort = "cs:Z::19+ggggg:20-aag:58"
     CIGAR = "19M5I20M3D58M"
     CSTAG = "cs:Z:=ACTGTGCGGCATACTTAAT+ggggg=TATACATTTGAAACGCGCCC-aag=TGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     assert shorten(CSTAG) == csshort
+
 
 def test_first_5nt_del_softclip_5nt():
     SEQ = "TTTTTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
@@ -67,21 +73,35 @@ def test_softclip_plusminus_10nt():
     CSTAG = "cs:Z:=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     assert shorten(CSTAG) == csshort
 
-def test_real():
 
+def test_real():
     def call_cs_cigar_seq(content):
-        names = ["QNAME", "FLAG", "RNAME", "POS", "MAPQ", "CIGAR", "RNEXT", "PNEXT", "TLEN", "SEQ", "QUAL"]
-        content_dict = {n:c for n,c in zip(names, content.split("\t"))}
-        content_dict.update({"CS": c for c in content.split("\t") if re.search(r"^cs:Z",c)})
+        names = [
+            "QNAME",
+            "FLAG",
+            "RNAME",
+            "POS",
+            "MAPQ",
+            "CIGAR",
+            "RNEXT",
+            "PNEXT",
+            "TLEN",
+            "SEQ",
+            "QUAL",
+        ]
+        content_dict = {n: c for n, c in zip(names, content.split("\t"))}
+        content_dict.update(
+            {"CS": c for c in content.split("\t") if re.search(r"^cs:Z", c)}
+        )
         return content_dict["CS"], content_dict["CIGAR"], content_dict["SEQ"]
 
     with open("tests/data/real/tyr_cs.sam") as f:
         sam_short = [x.strip() for x in f.readlines()]
-    contents_short = [s for s in sam_short  if not re.search(r"^@", s)]
+    contents_short = [s for s in sam_short if not re.search(r"^@", s)]
 
     with open("tests/data/real/tyr_cslong.sam") as f:
         sam_long = [x.strip() for x in f.readlines()]
-    contents_long = [s for s in sam_long  if not re.search(r"^@", s)]
+    contents_long = [s for s in sam_long if not re.search(r"^@", s)]
 
     cs_shortened = []
     for content in contents_long:

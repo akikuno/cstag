@@ -2,6 +2,7 @@ import re
 from itertools import chain
 from collections import deque, Counter
 
+
 def consensus(CSTAG: list, CIGAR: list, POS: list) -> str:
     """generate consensus of cs tags
     Args:
@@ -30,20 +31,20 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -> str:
     softclips = [re.sub(r"^([0-9]+)S.*", r"\1", cigar) for cigar in CIGAR]
     softclips = [int(s) if s.isdigit() else 0 for s in softclips]
 
-    starts = [p+s for p, s in zip(pos, softclips)]
+    starts = [p + s for p, s in zip(pos, softclips)]
 
     cs_list = []
     for cs in CSTAG:
         cs = cs.replace("cs:Z:", "")
-        cs = re.split(r'([-*~=])', cs)[1:]
-        cs = [i+j for i,j in zip(cs[0::2], cs[1::2])]
+        cs = re.split(r"([-*~=])", cs)[1:]
+        cs = [i + j for i, j in zip(cs[0::2], cs[1::2])]
         cs = [c.replace("=", "") for c in cs]
         cs = [re.split(r"(?=[ACGT])", c) for c in cs]
         cs = [list(filter(None, c)) for c in cs]
         cs = list(chain.from_iterable(cs))
         cs_list.append(deque(cs))
 
-    cs_maxlen = max(len(cs)+start for cs, start in zip(cs_list, starts))
+    cs_maxlen = max(len(cs) + start for cs, start in zip(cs_list, starts))
     for i, (cs, start) in enumerate(zip(cs_list, starts)):
         if start:
             cs_list[i].extendleft(["N"] * start)

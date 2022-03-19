@@ -8,4 +8,6 @@ output = os.path.join("/tmp", "report")
 description = "Example"
 to_html(cs, output, description)
 
-assert filecmp.cmp(output + ".html", os.path.join("tests", "data", "to_html", "report.html"))
+assert filecmp.cmp(
+    output + ".html", os.path.join("tests", "data", "to_html", "report.html")
+)

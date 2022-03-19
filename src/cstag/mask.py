@@ -1,6 +1,7 @@
 import re
 
-def mask(CSTAG: str, QUAL: str, THRESHOLD = 10: int):
+
+def mask(CSTAG: str, QUAL: str, THRESHOLD: int = 10):
     """Mask low-quality bases to 'N'
     Args:
         CSTAG (str): cs tag in the **long** format
@@ -22,12 +23,12 @@ def mask(CSTAG: str, QUAL: str, THRESHOLD = 10: int):
     if not 0 <= THRESHOLD <= 40:
         raise Exception("Error: threshold must be within a range between 0 to 40")
 
-    mask_symbols = [chr(th+33) for th in range(THRESHOLD+1)]
+    mask_symbols = [chr(th + 33) for th in range(THRESHOLD + 1)]
     mask_symbols = set(mask_symbols)
 
     cs = CSTAG.replace("cs:Z:", "")
-    list_cs = re.split(r'([-+*~=])', cs)[1:]
-    list_cs = [i + j for i,j in zip(list_cs[0::2], list_cs[1::2])]
+    list_cs = re.split(r"([-+*~=])", cs)[1:]
+    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
     cs_masked = []
     idx = 0
@@ -39,7 +40,7 @@ def mask(CSTAG: str, QUAL: str, THRESHOLD = 10: int):
             idx += 1
         elif cs[0] == "=" or cs[0] == "+":
             for i in range(len(cs) - 1):
-                if QUAL[idx+i] in mask_symbols:
+                if QUAL[idx + i] in mask_symbols:
                     cs[i + 1] = "N" if cs[0] == "=" else "n"
             idx += i + 1
         cs_masked.append("".join(cs))
