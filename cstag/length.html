@@ -29,6 +29,7 @@
 <pre><code class="python">import re
 import sys
 
+
 def shorten(CSTAG: str) -&gt; str:
     &#34;&#34;&#34;Convert long format of cs tag into short format
     Args:
@@ -41,18 +42,17 @@ def shorten(CSTAG: str) -&gt; str:
         &gt;&gt;&gt; cstag.shorten(cs)
         cs:Z::4*ag:3
     &#34;&#34;&#34;
-    cstags = re.split(r&#39;([-+*~=])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
-    cstags = [i+j for i,j in zip(cstags[0::2], cstags[1::2])]
+    cstags = re.split(r&#34;([-+*~=])&#34;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
+    cstags = [i + j for i, j in zip(cstags[0::2], cstags[1::2])]
 
     csshort = []
     for cs in cstags:
         if cs[0] == &#34;=&#34;:
-            csshort.append(&#34;:&#34; + str(len(cs)-1))
+            csshort.append(&#34;:&#34; + str(len(cs) - 1))
             continue
         csshort.append(cs)
 
     return &#34;cs:Z:&#34; + &#34;&#34;.join(csshort)
-
 
 
 def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
@@ -76,8 +76,8 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
     if re.search(r&#34;[ACGT]&#34;, CSTAG):
         raise Exception(&#34;Error: input cs tag is not short format&#34;)
 
-    cstags = re.split(r&#39;([-+*~:])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
-    cstags = [i+j for i,j in zip(cstags[0::2], cstags[1::2])]
+    cstags = re.split(r&#34;([-+*~:])&#34;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
+    cstags = [i + j for i, j in zip(cstags[0::2], cstags[1::2])]
 
     softclip = re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, CIGAR)
     idx = int(softclip) if softclip.isdigit() else 0
@@ -95,7 +95,7 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -&gt; str:
         if cs[0] == &#34;*&#34;:
             idx += 1
         if cs[0] == &#34;+&#34;:
-            idx += len(cs)-1
+            idx += len(cs) - 1
 
     return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
 </details>
@@ -156,8 +156,8 @@ cs:Z:=ACGT*ag=CGT
     if re.search(r&#34;[ACGT]&#34;, CSTAG):
         raise Exception(&#34;Error: input cs tag is not short format&#34;)
 
-    cstags = re.split(r&#39;([-+*~:])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
-    cstags = [i+j for i,j in zip(cstags[0::2], cstags[1::2])]
+    cstags = re.split(r&#34;([-+*~:])&#34;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
+    cstags = [i + j for i, j in zip(cstags[0::2], cstags[1::2])]
 
     softclip = re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, CIGAR)
     idx = int(softclip) if softclip.isdigit() else 0
@@ -175,7 +175,7 @@ cs:Z:=ACGT*ag=CGT
         if cs[0] == &#34;*&#34;:
             idx += 1
         if cs[0] == &#34;+&#34;:
-            idx += len(cs)-1
+            idx += len(cs) - 1
 
     return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
 </details>
@@ -214,13 +214,13 @@ cs:Z::4*ag:3
         &gt;&gt;&gt; cstag.shorten(cs)
         cs:Z::4*ag:3
     &#34;&#34;&#34;
-    cstags = re.split(r&#39;([-+*~=])&#39;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
-    cstags = [i+j for i,j in zip(cstags[0::2], cstags[1::2])]
+    cstags = re.split(r&#34;([-+*~=])&#34;, CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
+    cstags = [i + j for i, j in zip(cstags[0::2], cstags[1::2])]
 
     csshort = []
     for cs in cstags:
         if cs[0] == &#34;=&#34;:
-            csshort.append(&#34;:&#34; + str(len(cs)-1))
+            csshort.append(&#34;:&#34; + str(len(cs) - 1))
             continue
         csshort.append(cs)
 

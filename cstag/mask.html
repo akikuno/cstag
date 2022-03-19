@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>cstag API documentation</title>
-<meta name="description" content="[![Licence](https://img.shields.io/badge/License-MIT-9cf.svg?style=flat-square)](https://choosealicense.com/licenses/mit/)
-…" />
+<title>cstag.mask API documentation</title>
+<meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -20,114 +19,145 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>cstag</code></h1>
+<h1 class="title">Module <code>cstag.mask</code></h1>
 </header>
 <section id="section-intro">
-<p><a href="https://choosealicense.com/licenses/mit/"><img alt="Licence" src="https://img.shields.io/badge/License-MIT-9cf.svg?style=flat-square"></a>
-<a href="https://akikuno.github.io/cstag/cstag/"><img alt="Docs" src="https://img.shields.io/badge/Docs-passing-informational.svg?style=flat-square&amp;color=brightgreen"></a>
-<a href="https://github.com/akikuno/cstag/actions"><img alt="Test" src="https://img.shields.io/github/workflow/status/akikuno/cstag/Pytest?json&amp;label=Test&amp;color=brightgreen&amp;style=flat-square"></a>
-<a href="https://pypi.org/project/cstag/"><img alt="Python" src="https://img.shields.io/pypi/pyversions/cstag.svg?label=Python&amp;color=blue&amp;style=flat-square"></a>
-<a href="https://pypi.org/project/cstag/"><img alt="PyPI" src="https://img.shields.io/pypi/v/cstag.svg?label=PyPI&amp;color=orange&amp;style=flat-square"></a>
-<a href="https://anaconda.org/bioconda/cstag"><img alt="Bioconda" src="https://img.shields.io/conda/v/bioconda/cstag?label=Bioconda&amp;color=orange&amp;style=flat-square"></a></p>
-<h1 id="cstag">cstag</h1>
-<p><code><a title="cstag" href="#cstag">cstag</a></code> is a Python module to manipulate <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tag</a>.</p>
-<ul>
-<li><code>cstag.shorten()</code>: to convert a cs tag from long to short format</li>
-<li><code>cstag.lengthen()</code>: to convert a cs tag from short to long format</li>
-<li><code>cstag.consensus()</code>: to generate a consensus cs tag from multiple cs tags</li>
-<li><code>cstag.to_html()</code>: to output html report</li>
-</ul>
-<!-- - <code>cstag.to\_mids()</code>: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:) -->
-<h2 id="installation">Installation</h2>
-<p>From <a href="https://pypi.org/project/cstag/">PyPI</a>:</p>
-<pre><code class="language-bash">pip install cstag
-</code></pre>
-<p>From <a href="https://anaconda.org/bioconda/cstag">Bioconda</a>:</p>
-<pre><code class="language-bash">conda config --add channels defaults
-conda config --add channels conda-forge
-conda config --add channels bioconda
-
-conda install cstag
-</code></pre>
-<h2 id="examples">Examples</h2>
-<h3 id="shortenlengthen">Shorten/Lengthen</h3>
-<pre><code class="language-python">import cstag
-
-# Convert a cs tag from long to short
-cs = &quot;cs:Z:=ACGT*ag=CGT&quot;
-
-cstag.shorten(cs)
-# =&gt; cs:Z::4*ag:3
-
-
-# Convert a cs tag from short to long
-cs = &quot;cs:Z::4*ag:3&quot;
-cigar = &quot;8M&quot;
-seq = &quot;ACGTACGT&quot;
-
-cstag.lengthen(cs, cigar, seq)
-# =&gt; cs:Z:=ACGT*ag=CGT
-</code></pre>
-<h3 id="call-consensus">Call consensus</h3>
-<pre><code class="language-python">import cstag
-
-cs_list = [&quot;cs:Z:=ACGT&quot;, &quot;cs:Z:=AC*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=ACT+ccc=T&quot;]
-cigar_list = [&quot;4M&quot;, &quot;4M&quot;, &quot;1S3M&quot;, &quot;3M&quot;, &quot;3M3I1M&quot;]
-pos_list = [1, 1, 1, 2, 1]
-
-cstag.consensus(cs_list, cigar_list, pos_list)
-# =&gt; cs:Z:=AC*gt*T
-</code></pre>
-<h3 id="output-html-report">Output HTML report</h3>
-<pre><code class="language-python">import cstag
-
-cs = &quot;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
-output = &quot;report&quot;
-description = &quot;Example&quot;
-
-cstag.to_html(cs, output, description)
-# =&gt; Output &quot;report.html&quot;
-</code></pre>
-<p>The <code>report.html</code> is :point_down:</p>
-<p><img width="414" alt="example_report" src="https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png"></p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;
-.. include:: ../../README.md
-&#34;&#34;&#34;
+<pre><code class="python">import re
 
-from .length import shorten, lengthen
-from .cons import consensus
-from .convert import to_html
-from .mask import mask</code></pre>
+
+def mask(CSTAG: str, QUAL: str, THRESHOLD: int = 10):
+    &#34;&#34;&#34;Mask low-quality bases to &#39;N&#39;
+    Args:
+        CSTAG (str): cs tag in the **long** format
+        QUAL (str): ASCII of Phred-scaled base quaiity+33
+        THRESHOLD (int): optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as &#39;less than or equal to the threshold&#39;
+    Return:
+        str: Masked cs tag
+    Example:
+        &gt;&gt;&gt; import cstag
+        &gt;&gt;&gt; CSTAG = &#34;cs:Z:=ACGT*ac+gg-cc=T&#34;
+        &gt;&gt;&gt; QUAL = &#34;AA!!!!AA&#34;
+        &gt;&gt;&gt; cstag.mask(CSTAG, QUAL)
+        cs:Z:=ACNN*an+ng-cc=T
+    &#34;&#34;&#34;
+    if not re.search(r&#34;[ACGT]&#34;, CSTAG):
+        raise Exception(&#34;Error: cs tag must be a long format&#34;)
+    if not isinstance(THRESHOLD, int):
+        raise Exception(&#34;Error: threshold must be an integer&#34;)
+    if not 0 &lt;= THRESHOLD &lt;= 40:
+        raise Exception(&#34;Error: threshold must be within a range between 0 to 40&#34;)
+
+    mask_symbols = [chr(th + 33) for th in range(THRESHOLD + 1)]
+    mask_symbols = set(mask_symbols)
+
+    cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
+    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
+
+    cs_masked = []
+    idx = 0
+    for cs in list_cs:
+        cs = list(cs)
+        if cs[0] == &#34;*&#34;:
+            if QUAL[idx] in mask_symbols:
+                cs[-1] = &#34;n&#34;
+            idx += 1
+        elif cs[0] == &#34;=&#34; or cs[0] == &#34;+&#34;:
+            for i in range(len(cs) - 1):
+                if QUAL[idx + i] in mask_symbols:
+                    cs[i + 1] = &#34;N&#34; if cs[0] == &#34;=&#34; else &#34;n&#34;
+            idx += i + 1
+        cs_masked.append(&#34;&#34;.join(cs))
+
+    return &#34;cs:Z:&#34; + &#34;&#34;.join(cs_masked)</code></pre>
 </details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt><code class="name"><a title="cstag.cons" href="cons.html">cstag.cons</a></code></dt>
+<dt id="cstag.mask.mask"><code class="name flex">
+<span>def <span class="ident">mask</span></span>(<span>CSTAG: str, QUAL: str, THRESHOLD: int = 10)</span>
+</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="cstag.convert" href="convert.html">cstag.convert</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="cstag.length" href="length.html">cstag.length</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="cstag.mask" href="mask.html">cstag.mask</a></code></dt>
-<dd>
-<div class="desc"></div>
+<div class="desc"><p>Mask low-quality bases to 'N'</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>CSTAG</code></strong> :&ensp;<code>str</code></dt>
+<dd>cs tag in the <strong>long</strong> format</dd>
+<dt><strong><code>QUAL</code></strong> :&ensp;<code>str</code></dt>
+<dd>ASCII of Phred-scaled base quaiity+33</dd>
+<dt><strong><code>THRESHOLD</code></strong> :&ensp;<code>int</code></dt>
+<dd>optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as 'less than or equal to the threshold'</dd>
+</dl>
+<h2 id="return">Return</h2>
+<p>str: Masked cs tag</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
+&gt;&gt;&gt; CSTAG = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
+&gt;&gt;&gt; QUAL = &quot;AA!!!!AA&quot;
+&gt;&gt;&gt; cstag.mask(CSTAG, QUAL)
+cs:Z:=ACNN*an+ng-cc=T
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mask(CSTAG: str, QUAL: str, THRESHOLD: int = 10):
+    &#34;&#34;&#34;Mask low-quality bases to &#39;N&#39;
+    Args:
+        CSTAG (str): cs tag in the **long** format
+        QUAL (str): ASCII of Phred-scaled base quaiity+33
+        THRESHOLD (int): optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as &#39;less than or equal to the threshold&#39;
+    Return:
+        str: Masked cs tag
+    Example:
+        &gt;&gt;&gt; import cstag
+        &gt;&gt;&gt; CSTAG = &#34;cs:Z:=ACGT*ac+gg-cc=T&#34;
+        &gt;&gt;&gt; QUAL = &#34;AA!!!!AA&#34;
+        &gt;&gt;&gt; cstag.mask(CSTAG, QUAL)
+        cs:Z:=ACNN*an+ng-cc=T
+    &#34;&#34;&#34;
+    if not re.search(r&#34;[ACGT]&#34;, CSTAG):
+        raise Exception(&#34;Error: cs tag must be a long format&#34;)
+    if not isinstance(THRESHOLD, int):
+        raise Exception(&#34;Error: threshold must be an integer&#34;)
+    if not 0 &lt;= THRESHOLD &lt;= 40:
+        raise Exception(&#34;Error: threshold must be within a range between 0 to 40&#34;)
+
+    mask_symbols = [chr(th + 33) for th in range(THRESHOLD + 1)]
+    mask_symbols = set(mask_symbols)
+
+    cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
+    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
+
+    cs_masked = []
+    idx = 0
+    for cs in list_cs:
+        cs = list(cs)
+        if cs[0] == &#34;*&#34;:
+            if QUAL[idx] in mask_symbols:
+                cs[-1] = &#34;n&#34;
+            idx += 1
+        elif cs[0] == &#34;=&#34; or cs[0] == &#34;+&#34;:
+            for i in range(len(cs) - 1):
+                if QUAL[idx + i] in mask_symbols:
+                    cs[i + 1] = &#34;N&#34; if cs[0] == &#34;=&#34; else &#34;n&#34;
+            idx += i + 1
+        cs_masked.append(&#34;&#34;.join(cs))
+
+    return &#34;cs:Z:&#34; + &#34;&#34;.join(cs_masked)</code></pre>
+</details>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
 </section>
 <section>
 </section>
@@ -135,26 +165,17 @@ from .mask import mask</code></pre>
 <nav id="sidebar">
 <h1>Index</h1>
 <div class="toc">
-<ul>
-<li><a href="#cstag">cstag</a><ul>
-<li><a href="#installation">Installation</a></li>
-<li><a href="#examples">Examples</a><ul>
-<li><a href="#shortenlengthen">Shorten/Lengthen</a></li>
-<li><a href="#call-consensus">Call consensus</a></li>
-<li><a href="#output-html-report">Output HTML report</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+<ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="cstag.cons" href="cons.html">cstag.cons</a></code></li>
-<li><code><a title="cstag.convert" href="convert.html">cstag.convert</a></code></li>
-<li><code><a title="cstag.length" href="length.html">cstag.length</a></code></li>
-<li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code></li>
+<li><code><a title="cstag" href="index.html">cstag</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="cstag.mask.mask" href="#cstag.mask.mask">mask</a></code></li>
 </ul>
 </li>
 </ul>

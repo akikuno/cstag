@@ -28,8 +28,9 @@
 </summary>
 <pre><code class="python">import re
 
+
 def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
-    &#34;&#34;&#34;Convert long format of cs tag into short format
+    &#34;&#34;&#34;Output HTML file showing a sequence with mutations colored
     Args:
         CSTAG (str): cs tag in the **long** format
         OUTPUT_FILE_NAME (str): output file name
@@ -44,8 +45,6 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
         &gt;&gt;&gt; cstag.to_html(CSTAG, OUTPUT, DESCRIPTION)
         https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
     &#34;&#34;&#34;
-    import re
-
     if not re.search(r&#34;[ACGT]&#34;, CSTAG):
         raise Exception(&#34;Error: cs tag must be a long format&#34;)
 
@@ -112,7 +111,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
     &lt;body&gt;
     &#34;&#34;&#34;
 
-    html_legend =&#34;&#34;&#34;
+    html_legend = &#34;&#34;&#34;
     &lt;p class = &#34;p_legend&#34;&gt;
     Labels:
     &lt;span class=&#34;Ins&#34;&gt;Insertion&lt;/span&gt;
@@ -124,7 +123,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
     &lt;hr&gt;
     &#34;&#34;&#34;
 
-    html_footer =&#34;&#34;&#34;
+    html_footer = &#34;&#34;&#34;
     &lt;/body&gt;
     &lt;/html&gt;
     &#34;&#34;&#34;
@@ -134,8 +133,8 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
         description = f&#34;&lt;h1&gt;{description}&lt;/h1&gt;&#34;
 
     cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
-    list_cs = re.split(r&#39;([-+*~=])&#39;, cs)[1:]
-    list_cs = [i+j for i,j in zip(list_cs[0::2], list_cs[1::2])]
+    list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
+    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
     html_cs = []
     for cs in list_cs:
@@ -154,19 +153,20 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
             right = cs[-2:].upper()
             html_cs.append(f&#34;&lt;span class=&#39;Splice&#39;&gt;{left + splice + right}&lt;/span&gt;&#34;)
 
-
     html_cs = &#34;&#34;.join(html_cs)
     html_cs = f&#34;&lt;p class=&#39;p_seq&#39;&gt;{html_cs}&lt;/p&gt;&#34;
 
-    report = &#34;\n&#34;.join([
-        html_header,
-        description,
-        html_legend,
-        html_cs,
-        html_footer,
-    ])
+    report = &#34;\n&#34;.join(
+        [
+            html_header,
+            description,
+            html_legend,
+            html_cs,
+            html_footer,
+        ]
+    )
 
-    with open(OUTPUT_FILE_NAME + &#39;.html&#39;, &#39;w&#39;) as f:
+    with open(OUTPUT_FILE_NAME + &#34;.html&#34;, &#34;w&#34;) as f:
         f.write(report)</code></pre>
 </details>
 </section>
@@ -181,7 +181,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
 <span>def <span class="ident">to_html</span></span>(<span>CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = '') ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Convert long format of cs tag into short format</p>
+<div class="desc"><p>Output HTML file showing a sequence with mutations colored</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>CSTAG</code></strong> :&ensp;<code>str</code></dt>
@@ -206,7 +206,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
-    &#34;&#34;&#34;Convert long format of cs tag into short format
+    &#34;&#34;&#34;Output HTML file showing a sequence with mutations colored
     Args:
         CSTAG (str): cs tag in the **long** format
         OUTPUT_FILE_NAME (str): output file name
@@ -221,8 +221,6 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
         &gt;&gt;&gt; cstag.to_html(CSTAG, OUTPUT, DESCRIPTION)
         https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
     &#34;&#34;&#34;
-    import re
-
     if not re.search(r&#34;[ACGT]&#34;, CSTAG):
         raise Exception(&#34;Error: cs tag must be a long format&#34;)
 
@@ -289,7 +287,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
     &lt;body&gt;
     &#34;&#34;&#34;
 
-    html_legend =&#34;&#34;&#34;
+    html_legend = &#34;&#34;&#34;
     &lt;p class = &#34;p_legend&#34;&gt;
     Labels:
     &lt;span class=&#34;Ins&#34;&gt;Insertion&lt;/span&gt;
@@ -301,7 +299,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
     &lt;hr&gt;
     &#34;&#34;&#34;
 
-    html_footer =&#34;&#34;&#34;
+    html_footer = &#34;&#34;&#34;
     &lt;/body&gt;
     &lt;/html&gt;
     &#34;&#34;&#34;
@@ -311,8 +309,8 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
         description = f&#34;&lt;h1&gt;{description}&lt;/h1&gt;&#34;
 
     cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
-    list_cs = re.split(r&#39;([-+*~=])&#39;, cs)[1:]
-    list_cs = [i+j for i,j in zip(list_cs[0::2], list_cs[1::2])]
+    list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
+    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
     html_cs = []
     for cs in list_cs:
@@ -331,19 +329,20 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
             right = cs[-2:].upper()
             html_cs.append(f&#34;&lt;span class=&#39;Splice&#39;&gt;{left + splice + right}&lt;/span&gt;&#34;)
 
-
     html_cs = &#34;&#34;.join(html_cs)
     html_cs = f&#34;&lt;p class=&#39;p_seq&#39;&gt;{html_cs}&lt;/p&gt;&#34;
 
-    report = &#34;\n&#34;.join([
-        html_header,
-        description,
-        html_legend,
-        html_cs,
-        html_footer,
-    ])
+    report = &#34;\n&#34;.join(
+        [
+            html_header,
+            description,
+            html_legend,
+            html_cs,
+            html_footer,
+        ]
+    )
 
-    with open(OUTPUT_FILE_NAME + &#39;.html&#39;, &#39;w&#39;) as f:
+    with open(OUTPUT_FILE_NAME + &#34;.html&#34;, &#34;w&#34;) as f:
         f.write(report)</code></pre>
 </details>
 </dd>

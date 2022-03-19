@@ -30,6 +30,7 @@
 from itertools import chain
 from collections import deque, Counter
 
+
 def consensus(CSTAG: list, CIGAR: list, POS: list) -&gt; str:
     &#34;&#34;&#34;generate consensus of cs tags
     Args:
@@ -58,20 +59,20 @@ def consensus(CSTAG: list, CIGAR: list, POS: list) -&gt; str:
     softclips = [re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, cigar) for cigar in CIGAR]
     softclips = [int(s) if s.isdigit() else 0 for s in softclips]
 
-    starts = [p+s for p, s in zip(pos, softclips)]
+    starts = [p + s for p, s in zip(pos, softclips)]
 
     cs_list = []
     for cs in CSTAG:
         cs = cs.replace(&#34;cs:Z:&#34;, &#34;&#34;)
-        cs = re.split(r&#39;([-*~=])&#39;, cs)[1:]
-        cs = [i+j for i,j in zip(cs[0::2], cs[1::2])]
+        cs = re.split(r&#34;([-*~=])&#34;, cs)[1:]
+        cs = [i + j for i, j in zip(cs[0::2], cs[1::2])]
         cs = [c.replace(&#34;=&#34;, &#34;&#34;) for c in cs]
         cs = [re.split(r&#34;(?=[ACGT])&#34;, c) for c in cs]
         cs = [list(filter(None, c)) for c in cs]
         cs = list(chain.from_iterable(cs))
         cs_list.append(deque(cs))
 
-    cs_maxlen = max(len(cs)+start for cs, start in zip(cs_list, starts))
+    cs_maxlen = max(len(cs) + start for cs, start in zip(cs_list, starts))
     for i, (cs, start) in enumerate(zip(cs_list, starts)):
         if start:
             cs_list[i].extendleft([&#34;N&#34;] * start)
@@ -158,20 +159,20 @@ cs:Z:=AC*gt*T
     softclips = [re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, cigar) for cigar in CIGAR]
     softclips = [int(s) if s.isdigit() else 0 for s in softclips]
 
-    starts = [p+s for p, s in zip(pos, softclips)]
+    starts = [p + s for p, s in zip(pos, softclips)]
 
     cs_list = []
     for cs in CSTAG:
         cs = cs.replace(&#34;cs:Z:&#34;, &#34;&#34;)
-        cs = re.split(r&#39;([-*~=])&#39;, cs)[1:]
-        cs = [i+j for i,j in zip(cs[0::2], cs[1::2])]
+        cs = re.split(r&#34;([-*~=])&#34;, cs)[1:]
+        cs = [i + j for i, j in zip(cs[0::2], cs[1::2])]
         cs = [c.replace(&#34;=&#34;, &#34;&#34;) for c in cs]
         cs = [re.split(r&#34;(?=[ACGT])&#34;, c) for c in cs]
         cs = [list(filter(None, c)) for c in cs]
         cs = list(chain.from_iterable(cs))
         cs_list.append(deque(cs))
 
-    cs_maxlen = max(len(cs)+start for cs, start in zip(cs_list, starts))
+    cs_maxlen = max(len(cs) + start for cs, start in zip(cs_list, starts))
     for i, (cs, start) in enumerate(zip(cs_list, starts)):
         if start:
             cs_list[i].extendleft([&#34;N&#34;] * start)
