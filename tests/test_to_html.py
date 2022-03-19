@@ -3,6 +3,7 @@ import os
 import filecmp
 from src.cstag import to_html
 
+
 def test_html():
     cs = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
     output = os.path.join("/tmp", "report")
