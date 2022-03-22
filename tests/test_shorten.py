@@ -10,7 +10,9 @@ def test_softclip():
 
 
 def test_substitution():
-    CSTAG = "cs:Z:=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCT*ag=GGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
+    CSTAG = (
+        "cs:Z:=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCT*ag=GGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
+    )
 
     csshort = "cs:Z::49*ag:50"
     assert shorten(CSTAG) == csshort
@@ -20,7 +22,9 @@ def test_deletion():
 
     csshort = "cs:Z::39-aagtgacgct:51"
 
-    CSTAG = "cs:Z:=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCC-aagtgacgct=AGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
+    CSTAG = (
+        "cs:Z:=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCC-aagtgacgct=AGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
+    )
     assert shorten(CSTAG) == csshort
 
 
@@ -86,9 +90,7 @@ def test_real():
             "QUAL",
         ]
         content_dict = {n: c for n, c in zip(names, content.split("\t"))}
-        content_dict.update(
-            {"CS": c for c in content.split("\t") if re.search(r"^cs:Z", c)}
-        )
+        content_dict.update({"CS": c for c in content.split("\t") if re.search(r"^cs:Z", c)})
         return content_dict["CS"], content_dict["CIGAR"], content_dict["SEQ"]
 
     with open("tests/data/real/tyr_cs.sam") as f:

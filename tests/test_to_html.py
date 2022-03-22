@@ -1,4 +1,3 @@
-import re
 import os
 import filecmp
 from src.cstag import to_html
@@ -10,6 +9,4 @@ def test_html():
     description = "Example"
     to_html(cs, output, description)
 
-    assert filecmp.cmp(
-        output + ".html", os.path.join("tests", "data", "to_html", "report.html")
-    )
+    assert filecmp.cmp(output + ".html", os.path.join("tests", "data", "to_html", "report.html"))

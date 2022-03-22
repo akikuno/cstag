@@ -1,4 +1,3 @@
-import re
 import src.cstag as cstag
 import pytest
 
