@@ -32,11 +32,11 @@
 <h1 id="cstag">cstag</h1>
 <p><code><a title="cstag" href="#cstag">cstag</a></code> is a Python module to manipulate <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tag</a>.</p>
 <ul>
-<li><code>cstag.shorten()</code>: to convert a cs tag from long to short format</li>
-<li><code>cstag.lengthen()</code>: to convert a cs tag from short to long format</li>
-<li><code>cstag.consensus()</code>: to generate a consensus cs tag from multiple cs tags</li>
+<li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code>: to convert a cs tag from long to short format</li>
+<li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code>: to convert a cs tag from short to long format</li>
+<li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code>: to generate a consensus cs tag from multiple cs tags</li>
 <li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code>: to mask low-quality bases in a cs tag</li>
-<li><code>cstag.to_html()</code>: to output html report</li>
+<li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: to output html report</li>
 </ul>
 <!-- - <code>cstag.to\_mids()</code>: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:) -->
 <p>See <a href="https://akikuno.github.io/cstag/cstag/">documentation</a> for more information.</p>
@@ -109,28 +109,44 @@ cstag.to_html(cs, output, description)
 .. include:: ../../README.md
 &#34;&#34;&#34;
 
-from .length import shorten, lengthen
-from .cons import consensus
-from .convert import to_html
-from .mask import mask</code></pre>
+from .shorten import shorten
+from .lengthen import lengthen
+from .consensus import consensus
+from .to_html import to_html
+from .mask import mask
+
+
+# import os
+# import glob
+
+# dir_init = glob.glob(os.path.join(&#34;src&#34;,&#34;*&#34;,&#34;__init__.py&#34;))[0]
+# dir_init = os.path.dirname(dir_init)
+
+# modules = [f for f in os.listdir(dir_init) if not f.startswith(&#34;__&#34;)]
+# __all__ = [module.strip(&#34;.py&#34;) for module in modules]
+# print(__all__)</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt><code class="name"><a title="cstag.cons" href="cons.html">cstag.cons</a></code></dt>
+<dt><code class="name"><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="cstag.convert" href="convert.html">cstag.convert</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="cstag.length" href="length.html">cstag.length</a></code></dt>
+<dt><code class="name"><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 <dt><code class="name"><a title="cstag.mask" href="mask.html">cstag.mask</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -163,10 +179,11 @@ from .mask import mask</code></pre>
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
-<li><code><a title="cstag.cons" href="cons.html">cstag.cons</a></code></li>
-<li><code><a title="cstag.convert" href="convert.html">cstag.convert</a></code></li>
-<li><code><a title="cstag.length" href="length.html">cstag.length</a></code></li>
+<li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code></li>
+<li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code></li>
 <li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code></li>
+<li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code></li>
+<li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></li>
 </ul>
 </li>
 </ul>
