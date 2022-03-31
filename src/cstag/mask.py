@@ -1,17 +1,19 @@
 import re
 
 
-def mask(CSTAG: str, QUAL: str, THRESHOLD: int = 10):
+def mask(CSTAG: str, CIGAR: str, QUAL: str, THRESHOLD: int = 10):
     """Mask low-quality bases to 'N'
     Args:
         CSTAG (str): cs tag in the **long** format
-        QUAL (str): ASCII of Phred-scaled base quaiity+33
+        CIGAR (str): CIGAR strings (6th column in SAM file)
+        QUAL (str): ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)
         THRESHOLD (int): optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as 'less than or equal to the threshold'
     Return:
         str: Masked cs tag
     Example:
         >>> import cstag
         >>> CSTAG = "cs:Z:=ACGT*ac+gg-cc=T"
+        >>> CIGAR = "5M2I2D1M"
         >>> QUAL = "AA!!!!AA"
         >>> cstag.mask(CSTAG, QUAL)
         cs:Z:=ACNN*an+ng-cc=T
@@ -29,6 +31,10 @@ def mask(CSTAG: str, QUAL: str, THRESHOLD: int = 10):
     cs = CSTAG.replace("cs:Z:", "")
     list_cs = re.split(r"([-+*~=])", cs)[1:]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
+
+    if CIGAR.split("S")[0].isdigit():
+        softclip = int(CIGAR.split("S")[0])
+        QUAL = QUAL[softclip:]
 
     cs_masked = []
     idx = 0
