@@ -84,9 +84,10 @@ cstag.consensus(cs_list, cigar_list, pos_list)
 <pre><code class="language-python">import cstag
 
 cs = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
+cigar = &quot;5M2I2D1M
 qual = &quot;AA!!!!AA&quot;
 phred_threshold = 10
-cstag.mask(cs, qual, phred_threshold)
+cstag.mask(cs, cigar, qual, phred_threshold)
 # =&gt; cs:Z:=ACNN*an+ng-cc=T
 </code></pre>
 <h3 id="output-html-report">Output HTML report</h3>
