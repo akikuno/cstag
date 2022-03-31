@@ -78,9 +78,10 @@ cstag.consensus(cs_list, cigar_list, pos_list)
 import cstag
 
 cs = "cs:Z:=ACGT*ac+gg-cc=T"
+cigar = "5M2I2D1M
 qual = "AA!!!!AA"
 phred_threshold = 10
-cstag.mask(cs, qual, phred_threshold)
+cstag.mask(cs, cigar, qual, phred_threshold)
 # => cs:Z:=ACNN*an+ng-cc=T
 ```
 
