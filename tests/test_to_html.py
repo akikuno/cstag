@@ -1,11 +1,12 @@
 import os
 import filecmp
+import tempfile
 from src.cstag import to_html
 
 
 def test_html():
     cs = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
-    output = os.path.join("/tmp", "report")
+    output = tempfile.NamedTemporaryFile()
     description = "Example"
     to_html(cs, output, description)
 
