@@ -138,5 +138,5 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
         ]
     )
 
-    with open(OUTPUT_FILE_NAME + ".html", "w") as f:
+    with open(OUTPUT_FILE_NAME + ".html", "w", newline="\n") as f:
         f.write(report)
