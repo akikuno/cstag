@@ -29,11 +29,7 @@ pip install cstag
 From [Bioconda](https://anaconda.org/bioconda/cstag):
 
 ```bash
-conda config --add channels defaults
-conda config --add channels conda-forge
-conda config --add channels bioconda
-
-conda install cstag
+conda install -c bioconda cstag
 ```
 
 ## Examples
