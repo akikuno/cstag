@@ -29,20 +29,18 @@
 <pre><code class="python">import re
 
 
-def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
+def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
     &#34;&#34;&#34;Output HTML file showing a sequence with mutations colored
     Args:
         CSTAG (str): cs tag in the **long** format
-        OUTPUT_FILE_NAME (str): output file name
         DESCRIPTION (str): (optional) header information in the output file
     Return:
         HTML file (*OUTPUT_FILE_NAME.html*)
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; CSTAG = &#34;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&#34;
-        &gt;&gt;&gt; OUTPUT = &#34;Report&#34;
         &gt;&gt;&gt; DESCRIPTION = &#34;Example&#34;
-        &gt;&gt;&gt; cstag.to_html(CSTAG, OUTPUT, DESCRIPTION)
+        &gt;&gt;&gt; cstag_html = cstag.to_html(CSTAG, DESCRIPTION)
         https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
     &#34;&#34;&#34;
     if not re.search(r&#34;[ACGT]&#34;, CSTAG):
@@ -137,12 +135,18 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
     html_cs = []
-    for cs in list_cs:
+    idx = 0
+    while idx &lt; len(list_cs):
+        cs = list_cs[idx]
         if cs[0] == &#34;=&#34;:
             cs = re.sub(r&#34;(N+)&#34;, r&#34;&lt;span class=&#39;Unknown&#39;&gt;\1&lt;/span&gt;&#34;, cs)
             html_cs.append(cs[1:])
         elif cs[0] == &#34;*&#34;:
-            html_cs.append(f&#34;&lt;span class=&#39;Sub&#39;&gt;{cs[2].upper()}&lt;/span&gt;&#34;)
+            html_cs.append(f&#34;&lt;span class=&#39;Sub&#39;&gt;{cs[2].upper()}&#34;)
+            while idx &lt; len(list_cs) - 1 and list_cs[idx+1].startswith(&#34;*&#34;):
+                html_cs.append(f&#34;{list_cs[idx+1][2].upper()}&#34;)
+                idx += 1
+            html_cs.append(&#34;&lt;/span&gt;&#34;)
         elif cs[0] == &#34;+&#34;:
             html_cs.append(f&#34;&lt;span class=&#39;Ins&#39;&gt;{cs[1:].upper()}&lt;/span&gt;&#34;)
         elif cs[0] == &#34;-&#34;:
@@ -152,6 +156,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
             splice = &#34;-&#34; * int(cs[3:-2])
             right = cs[-2:].upper()
             html_cs.append(f&#34;&lt;span class=&#39;Splice&#39;&gt;{left + splice + right}&lt;/span&gt;&#34;)
+        idx += 1
 
     html_cs = &#34;&#34;.join(html_cs)
     html_cs = f&#34;&lt;p class=&#39;p_seq&#39;&gt;{html_cs}&lt;/p&gt;&#34;
@@ -165,9 +170,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
             html_footer,
         ]
     )
-
-    with open(OUTPUT_FILE_NAME + &#34;.html&#34;, &#34;w&#34;, newline=&#34;\n&#34;) as f:
-        f.write(report)</code></pre>
+    return report</code></pre>
 </details>
 </section>
 <section>
@@ -178,7 +181,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="cstag.to_html.to_html"><code class="name flex">
-<span>def <span class="ident">to_html</span></span>(<span>CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = '') ‑> None</span>
+<span>def <span class="ident">to_html</span></span>(<span>CSTAG: str, DESCRIPTION: str = '') ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Output HTML file showing a sequence with mutations colored</p>
@@ -186,8 +189,6 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
 <dl>
 <dt><strong><code>CSTAG</code></strong> :&ensp;<code>str</code></dt>
 <dd>cs tag in the <strong>long</strong> format</dd>
-<dt><strong><code>OUTPUT_FILE_NAME</code></strong> :&ensp;<code>str</code></dt>
-<dd>output file name</dd>
 <dt><strong><code>DESCRIPTION</code></strong> :&ensp;<code>str</code></dt>
 <dd>(optional) header information in the output file</dd>
 </dl>
@@ -196,29 +197,26 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; CSTAG = &quot;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
-&gt;&gt;&gt; OUTPUT = &quot;Report&quot;
 &gt;&gt;&gt; DESCRIPTION = &quot;Example&quot;
-&gt;&gt;&gt; cstag.to_html(CSTAG, OUTPUT, DESCRIPTION)
+&gt;&gt;&gt; cstag_html = cstag.to_html(CSTAG, DESCRIPTION)
 &lt;https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png&gt;
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
+<pre><code class="python">def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
     &#34;&#34;&#34;Output HTML file showing a sequence with mutations colored
     Args:
         CSTAG (str): cs tag in the **long** format
-        OUTPUT_FILE_NAME (str): output file name
         DESCRIPTION (str): (optional) header information in the output file
     Return:
         HTML file (*OUTPUT_FILE_NAME.html*)
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; CSTAG = &#34;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&#34;
-        &gt;&gt;&gt; OUTPUT = &#34;Report&#34;
         &gt;&gt;&gt; DESCRIPTION = &#34;Example&#34;
-        &gt;&gt;&gt; cstag.to_html(CSTAG, OUTPUT, DESCRIPTION)
+        &gt;&gt;&gt; cstag_html = cstag.to_html(CSTAG, DESCRIPTION)
         https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
     &#34;&#34;&#34;
     if not re.search(r&#34;[ACGT]&#34;, CSTAG):
@@ -313,12 +311,18 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
     html_cs = []
-    for cs in list_cs:
+    idx = 0
+    while idx &lt; len(list_cs):
+        cs = list_cs[idx]
         if cs[0] == &#34;=&#34;:
             cs = re.sub(r&#34;(N+)&#34;, r&#34;&lt;span class=&#39;Unknown&#39;&gt;\1&lt;/span&gt;&#34;, cs)
             html_cs.append(cs[1:])
         elif cs[0] == &#34;*&#34;:
-            html_cs.append(f&#34;&lt;span class=&#39;Sub&#39;&gt;{cs[2].upper()}&lt;/span&gt;&#34;)
+            html_cs.append(f&#34;&lt;span class=&#39;Sub&#39;&gt;{cs[2].upper()}&#34;)
+            while idx &lt; len(list_cs) - 1 and list_cs[idx+1].startswith(&#34;*&#34;):
+                html_cs.append(f&#34;{list_cs[idx+1][2].upper()}&#34;)
+                idx += 1
+            html_cs.append(&#34;&lt;/span&gt;&#34;)
         elif cs[0] == &#34;+&#34;:
             html_cs.append(f&#34;&lt;span class=&#39;Ins&#39;&gt;{cs[1:].upper()}&lt;/span&gt;&#34;)
         elif cs[0] == &#34;-&#34;:
@@ -328,6 +332,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
             splice = &#34;-&#34; * int(cs[3:-2])
             right = cs[-2:].upper()
             html_cs.append(f&#34;&lt;span class=&#39;Splice&#39;&gt;{left + splice + right}&lt;/span&gt;&#34;)
+        idx += 1
 
     html_cs = &#34;&#34;.join(html_cs)
     html_cs = f&#34;&lt;p class=&#39;p_seq&#39;&gt;{html_cs}&lt;/p&gt;&#34;
@@ -341,9 +346,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = &#34;&#34;) -&
             html_footer,
         ]
     )
-
-    with open(OUTPUT_FILE_NAME + &#34;.html&#34;, &#34;w&#34;, newline=&#34;\n&#34;) as f:
-        f.write(report)</code></pre>
+    return report</code></pre>
 </details>
 </dd>
 </dl>
