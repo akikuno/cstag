@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        h1 {
+            font-family: Consolas, 'Courier New', monospace;
+            color: #333;
+            padding: 0.1em 0;
+            border-top: solid 3px #333;
+            border-bottom: solid 3px #333;
+        }
+
+        .p_seq {
+            font-family: Consolas, 'Courier New', monospace;
+            color: #585858;
+            word-wrap: break-word;
+            letter-spacing: 0.15em;
+        }
+
+        .p_legend {
+            font-family: Consolas, 'Courier New', monospace;
+            color: #585858;
+            word-wrap: break-word;
+        }
+
+        .Ins {
+            color: #333;
+            border: 0.1em solid;
+            background-color: #ee827c;
+            font-weight: bold;
+            # border-radius: 5px;
+        }
+
+        .Del {
+            color: #333;
+            border: 0.1em solid;
+            background-color: #a0d8ef;
+            font-weight: bold;
+            # border-radius: 5px;
+        }
+
+        .Sub {
+            color: #333;
+            border: 0.1em solid;
+            background-color: #98d98e;
+            font-weight: bold;
+            # border-radius: 5px;
+        }
+
+        .Splice {
+            color: #333;
+            border: 0.1em solid;
+            background-color: #f8e58c;
+            font-weight: bold;
+        }
+
+        .Unknown {
+            color: #333;
+            border: 0.1em solid;
+            background-color: #c0c6c9;
+            font-weight: bold;
+            # border-radius: 5px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <h1>Example</h1>
+
+    <p class="p_legend">
+        Labels:
+        <span class="Ins">Insertion</span>
+        <span class="Del">Deletion</span>
+        <span class="Sub">Substitution</span>
+        <span class="Splice">Splicing</span>
+        <span class="Unknown">Unknown</span>
+    </p>
+    <hr>
+
+    <p class='p_seq'><span class='Sub'>TG</span>A</p>
+
+</body>
+
+</html>

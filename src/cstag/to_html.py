@@ -1,20 +1,18 @@
 import re
 
 
-def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
+def to_html(CSTAG: str, DESCRIPTION: str = "") -> None:
     """Output HTML file showing a sequence with mutations colored
     Args:
         CSTAG (str): cs tag in the **long** format
-        OUTPUT_FILE_NAME (str): output file name
         DESCRIPTION (str): (optional) header information in the output file
     Return:
         HTML file (*OUTPUT_FILE_NAME.html*)
     Example:
         >>> import cstag
         >>> CSTAG = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
-        >>> OUTPUT = "Report"
         >>> DESCRIPTION = "Example"
-        >>> cstag.to_html(CSTAG, OUTPUT, DESCRIPTION)
+        >>> cstag_html = cstag.to_html(CSTAG, DESCRIPTION)
         https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
     """
     if not re.search(r"[ACGT]", CSTAG):
@@ -109,12 +107,18 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
     html_cs = []
-    for cs in list_cs:
+    idx = 0
+    while idx < len(list_cs):
+        cs = list_cs[idx]
         if cs[0] == "=":
             cs = re.sub(r"(N+)", r"<span class='Unknown'>\1</span>", cs)
             html_cs.append(cs[1:])
         elif cs[0] == "*":
-            html_cs.append(f"<span class='Sub'>{cs[2].upper()}</span>")
+            html_cs.append(f"<span class='Sub'>{cs[2].upper()}")
+            while idx < len(list_cs) - 1 and list_cs[idx+1].startswith("*"):
+                html_cs.append(f"{list_cs[idx+1][2].upper()}")
+                idx += 1
+            html_cs.append("</span>")
         elif cs[0] == "+":
             html_cs.append(f"<span class='Ins'>{cs[1:].upper()}</span>")
         elif cs[0] == "-":
@@ -124,6 +128,7 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
             splice = "-" * int(cs[3:-2])
             right = cs[-2:].upper()
             html_cs.append(f"<span class='Splice'>{left + splice + right}</span>")
+        idx += 1
 
     html_cs = "".join(html_cs)
     html_cs = f"<p class='p_seq'>{html_cs}</p>"
@@ -137,6 +142,4 @@ def to_html(CSTAG: str, OUTPUT_FILE_NAME: str, DESCRIPTION: str = "") -> None:
             html_footer,
         ]
     )
-
-    with open(OUTPUT_FILE_NAME + ".html", "w", newline="\n") as f:
-        f.write(report)
+    return report
