@@ -85,12 +85,13 @@ cstag.mask(cs, cigar, qual, phred_threshold)
 
 ```python
 import cstag
+from pathlib import Path
 
 cs = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
-output = "report"
 description = "Example"
 
-cstag.to_html(cs, output, description)
+cstag_html = cstag.to_html(cs, description)
+Path("report.html").write_text(cstag_html)
 # => Output "report.html"
 ```
 The `report.html` is :point_down:
