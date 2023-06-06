@@ -131,6 +131,8 @@ def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
         description = f&#34;&lt;h1&gt;{description}&lt;/h1&gt;&#34;
 
     cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    if cs.startswith(&#34;N&#34;):
+        cs = &#34;=&#34; + cs
     list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
@@ -307,6 +309,8 @@ def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
         description = f&#34;&lt;h1&gt;{description}&lt;/h1&gt;&#34;
 
     cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    if cs.startswith(&#34;N&#34;):
+        cs = &#34;=&#34; + cs
     list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
