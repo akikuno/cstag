@@ -49,3 +49,14 @@ def test_html_repeat_substitution_end():
     answer = answer[0].split()
     assert test == answer
 
+
+def test_html_start_from_N():
+    cs = "cs:Z:NNN=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+    description = "Example"
+    cs_html = to_html(cs, description)
+    test = [h for h in cs_html.split("\n") if h.count("<p class='p_seq'>")]
+    test = test[0].split()
+    answer = [
+        '<p', "class='p_seq'><span", "class='Unknown'>NNN</span>AC<span", "class='Ins'>GGG</span>T<span", "class='Del'>ACGT</span><span", "class='Sub'>T</span><span", "class='Splice'>GT----------CG</span>G<span", "class='Unknown'>NNN</span></p>"
+        ]
+    assert test == answer

@@ -103,6 +103,8 @@ def to_html(CSTAG: str, DESCRIPTION: str = "") -> None:
         description = f"<h1>{description}</h1>"
 
     cs = CSTAG.replace("cs:Z:", "")
+    if cs.startswith("N"):
+        cs = "=" + cs
     list_cs = re.split(r"([-+*~=])", cs)[1:]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
