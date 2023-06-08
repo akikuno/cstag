@@ -1,24 +1,6 @@
 import re
 
-
-def to_html(CSTAG: str, DESCRIPTION: str = "") -> None:
-    """Output HTML file showing a sequence with mutations colored
-    Args:
-        CSTAG (str): cs tag in the **long** format
-        DESCRIPTION (str): (optional) header information in the output file
-    Return:
-        HTML file (*OUTPUT_FILE_NAME.html*)
-    Example:
-        >>> import cstag
-        >>> CSTAG = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
-        >>> DESCRIPTION = "Example"
-        >>> cstag_html = cstag.to_html(CSTAG, DESCRIPTION)
-        https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
-    """
-    if not re.search(r"[ACGT]", CSTAG):
-        raise Exception("Error: cs tag must be a long format")
-
-    html_header = """<!DOCTYPE html>
+HTML_HEADER = """<!DOCTYPE html>
     <html>
     <head>
     <style>
@@ -79,45 +61,50 @@ def to_html(CSTAG: str, DESCRIPTION: str = "") -> None:
     </style>
     </head>
     <body>
-    """
+"""
 
-    html_legend = """
-    <p class = "p_legend">
-    Labels:
-    <span class="Ins">Insertion</span>
-    <span class="Del">Deletion</span>
-    <span class="Sub">Substitution</span>
-    <span class="Splice">Splicing</span>
-    <span class="Unknown">Unknown</span>
-    </p>
-    <hr>
-    """
+HTML_LEGEND = """
+<p class = "p_legend">
+Labels:
+<span class="Ins">Insertion</span>
+<span class="Del">Deletion</span>
+<span class="Sub">Substitution</span>
+<span class="Splice">Splicing</span>
+<span class="Unknown">Unknown</span>
+</p>
+<hr>
+"""
 
-    html_footer = """
-    </body>
-    </html>
-    """
+HTML_FOOTER = """
+</body>
+</html>
+"""
 
-    description = DESCRIPTION
-    if description:
-        description = f"<h1>{description}</h1>"
 
-    cs = CSTAG.replace("cs:Z:", "")
-    if cs.startswith("N"):
-        cs = "=" + cs
-    list_cs = re.split(r"([-+*~=])", cs)[1:]
+def validate_cstag(cstag: str) -> None:
+    if not re.search(r"[ACGTN]", cstag):
+        raise Exception("Error: cs tag must be a long format")
+
+
+def process_cstag(cstag: str) -> str:
+    cstag = cstag.replace("cs:Z:", "")
+    cstag_split_n = re.split(r"(N+)", cstag)
+    cs_mark_n = "".join(["@" + cs if cs.startswith("N") else cs for cs in cstag_split_n])
+    list_cs = re.split(r"([-+*~=@])", cs_mark_n)
+    list_cs = [l for l in list_cs if l != ""]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
-
     html_cs = []
     idx = 0
     while idx < len(list_cs):
         cs = list_cs[idx]
-        if cs[0] == "=":
-            cs = re.sub(r"(N+)", r"<span class='Unknown'>\1</span>", cs)
+        if cs.startswith("="):
             html_cs.append(cs[1:])
+        elif cs.startswith("@"):
+            cs = re.sub(r"(N+)", r"<span class='Unknown'>\1</span>", cs[1:])
+            html_cs.append(cs)
         elif cs[0] == "*":
             html_cs.append(f"<span class='Sub'>{cs[2].upper()}")
-            while idx < len(list_cs) - 1 and list_cs[idx+1].startswith("*"):
+            while idx < len(list_cs) - 1 and list_cs[idx + 1].startswith("*"):
                 html_cs.append(f"{list_cs[idx+1][2].upper()}")
                 idx += 1
             html_cs.append("</span>")
@@ -131,17 +118,33 @@ def to_html(CSTAG: str, DESCRIPTION: str = "") -> None:
             right = cs[-2:].upper()
             html_cs.append(f"<span class='Splice'>{left + splice + right}</span>")
         idx += 1
-
     html_cs = "".join(html_cs)
-    html_cs = f"<p class='p_seq'>{html_cs}</p>"
+    return f"<p class='p_seq'>{html_cs}</p>"
 
+
+def to_html(cstag: str, description: str = "") -> str:
+    """Output HTML string showing a sequence with mutations colored
+    Args:
+        cstag (str): cs tag in the **long** format
+        description (str): (optional) header information in the output string
+    Return:
+        HTML string
+    Example:
+        >>> import cstag
+        >>> cstag = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+        >>> description = "Example"
+        >>> html_string = cstag.to_html(cstag, description)
+    """
+    validate_cstag(cstag)
+    description_str = f"<h1>{description}</h1>" if description else ""
+    html_cs = process_cstag(cstag)
     report = "\n".join(
         [
-            html_header,
-            description,
-            html_legend,
+            HTML_HEADER,
+            description_str,
+            HTML_LEGEND,
             html_cs,
-            html_footer,
+            HTML_FOOTER,
         ]
     )
     return report
