@@ -28,25 +28,7 @@
 </summary>
 <pre><code class="python">import re
 
-
-def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
-    &#34;&#34;&#34;Output HTML file showing a sequence with mutations colored
-    Args:
-        CSTAG (str): cs tag in the **long** format
-        DESCRIPTION (str): (optional) header information in the output file
-    Return:
-        HTML file (*OUTPUT_FILE_NAME.html*)
-    Example:
-        &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; CSTAG = &#34;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&#34;
-        &gt;&gt;&gt; DESCRIPTION = &#34;Example&#34;
-        &gt;&gt;&gt; cstag_html = cstag.to_html(CSTAG, DESCRIPTION)
-        https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
-    &#34;&#34;&#34;
-    if not re.search(r&#34;[ACGT]&#34;, CSTAG):
-        raise Exception(&#34;Error: cs tag must be a long format&#34;)
-
-    html_header = &#34;&#34;&#34;&lt;!DOCTYPE html&gt;
+HTML_HEADER = &#34;&#34;&#34;&lt;!DOCTYPE html&gt;
     &lt;html&gt;
     &lt;head&gt;
     &lt;style&gt;
@@ -107,45 +89,50 @@ def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
     &lt;/style&gt;
     &lt;/head&gt;
     &lt;body&gt;
-    &#34;&#34;&#34;
+&#34;&#34;&#34;
 
-    html_legend = &#34;&#34;&#34;
-    &lt;p class = &#34;p_legend&#34;&gt;
-    Labels:
-    &lt;span class=&#34;Ins&#34;&gt;Insertion&lt;/span&gt;
-    &lt;span class=&#34;Del&#34;&gt;Deletion&lt;/span&gt;
-    &lt;span class=&#34;Sub&#34;&gt;Substitution&lt;/span&gt;
-    &lt;span class=&#34;Splice&#34;&gt;Splicing&lt;/span&gt;
-    &lt;span class=&#34;Unknown&#34;&gt;Unknown&lt;/span&gt;
-    &lt;/p&gt;
-    &lt;hr&gt;
-    &#34;&#34;&#34;
+HTML_LEGEND = &#34;&#34;&#34;
+&lt;p class = &#34;p_legend&#34;&gt;
+Labels:
+&lt;span class=&#34;Ins&#34;&gt;Insertion&lt;/span&gt;
+&lt;span class=&#34;Del&#34;&gt;Deletion&lt;/span&gt;
+&lt;span class=&#34;Sub&#34;&gt;Substitution&lt;/span&gt;
+&lt;span class=&#34;Splice&#34;&gt;Splicing&lt;/span&gt;
+&lt;span class=&#34;Unknown&#34;&gt;Unknown&lt;/span&gt;
+&lt;/p&gt;
+&lt;hr&gt;
+&#34;&#34;&#34;
 
-    html_footer = &#34;&#34;&#34;
-    &lt;/body&gt;
-    &lt;/html&gt;
-    &#34;&#34;&#34;
+HTML_FOOTER = &#34;&#34;&#34;
+&lt;/body&gt;
+&lt;/html&gt;
+&#34;&#34;&#34;
 
-    description = DESCRIPTION
-    if description:
-        description = f&#34;&lt;h1&gt;{description}&lt;/h1&gt;&#34;
 
-    cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
-    if cs.startswith(&#34;N&#34;):
-        cs = &#34;=&#34; + cs
-    list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
+def validate_cstag(cstag: str) -&gt; None:
+    if not re.search(r&#34;[ACGTN]&#34;, cstag):
+        raise Exception(&#34;Error: cs tag must be a long format&#34;)
+
+
+def process_cstag(cstag: str) -&gt; str:
+    cstag = cstag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    cstag_split_n = re.split(r&#34;(N+)&#34;, cstag)
+    cs_mark_n = &#34;&#34;.join([&#34;@&#34; + cs if cs.startswith(&#34;N&#34;) else cs for cs in cstag_split_n])
+    list_cs = re.split(r&#34;([-+*~=@])&#34;, cs_mark_n)
+    list_cs = [l for l in list_cs if l != &#34;&#34;]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
-
     html_cs = []
     idx = 0
     while idx &lt; len(list_cs):
         cs = list_cs[idx]
-        if cs[0] == &#34;=&#34;:
-            cs = re.sub(r&#34;(N+)&#34;, r&#34;&lt;span class=&#39;Unknown&#39;&gt;\1&lt;/span&gt;&#34;, cs)
+        if cs.startswith(&#34;=&#34;):
             html_cs.append(cs[1:])
+        elif cs.startswith(&#34;@&#34;):
+            cs = re.sub(r&#34;(N+)&#34;, r&#34;&lt;span class=&#39;Unknown&#39;&gt;\1&lt;/span&gt;&#34;, cs[1:])
+            html_cs.append(cs)
         elif cs[0] == &#34;*&#34;:
             html_cs.append(f&#34;&lt;span class=&#39;Sub&#39;&gt;{cs[2].upper()}&#34;)
-            while idx &lt; len(list_cs) - 1 and list_cs[idx+1].startswith(&#34;*&#34;):
+            while idx &lt; len(list_cs) - 1 and list_cs[idx + 1].startswith(&#34;*&#34;):
                 html_cs.append(f&#34;{list_cs[idx+1][2].upper()}&#34;)
                 idx += 1
             html_cs.append(&#34;&lt;/span&gt;&#34;)
@@ -159,17 +146,33 @@ def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
             right = cs[-2:].upper()
             html_cs.append(f&#34;&lt;span class=&#39;Splice&#39;&gt;{left + splice + right}&lt;/span&gt;&#34;)
         idx += 1
-
     html_cs = &#34;&#34;.join(html_cs)
-    html_cs = f&#34;&lt;p class=&#39;p_seq&#39;&gt;{html_cs}&lt;/p&gt;&#34;
+    return f&#34;&lt;p class=&#39;p_seq&#39;&gt;{html_cs}&lt;/p&gt;&#34;
 
+
+def to_html(cstag: str, description: str = &#34;&#34;) -&gt; str:
+    &#34;&#34;&#34;Output HTML string showing a sequence with mutations colored
+    Args:
+        cstag (str): cs tag in the **long** format
+        description (str): (optional) header information in the output string
+    Return:
+        HTML string
+    Example:
+        &gt;&gt;&gt; import cstag
+        &gt;&gt;&gt; cstag = &#34;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&#34;
+        &gt;&gt;&gt; description = &#34;Example&#34;
+        &gt;&gt;&gt; html_string = cstag.to_html(cstag, description)
+    &#34;&#34;&#34;
+    validate_cstag(cstag)
+    description_str = f&#34;&lt;h1&gt;{description}&lt;/h1&gt;&#34; if description else &#34;&#34;
+    html_cs = process_cstag(cstag)
     report = &#34;\n&#34;.join(
         [
-            html_header,
-            description,
-            html_legend,
+            HTML_HEADER,
+            description_str,
+            HTML_LEGEND,
             html_cs,
-            html_footer,
+            HTML_FOOTER,
         ]
     )
     return report</code></pre>
@@ -182,148 +185,34 @@ def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="cstag.to_html.to_html"><code class="name flex">
-<span>def <span class="ident">to_html</span></span>(<span>CSTAG: str, DESCRIPTION: str = '') ‑> None</span>
+<dt id="cstag.to_html.process_cstag"><code class="name flex">
+<span>def <span class="ident">process_cstag</span></span>(<span>cstag: str) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Output HTML file showing a sequence with mutations colored</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>CSTAG</code></strong> :&ensp;<code>str</code></dt>
-<dd>cs tag in the <strong>long</strong> format</dd>
-<dt><strong><code>DESCRIPTION</code></strong> :&ensp;<code>str</code></dt>
-<dd>(optional) header information in the output file</dd>
-</dl>
-<h2 id="return">Return</h2>
-<p>HTML file (<em>OUTPUT_FILE_NAME.html</em>)</p>
-<h2 id="example">Example</h2>
-<pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; CSTAG = &quot;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
-&gt;&gt;&gt; DESCRIPTION = &quot;Example&quot;
-&gt;&gt;&gt; cstag_html = cstag.to_html(CSTAG, DESCRIPTION)
-&lt;https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png&gt;
-</code></pre></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
-    &#34;&#34;&#34;Output HTML file showing a sequence with mutations colored
-    Args:
-        CSTAG (str): cs tag in the **long** format
-        DESCRIPTION (str): (optional) header information in the output file
-    Return:
-        HTML file (*OUTPUT_FILE_NAME.html*)
-    Example:
-        &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; CSTAG = &#34;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&#34;
-        &gt;&gt;&gt; DESCRIPTION = &#34;Example&#34;
-        &gt;&gt;&gt; cstag_html = cstag.to_html(CSTAG, DESCRIPTION)
-        https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png
-    &#34;&#34;&#34;
-    if not re.search(r&#34;[ACGT]&#34;, CSTAG):
-        raise Exception(&#34;Error: cs tag must be a long format&#34;)
-
-    html_header = &#34;&#34;&#34;&lt;!DOCTYPE html&gt;
-    &lt;html&gt;
-    &lt;head&gt;
-    &lt;style&gt;
-    h1 {
-    font-family: Consolas, &#39;Courier New&#39;, monospace;
-    color: #333;
-    padding: 0.1em 0;
-    border-top: solid 3px #333;
-    border-bottom: solid 3px #333;
-    }
-    .p_seq {
-    font-family: Consolas, &#39;Courier New&#39;, monospace;
-    color: #585858;
-    word-wrap: break-word;
-    letter-spacing: 0.15em;
-    }
-    .p_legend {
-    font-family: Consolas, &#39;Courier New&#39;, monospace;
-    color: #585858;
-    word-wrap: break-word;
-    }
-
-    .Ins {
-    color: #333;
-    border: 0.1em solid;
-    background-color: #ee827c;
-    font-weight: bold;
-    # border-radius: 5px;
-    }
-    .Del {
-    color: #333;
-    border: 0.1em solid;
-    background-color: #a0d8ef;
-    font-weight: bold;
-    # border-radius: 5px;
-    }
-    .Sub {
-    color: #333;
-    border: 0.1em solid;
-    background-color: #98d98e;
-    font-weight: bold;
-    # border-radius: 5px;
-    }
-    .Splice {
-    color: #333;
-    border: 0.1em solid;
-    background-color: #f8e58c;
-    font-weight: bold;
-    }
-    .Unknown {
-    color: #333;
-    border: 0.1em solid;
-    background-color: #c0c6c9;
-    font-weight: bold;
-    # border-radius: 5px;
-    }
-
-    &lt;/style&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-    &#34;&#34;&#34;
-
-    html_legend = &#34;&#34;&#34;
-    &lt;p class = &#34;p_legend&#34;&gt;
-    Labels:
-    &lt;span class=&#34;Ins&#34;&gt;Insertion&lt;/span&gt;
-    &lt;span class=&#34;Del&#34;&gt;Deletion&lt;/span&gt;
-    &lt;span class=&#34;Sub&#34;&gt;Substitution&lt;/span&gt;
-    &lt;span class=&#34;Splice&#34;&gt;Splicing&lt;/span&gt;
-    &lt;span class=&#34;Unknown&#34;&gt;Unknown&lt;/span&gt;
-    &lt;/p&gt;
-    &lt;hr&gt;
-    &#34;&#34;&#34;
-
-    html_footer = &#34;&#34;&#34;
-    &lt;/body&gt;
-    &lt;/html&gt;
-    &#34;&#34;&#34;
-
-    description = DESCRIPTION
-    if description:
-        description = f&#34;&lt;h1&gt;{description}&lt;/h1&gt;&#34;
-
-    cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
-    if cs.startswith(&#34;N&#34;):
-        cs = &#34;=&#34; + cs
-    list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
+<pre><code class="python">def process_cstag(cstag: str) -&gt; str:
+    cstag = cstag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    cstag_split_n = re.split(r&#34;(N+)&#34;, cstag)
+    cs_mark_n = &#34;&#34;.join([&#34;@&#34; + cs if cs.startswith(&#34;N&#34;) else cs for cs in cstag_split_n])
+    list_cs = re.split(r&#34;([-+*~=@])&#34;, cs_mark_n)
+    list_cs = [l for l in list_cs if l != &#34;&#34;]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
-
     html_cs = []
     idx = 0
     while idx &lt; len(list_cs):
         cs = list_cs[idx]
-        if cs[0] == &#34;=&#34;:
-            cs = re.sub(r&#34;(N+)&#34;, r&#34;&lt;span class=&#39;Unknown&#39;&gt;\1&lt;/span&gt;&#34;, cs)
+        if cs.startswith(&#34;=&#34;):
             html_cs.append(cs[1:])
+        elif cs.startswith(&#34;@&#34;):
+            cs = re.sub(r&#34;(N+)&#34;, r&#34;&lt;span class=&#39;Unknown&#39;&gt;\1&lt;/span&gt;&#34;, cs[1:])
+            html_cs.append(cs)
         elif cs[0] == &#34;*&#34;:
             html_cs.append(f&#34;&lt;span class=&#39;Sub&#39;&gt;{cs[2].upper()}&#34;)
-            while idx &lt; len(list_cs) - 1 and list_cs[idx+1].startswith(&#34;*&#34;):
+            while idx &lt; len(list_cs) - 1 and list_cs[idx + 1].startswith(&#34;*&#34;):
                 html_cs.append(f&#34;{list_cs[idx+1][2].upper()}&#34;)
                 idx += 1
             html_cs.append(&#34;&lt;/span&gt;&#34;)
@@ -337,20 +226,74 @@ def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
             right = cs[-2:].upper()
             html_cs.append(f&#34;&lt;span class=&#39;Splice&#39;&gt;{left + splice + right}&lt;/span&gt;&#34;)
         idx += 1
-
     html_cs = &#34;&#34;.join(html_cs)
-    html_cs = f&#34;&lt;p class=&#39;p_seq&#39;&gt;{html_cs}&lt;/p&gt;&#34;
-
+    return f&#34;&lt;p class=&#39;p_seq&#39;&gt;{html_cs}&lt;/p&gt;&#34;</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_html.to_html"><code class="name flex">
+<span>def <span class="ident">to_html</span></span>(<span>cstag: str, description: str = '') ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Output HTML string showing a sequence with mutations colored</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>cstag</code></strong> :&ensp;<code>str</code></dt>
+<dd>cs tag in the <strong>long</strong> format</dd>
+<dt><strong><code>description</code></strong> :&ensp;<code>str</code></dt>
+<dd>(optional) header information in the output string</dd>
+</dl>
+<h2 id="return">Return</h2>
+<p>HTML string</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
+&gt;&gt;&gt; cstag = &quot;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
+&gt;&gt;&gt; description = &quot;Example&quot;
+&gt;&gt;&gt; html_string = cstag.to_html(cstag, description)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_html(cstag: str, description: str = &#34;&#34;) -&gt; str:
+    &#34;&#34;&#34;Output HTML string showing a sequence with mutations colored
+    Args:
+        cstag (str): cs tag in the **long** format
+        description (str): (optional) header information in the output string
+    Return:
+        HTML string
+    Example:
+        &gt;&gt;&gt; import cstag
+        &gt;&gt;&gt; cstag = &#34;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&#34;
+        &gt;&gt;&gt; description = &#34;Example&#34;
+        &gt;&gt;&gt; html_string = cstag.to_html(cstag, description)
+    &#34;&#34;&#34;
+    validate_cstag(cstag)
+    description_str = f&#34;&lt;h1&gt;{description}&lt;/h1&gt;&#34; if description else &#34;&#34;
+    html_cs = process_cstag(cstag)
     report = &#34;\n&#34;.join(
         [
-            html_header,
-            description,
-            html_legend,
+            HTML_HEADER,
+            description_str,
+            HTML_LEGEND,
             html_cs,
-            html_footer,
+            HTML_FOOTER,
         ]
     )
     return report</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_html.validate_cstag"><code class="name flex">
+<span>def <span class="ident">validate_cstag</span></span>(<span>cstag: str) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_cstag(cstag: str) -&gt; None:
+    if not re.search(r&#34;[ACGTN]&#34;, cstag):
+        raise Exception(&#34;Error: cs tag must be a long format&#34;)</code></pre>
 </details>
 </dd>
 </dl>
@@ -371,7 +314,9 @@ def to_html(CSTAG: str, DESCRIPTION: str = &#34;&#34;) -&gt; None:
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="cstag.to_html.process_cstag" href="#cstag.to_html.process_cstag">process_cstag</a></code></li>
 <li><code><a title="cstag.to_html.to_html" href="#cstag.to_html.to_html">to_html</a></code></li>
+<li><code><a title="cstag.to_html.validate_cstag" href="#cstag.to_html.validate_cstag">validate_cstag</a></code></li>
 </ul>
 </li>
 </ul>
