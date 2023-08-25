@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[metadata]
+name = "cstag"
+version = "0.4.3"
+author = "Akihiro Kuno"
+author_email = "akuno@md.tsukuba.ac.jp"
+description = "Python module to manipulate the minimap2's CS tag"
+long_description = "file: README.md"
+long_description_content_type = "text/markdown"
+url = "https://github.com/akikuno/cstag"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+[options]
+packages = "find:"
+package_dir = { "" = "src" }
