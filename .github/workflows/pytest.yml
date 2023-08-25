@@ -29,5 +29,8 @@ jobs:
 
       - name: Test with pytest on Windows🪟
         if: runner.os == 'Windows'
+        env:
+          PYTHONPATH: .\src
         run: |
-          set PYTHONPATH=.\src && python -m pytest tests\ -p no:warnings -vv
+          echo %PYTHONPATH%
+          python -m pytest tests\ -p no:warnings -vv
