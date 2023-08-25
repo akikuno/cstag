@@ -8,7 +8,7 @@
 
 `cstag` is a Python module to manipulate [minimap2's CS tag](https://github.com/lh3/minimap2#cs).
 
-- `cstag.call()`: Generate the cs tag
+- `cstag.call()`: Generate a cs tag
 - `cstag.shorten()`: Convert a cs tag from long to short format
 - `cstag.lengthen()`: Convert a cs tag from short to long format
 - `cstag.consensus()`: Generate a consensus cs tag from multiple cs tags
