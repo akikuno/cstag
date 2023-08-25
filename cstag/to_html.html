@@ -118,8 +118,7 @@ def process_cstag(cstag: str) -&gt; str:
     cstag = cstag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
     cstag_split_n = re.split(r&#34;(N+)&#34;, cstag)
     cs_mark_n = &#34;&#34;.join([&#34;@&#34; + cs if cs.startswith(&#34;N&#34;) else cs for cs in cstag_split_n])
-    list_cs = re.split(r&#34;([-+*~=@])&#34;, cs_mark_n)
-    list_cs = [l for l in list_cs if l != &#34;&#34;]
+    list_cs = [lst for lst in re.split(r&#34;([-+*~=@])&#34;, cs_mark_n) if lst]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
     html_cs = []
     idx = 0
@@ -198,8 +197,7 @@ def to_html(cstag: str, description: str = &#34;&#34;) -&gt; str:
     cstag = cstag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
     cstag_split_n = re.split(r&#34;(N+)&#34;, cstag)
     cs_mark_n = &#34;&#34;.join([&#34;@&#34; + cs if cs.startswith(&#34;N&#34;) else cs for cs in cstag_split_n])
-    list_cs = re.split(r&#34;([-+*~=@])&#34;, cs_mark_n)
-    list_cs = [l for l in list_cs if l != &#34;&#34;]
+    list_cs = [lst for lst in re.split(r&#34;([-+*~=@])&#34;, cs_mark_n) if lst]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
     html_cs = []
     idx = 0
