@@ -10,15 +10,25 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [ '3.8', '3.9', '3.10', '3.x' ]
     name: Python ${{ matrix.python-version }} ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip pytest
-      - name: Test with pytest
+
+      - name: Test with pytest on Linux🐧 and macOS🍎
+        if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
           export PYTHONPATH=./src
+          python -m pytest tests/ -p no:warnings -vv
+
+      - name: Test with pytest on Windows🪟
+        if: runner.os == 'Windows'
+        run: |
+          set PYTHONPATH=./src
           python -m pytest tests/ -p no:warnings -vv
