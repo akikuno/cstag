@@ -2,10 +2,9 @@
 .. include:: ../../README.md
 """
 
-from .shorten import shorten
-from .lengthen import lengthen
-from .consensus import consensus
-from .to_html import to_html
-from .mask import mask
-
-
+from cstag.shorten import shorten
+from cstag.lengthen import lengthen
+from cstag.consensus import consensus
+from cstag.to_html import to_html
+from cstag.mask import mask
+from cstag.call import call

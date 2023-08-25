@@ -90,8 +90,7 @@ def process_cstag(cstag: str) -> str:
     cstag = cstag.replace("cs:Z:", "")
     cstag_split_n = re.split(r"(N+)", cstag)
     cs_mark_n = "".join(["@" + cs if cs.startswith("N") else cs for cs in cstag_split_n])
-    list_cs = re.split(r"([-+*~=@])", cs_mark_n)
-    list_cs = [l for l in list_cs if l != ""]
+    list_cs = [lst for lst in re.split(r"([-+*~=@])", cs_mark_n) if lst]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
     html_cs = []
     idx = 0
