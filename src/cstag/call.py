@@ -8,7 +8,7 @@ from cstag.shorten import shorten
 ###########################################################
 
 # use arbitrary characters other than 'acgtn' for keys, which are used for deletions.
-mutation_to_key = {
+mutation_encoding = {
     "*ac": "b",
     "*ag": "d",
     "*at": "h",
@@ -22,7 +22,7 @@ mutation_to_key = {
     "*tc": "s",
     "*tg": "o",
 }
-key_to_mutation = {v: k for k, v in mutation_to_key.items()}
+mutation_decoding = {v: k for k, v in mutation_encoding.items()}
 
 
 ###########################################################
@@ -30,7 +30,7 @@ key_to_mutation = {v: k for k, v in mutation_to_key.items()}
 ###########################################################
 
 
-def _split_cigar(cigar: str) -> list[tuple(str, int)]:
+def _split_cigar(cigar: str) -> list[tuple[str, int]]:
     parsed_cigar = []
     start_idx = 0
     for idx, operation in enumerate(cigar):
@@ -46,7 +46,7 @@ def _join_cigar(cigar_tuples: list[tuple[str, int]]) -> str:
     return "".join(f"{length}{operation}" for operation, length in cigar_tuples)
 
 
-def trim_clips(cigar: str, seq: str) -> tuple(str, str):
+def trim_clips(cigar: str, seq: str) -> tuple[str, str]:
     if all(x not in cigar for x in "SH"):
         return cigar, seq
     cigar_split = _split_cigar(cigar)
@@ -68,7 +68,7 @@ def trim_clips(cigar: str, seq: str) -> tuple(str, str):
     return cigar, seq
 
 
-def _split_md(md: str) -> list[tuple(str, int)]:
+def _split_md(md: str) -> list[tuple[str, int]]:
     parsed_md = []
     idx = 0
     while idx < len(md):
@@ -89,63 +89,72 @@ def _split_md(md: str) -> list[tuple(str, int)]:
     return parsed_md
 
 
-def generate_cslong_md_based(seq: str, md: str) -> list[str]:
+def generate_cslong_md(seq: str, md: str) -> list[str]:
     md_split = _split_md(md)
-    cslong_md_based = []
+    cslong_md = []
     idx = 0
     for op, length in md_split:
         if op == "=":
-            cslong_md_based.append(f"={seq[idx:idx+length]}")
+            cslong_md.append(f"={seq[idx:idx+length]}")
             idx += length
         elif op.startswith("^"):
-            cslong_md_based.append(f"-{op[1:].lower()}")
+            cslong_md.append(f"-{op[1:].lower()}")
         else:
-            cslong_md_based.append(f"*{op}{seq[idx]}".lower())
+            cslong_md.append(f"*{op}{seq[idx]}".lower())
             idx += 1
-    return cslong_md_based
+    return cslong_md
 
 
-def align_length(cslong_md_based: list[str]) -> str:
-    str_cslong = []
-    for cs in cslong_md_based:
-        if cs.startswith("*"):
-            str_cslong.append(mutation_to_key[cs])
+def _encode_substitution(cslong_with_substitutions: list[str]) -> str:
+    """
+    Convert substitution representations like '*ac', '*ag', etc., to single characters.
+
+    The function aims to make the length of the sequence uniform for easier handling.
+    For example, if the original sequence 'ACGT' has 'G' substituted by 'A',
+    it would be represented as 'AC*agT'. To make the sequence length uniform,
+    this function would convert it to 'ACdT'.
+    """
+    cslong_converted = []
+    for cs_element in cslong_with_substitutions:
+        if cs_element.startswith("*"):
+            cslong_converted.append(mutation_encoding[cs_element])
         else:
-            str_cslong.append(cs[1:])
-    return "".join(str_cslong)
+            cslong_converted.append(cs_element[1:])
+    return "".join(cslong_converted)
 
 
-def generate_cslong_cigar_integrated(cigar: str, str_cslong: str) -> str:
+def generate_cslong_cigar_integrated(cigar: str, cslong_md: list[str]) -> list[str]:
     cigar_split = _split_cigar(cigar)
+    cslong_encoded = _encode_substitution(cslong_md)
     idx_n = 0
-    cslong = []
+    cslong_md_cigar = []
     for op, length in cigar_split:
         if op == "N":
-            cslong.append(f"~nn{length}nn")
+            cslong_md_cigar.append(f"~nn{length}nn")
         elif op == "I":
-            cslong.append(f"+{str_cslong[idx_n:idx_n+length]}".lower())
+            cslong_md_cigar.append(f"+{cslong_encoded[idx_n:idx_n+length]}".lower())
             idx_n += length
         elif op == "D":
-            cslong.append(f"-{str_cslong[idx_n:idx_n+length]}".lower())
+            cslong_md_cigar.append(f"-{cslong_encoded[idx_n:idx_n+length]}".lower())
             idx_n += length
         else:
-            cslong.append(f"={str_cslong[idx_n:idx_n+length]}")
+            cslong_md_cigar.append(f"={cslong_encoded[idx_n:idx_n+length]}")
             idx_n += length
-    return "".join(cslong)
+    return cslong_md_cigar
 
 
-def revert_substitution(cslong: str) -> str:
-    cslong_split = re.split(r"([bdhvxymrkwso])", cslong)
-    for i, cs in enumerate(cslong_split):
-        if cs in key_to_mutation:
-            cslong_split[i] = key_to_mutation[cs]
+def decode_substitution(cslong_md_cigar: list[str]) -> list[str]:
+    cslong_decoded = [c for c in re.split(r"([bdhvxymrkwso])", "".join(cslong_md_cigar)) if c]
+    for i, cs in enumerate(cslong_decoded):
+        if cs in mutation_decoding:
+            cslong_decoded[i] = mutation_decoding[cs]
         elif cs[0] not in {"=", "-", "+", "*", "~"}:
-            cslong_split[i] = f"={cs}"
-    return "".join(cslong_split)
+            cslong_decoded[i] = f"={cs}"
+    return cslong_decoded
 
 
-def add_prefix(cslong: str) -> str:
-    return f"cs:Z:{cslong}"
+def format_cslong(cslong: list[str]) -> str:
+    return f"cs:Z:{''.join(cslong)}"
 
 
 ###########################################################
@@ -155,11 +164,10 @@ def add_prefix(cslong: str) -> str:
 
 def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -> str:
     cigar, seq = trim_clips(cigar, seq)
-    cslong_md_based = generate_cslong_md_based(seq, md)
-    str_cslong = align_length(cslong_md_based)
-    cslong = generate_cslong_cigar_integrated(cigar, str_cslong)
-    cslong_update = revert_substitution(cslong)
-    cslong_update = add_prefix(cslong_update)
+    cslong_md = generate_cslong_md(seq, md)
+    cslong_md_cigar = generate_cslong_cigar_integrated(cigar, cslong_md)
+    cslong_decoded = decode_substitution(cslong_md_cigar)
+    cs_tag = format_cslong(cslong_decoded)
     if is_short_form:
-        cslong_update = shorten(cslong_update)
-    return cslong_update
+        cs_tag = shorten(cs_tag)
+    return cs_tag
