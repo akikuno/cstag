@@ -156,6 +156,7 @@ def test_decode_substitution(cslong, expected):
         ("5M1D4M", "5^A4", "ACGTGGCTA", "cs:Z:=ACGTG-a=GCTA"),
         ("3M1D1M1D4M", "3^C1^A4", "ACGGCTAG", "cs:Z:=ACG-c=G-a=CTAG"),
         ("3S5M", "5", "NNNACGTA", "cs:Z:=ACGTA"),
+        ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", "cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G"),
     ],
 )
 def test_generate_cs_tag_long_form(cigar, md, seq, expected):
@@ -173,6 +174,7 @@ def test_generate_cs_tag_long_form(cigar, md, seq, expected):
         ("5M1D4M", "5^A4", "ACGTGGCTA", "cs:Z::5-a:4"),
         ("3M1D1M1D4M", "3^C1^A4", "ACGGCTAG", "cs:Z::3-c:1-a:4"),
         ("3S5M", "5", "NNNACGTA", "cs:Z::5"),
+        ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", "cs:Z::2*ag:5-ag:4+ac~nn3nn:1"),
     ],
 )
 def test_generate_cs_tag_short_form(cigar, md, seq, expected):

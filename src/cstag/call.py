@@ -163,6 +163,27 @@ def format_cslong(cslong: list[str]) -> str:
 
 
 def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -> str:
+    """
+    Generate a cs tag based on CIGAR, MD, and SEQ information.
+
+    Args:
+        cigar (str): CIGAR string representing the alignment.
+        md (str): MD tag representing mismatching positions/base.
+        seq (str): The sequence of the read.
+        is_short_form (bool, optional): Whether to return the cs tag in short form. Defaults to True.
+
+    Returns:
+        str: A cs tag representing the alignment and differences.
+
+    Example:
+        >>> import your_module  # Replace 'your_module' with the actual module name
+        >>> cigar = "8M2D4M2I3N1M"
+        >>> md = "2A5^AG7"
+        >>> seq = "ACGTACGTACGTACG"
+        >>> is_short_form = False
+        >>> cstag.call(cigar, md, seq, is_short_form)
+        'cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G'
+    """
     cigar, seq = trim_clips(cigar, seq)
     cslong_md = generate_cslong_md(seq, md)
     cslong_md_cigar = generate_cslong_cigar_integrated(cigar, cslong_md)
