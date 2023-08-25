@@ -5,12 +5,7 @@ from src.cstag.call import (
     _join_cigar,
     trim_clips,
     generate_cslong_md_based,
-    # parse_md_number,
-    # handle_deletion,
-    # handle_mismatch,
-    # handle_M,
-    # handle_I,
-    # handle_N,
+    align_length,
     call,
 )
 
@@ -101,6 +96,14 @@ def test_generate_cslong_md_based():
     assert generate_cslong_md_based("ACGTACGT", "2^TA4T1") == ["=AC", "-ta", "=GTAC", "*tg", "=T"]
     assert generate_cslong_md_based("ACGTA", "2^TA1G1") == ["=AC", "-ta", "=G", "*gt", "=A"]
     assert generate_cslong_md_based("ACGTAA", "1A1^T1G1") == ["=A", "*ac", "=G", "-t", "=T", "*ga", "=A"]
+
+
+def test_align_length():
+    assert align_length(["=ACGT", "*ta", "=ACGT"]) == "ACGTwACGT"
+    assert align_length(["=ACGT", "-atcg", "=ACGT"]) == "ACGTatcgACGT"
+    assert align_length(["=ACGT", "*ta", "*gt"]) == "ACGTwk"
+    assert align_length(["=AC", "-at", "=GT", "*tc", "=AT"]) == "ACatGTsAT"
+    assert align_length(["=A", "*tc", "-t", "=G", "*tg", "=T"]) == "AstGoT"
 
 
 ###########################################################

@@ -7,6 +7,7 @@ from cstag.shorten import shorten
 # Define the mapping between the mutation and key
 ###########################################################
 
+# use arbitrary characters other than 'acgtn' for keys, which are used for deletions.
 mutation_to_key = {
     "*ac": "b",
     "*ag": "d",
