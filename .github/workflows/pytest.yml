@@ -21,16 +21,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip pytest
 
-      - name: Pytest on Linux🐧 and macOS🍎
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+      - name: Run pytest
         env:
-          PYTHONPATH: ./src
+          PYTHONPATH: src
         run: |
-          python -m pytest tests/ -p no:warnings -vv
+          python -m pytest tests -p no:warnings -vv
 
-      - name: Pytest on Windows🪟
-        if: runner.os == 'Windows'
-        env:
-          PYTHONPATH: .\src
-        run: |
-          python -m pytest tests\ -p no:warnings -vv
+      # - name: Pytest on Linux🐧 and macOS🍎
+      #   if: runner.os == 'Linux' || runner.os == 'macOS'
+      #   env:
+      #     PYTHONPATH: ./src
+      #   run: |
+      #     python -m pytest tests/ -p no:warnings -vv
+
+      # - name: Pytest on Windows🪟
+      #   if: runner.os == 'Windows'
+      #   env:
+      #     PYTHONPATH: .\src
+      #   run: |
+      #     python -m pytest tests\ -p no:warnings -vv
