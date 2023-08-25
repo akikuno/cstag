@@ -191,6 +191,27 @@ def format_cslong(cslong: list[str]) -&gt; str:
 
 
 def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
+    &#34;&#34;&#34;
+    Generate a cs tag based on CIGAR, MD, and SEQ information.
+
+    Args:
+        cigar (str): CIGAR string representing the alignment.
+        md (str): MD tag representing mismatching positions/base.
+        seq (str): The sequence of the read.
+        is_short_form (bool, optional): Whether to return the cs tag in short form. Defaults to True.
+
+    Returns:
+        str: A cs tag representing the alignment and differences.
+
+    Example:
+        &gt;&gt;&gt; import your_module  # Replace &#39;your_module&#39; with the actual module name
+        &gt;&gt;&gt; cigar = &#34;8M2D4M2I3N1M&#34;
+        &gt;&gt;&gt; md = &#34;2A5^AG7&#34;
+        &gt;&gt;&gt; seq = &#34;ACGTACGTACGTACG&#34;
+        &gt;&gt;&gt; is_short_form = False
+        &gt;&gt;&gt; cstag.call(cigar, md, seq, is_short_form)
+        &#39;cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G&#39;
+    &#34;&#34;&#34;
     cigar, seq = trim_clips(cigar, seq)
     cslong_md = generate_cslong_md(seq, md)
     cslong_md_cigar = generate_cslong_cigar_integrated(cigar, cslong_md)
@@ -212,12 +233,58 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
 <span>def <span class="ident">call</span></span>(<span>cigar: str, md: str, seq: str, is_short_form: bool = True) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Generate a cs tag based on CIGAR, MD, and SEQ information.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>cigar</code></strong> :&ensp;<code>str</code></dt>
+<dd>CIGAR string representing the alignment.</dd>
+<dt><strong><code>md</code></strong> :&ensp;<code>str</code></dt>
+<dd>MD tag representing mismatching positions/base.</dd>
+<dt><strong><code>seq</code></strong> :&ensp;<code>str</code></dt>
+<dd>The sequence of the read.</dd>
+<dt><strong><code>is_short_form</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to return the cs tag in short form. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>A cs tag representing the alignment and differences.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; import your_module  # Replace 'your_module' with the actual module name
+&gt;&gt;&gt; cigar = &quot;8M2D4M2I3N1M&quot;
+&gt;&gt;&gt; md = &quot;2A5^AG7&quot;
+&gt;&gt;&gt; seq = &quot;ACGTACGTACGTACG&quot;
+&gt;&gt;&gt; is_short_form = False
+&gt;&gt;&gt; cstag.call(cigar, md, seq, is_short_form)
+'cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G'
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
+    &#34;&#34;&#34;
+    Generate a cs tag based on CIGAR, MD, and SEQ information.
+
+    Args:
+        cigar (str): CIGAR string representing the alignment.
+        md (str): MD tag representing mismatching positions/base.
+        seq (str): The sequence of the read.
+        is_short_form (bool, optional): Whether to return the cs tag in short form. Defaults to True.
+
+    Returns:
+        str: A cs tag representing the alignment and differences.
+
+    Example:
+        &gt;&gt;&gt; import your_module  # Replace &#39;your_module&#39; with the actual module name
+        &gt;&gt;&gt; cigar = &#34;8M2D4M2I3N1M&#34;
+        &gt;&gt;&gt; md = &#34;2A5^AG7&#34;
+        &gt;&gt;&gt; seq = &#34;ACGTACGTACGTACG&#34;
+        &gt;&gt;&gt; is_short_form = False
+        &gt;&gt;&gt; cstag.call(cigar, md, seq, is_short_form)
+        &#39;cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G&#39;
+    &#34;&#34;&#34;
     cigar, seq = trim_clips(cigar, seq)
     cslong_md = generate_cslong_md(seq, md)
     cslong_md_cigar = generate_cslong_cigar_integrated(cigar, cslong_md)

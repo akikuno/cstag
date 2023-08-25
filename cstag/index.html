@@ -31,11 +31,12 @@
 <h1 id="cstag">cstag</h1>
 <p><code><a title="cstag" href="#cstag">cstag</a></code> is a Python module to manipulate <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tag</a>.</p>
 <ul>
-<li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code>: to convert a cs tag from long to short format</li>
-<li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code>: to convert a cs tag from short to long format</li>
-<li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code>: to generate a consensus cs tag from multiple cs tags</li>
-<li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code>: to mask low-quality bases in a cs tag</li>
-<li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: to output html report</li>
+<li><code><a title="cstag.call" href="call.html">cstag.call</a></code>: Generate the cs tag</li>
+<li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code>: Convert a cs tag from long to short format</li>
+<li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code>: Convert a cs tag from short to long format</li>
+<li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code>: Generate a consensus cs tag from multiple cs tags</li>
+<li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code>: Mask low-quality bases in a cs tag</li>
+<li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Output html report</li>
 </ul>
 <!-- - <code>cstag.to\_mids()</code>: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:) -->
 <p>See <a href="https://akikuno.github.io/cstag/cstag/">documentation</a> for more information.</p>
@@ -47,6 +48,19 @@
 <pre><code class="language-bash">conda install -c bioconda cstag
 </code></pre>
 <h2 id="examples">Examples</h2>
+<h3 id="generate-the-cs-tag">Generate the cs tag</h3>
+<pre><code class="language-python">import cstag
+
+cigar = &quot;8M2D4M2I3N1M&quot;
+md = &quot;2A5^AG7&quot;
+seq = &quot;ACGTACGTACGTACG&quot;
+
+cstag.call(cigar, md, seq, is_short_form=True)
+# =&gt; cs:Z::2*ag:5-ag:4+ac~nn3nn:1
+
+cstag.call(cigar, md, seq, is_short_form=False)
+# =&gt; cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
+</code></pre>
 <h3 id="shortenlengthen">Shorten/Lengthen</h3>
 <pre><code class="language-python">import cstag
 
@@ -157,6 +171,7 @@ from cstag.call import call</code></pre>
 <li><a href="#cstag">cstag</a><ul>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#examples">Examples</a><ul>
+<li><a href="#generate-the-cs-tag">Generate the cs tag</a></li>
 <li><a href="#shortenlengthen">Shorten/Lengthen</a></li>
 <li><a href="#call-consensus">Call consensus</a></li>
 <li><a href="#mask-low-quality-bases-in-a-cs-tag">Mask low-quality bases in a cs tag</a></li>
