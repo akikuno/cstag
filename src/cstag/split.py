@@ -4,7 +4,7 @@ import re
 
 
 def split(cs_tag: str) -> list[str]:
-    """Split cs tag
+    """Split a cs tag
     Args:
         cs_tag (str): a cs tag
     Return:
