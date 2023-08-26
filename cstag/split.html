@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>cstag.lengthen API documentation</title>
+<title>cstag.split API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,58 +19,33 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>cstag.lengthen</code></h1>
+<h1 class="title">Module <code>cstag.split</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import re
+<pre><code class="python">from __future__ import annotations
 
-def lengthen(cs_tag: str, cigar: str, seq: str) -&gt; str:
-    &#34;&#34;&#34;Convert short format of cs tag into long format
+import re
+
+
+def split(cs_tag: str) -&gt; list[str]:
+    &#34;&#34;&#34;Split a cs tag
     Args:
-        cs_tag (str): cs tag in **short** form
-        cigar (str): CIGAR string (6th column in SAM file)
-        seq (str): segment sequence (10th column in SAM file)
+        cs_tag (str): a cs tag
     Return:
-        str: cs tag in **long** form
+        list[str]: splits a cs tag by operators
 
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;cs:Z::4*ag:3&#34;
-        &gt;&gt;&gt; cigar = &#34;8M&#34;
-        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
-        &gt;&gt;&gt; cstag.lengthen(cs, cigar, seq)
-        cs:Z:=ACGT*ag=CGT
+        &gt;&gt;&gt; cstag.split(cs)
+        [&#34;cs:Z:&#34;, &#34;:4&#34;, &#34;*ag&#34;, &#34;:3&#34;]
     &#34;&#34;&#34;
-
-    if re.search(r&#34;[ACGT]&#34;, cs_tag):
-        raise Exception(&#34;Error: input cs tag is not short format&#34;)
-
-    cs_tag_split = re.split(r&#34;([-+*~:])&#34;, cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
-    cs_tag_split = [i + j for i, j in zip(cs_tag_split[0::2], cs_tag_split[1::2])]
-
-    softclip = re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, cigar)
-    idx = int(softclip) if softclip.isdigit() else 0
-
-    cslong = []
-    for cs in cs_tag_split:
-        if cs == &#34;&#34;:
-            continue
-        if cs[0] == &#34;:&#34;:
-            cs = int(cs[1:]) + idx
-            cslong.append(&#34;:&#34; + seq[idx:cs])
-            idx = cs
-            continue
-        cslong.append(cs)
-        if cs[0] == &#34;*&#34;:
-            idx += 1
-        if cs[0] == &#34;+&#34;:
-            idx += len(cs) - 1
-
-    return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
+    pattern = r&#34;(\=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})&#34;
+    return [cs for cs in re.split(pattern, cs_tag) if cs]</code></pre>
 </details>
 </section>
 <section>
@@ -80,77 +55,43 @@ def lengthen(cs_tag: str, cigar: str, seq: str) -&gt; str:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="cstag.lengthen.lengthen"><code class="name flex">
-<span>def <span class="ident">lengthen</span></span>(<span>cs_tag: str, cigar: str, seq: str) ‑> str</span>
+<dt id="cstag.split.split"><code class="name flex">
+<span>def <span class="ident">split</span></span>(<span>cs_tag: str) ‑> list[str]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Convert short format of cs tag into long format</p>
+<div class="desc"><p>Split a cs tag</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>cs_tag</code></strong> :&ensp;<code>str</code></dt>
-<dd>cs tag in <strong>short</strong> form</dd>
-<dt><strong><code>cigar</code></strong> :&ensp;<code>str</code></dt>
-<dd>CIGAR string (6th column in SAM file)</dd>
-<dt><strong><code>seq</code></strong> :&ensp;<code>str</code></dt>
-<dd>segment sequence (10th column in SAM file)</dd>
+<dd>a cs tag</dd>
 </dl>
 <h2 id="return">Return</h2>
-<p>str: cs tag in <strong>long</strong> form</p>
+<p>list[str]: splits a cs tag by operators</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs = &quot;cs:Z::4*ag:3&quot;
-&gt;&gt;&gt; cigar = &quot;8M&quot;
-&gt;&gt;&gt; seq = &quot;ACGTACGT&quot;
-&gt;&gt;&gt; cstag.lengthen(cs, cigar, seq)
-cs:Z:=ACGT*ag=CGT
+&gt;&gt;&gt; cstag.split(cs)
+[&quot;cs:Z:&quot;, &quot;:4&quot;, &quot;*ag&quot;, &quot;:3&quot;]
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def lengthen(cs_tag: str, cigar: str, seq: str) -&gt; str:
-    &#34;&#34;&#34;Convert short format of cs tag into long format
+<pre><code class="python">def split(cs_tag: str) -&gt; list[str]:
+    &#34;&#34;&#34;Split a cs tag
     Args:
-        cs_tag (str): cs tag in **short** form
-        cigar (str): CIGAR string (6th column in SAM file)
-        seq (str): segment sequence (10th column in SAM file)
+        cs_tag (str): a cs tag
     Return:
-        str: cs tag in **long** form
+        list[str]: splits a cs tag by operators
 
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;cs:Z::4*ag:3&#34;
-        &gt;&gt;&gt; cigar = &#34;8M&#34;
-        &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
-        &gt;&gt;&gt; cstag.lengthen(cs, cigar, seq)
-        cs:Z:=ACGT*ag=CGT
+        &gt;&gt;&gt; cstag.split(cs)
+        [&#34;cs:Z:&#34;, &#34;:4&#34;, &#34;*ag&#34;, &#34;:3&#34;]
     &#34;&#34;&#34;
-
-    if re.search(r&#34;[ACGT]&#34;, cs_tag):
-        raise Exception(&#34;Error: input cs tag is not short format&#34;)
-
-    cs_tag_split = re.split(r&#34;([-+*~:])&#34;, cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;))[1:]
-    cs_tag_split = [i + j for i, j in zip(cs_tag_split[0::2], cs_tag_split[1::2])]
-
-    softclip = re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, cigar)
-    idx = int(softclip) if softclip.isdigit() else 0
-
-    cslong = []
-    for cs in cs_tag_split:
-        if cs == &#34;&#34;:
-            continue
-        if cs[0] == &#34;:&#34;:
-            cs = int(cs[1:]) + idx
-            cslong.append(&#34;:&#34; + seq[idx:cs])
-            idx = cs
-            continue
-        cslong.append(cs)
-        if cs[0] == &#34;*&#34;:
-            idx += 1
-        if cs[0] == &#34;+&#34;:
-            idx += len(cs) - 1
-
-    return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
+    pattern = r&#34;(\=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})&#34;
+    return [cs for cs in re.split(pattern, cs_tag) if cs]</code></pre>
 </details>
 </dd>
 </dl>
@@ -171,7 +112,7 @@ cs:Z:=ACGT*ag=CGT
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="cstag.lengthen.lengthen" href="#cstag.lengthen.lengthen">lengthen</a></code></li>
+<li><code><a title="cstag.split.split" href="#cstag.split.split">split</a></code></li>
 </ul>
 </li>
 </ul>

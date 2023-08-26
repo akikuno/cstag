@@ -36,6 +36,8 @@
 <li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code>: Convert a cs tag from short to long format</li>
 <li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code>: Generate a consensus cs tag from multiple cs tags</li>
 <li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code>: Mask low-quality bases in a cs tag</li>
+<li><code><a title="cstag.split" href="split.html">cstag.split</a></code>: Split a cs tag</li>
+<li><code><a title="cstag.revcomp" href="revcomp.html">cstag.revcomp</a></code>: Converts a cs tag into its reverse complement.</li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Output html report</li>
 </ul>
 <!-- - <code>cstag.to\_mids()</code>: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:) -->
@@ -99,6 +101,20 @@ phred_threshold = 10
 cstag.mask(cs, cigar, qual, phred_threshold)
 # =&gt; cs:Z:=ACNN*an+ng-cc=T
 </code></pre>
+<h3 id="split-a-cs-tag">Split a cs tag</h3>
+<pre><code class="language-python">import cstag
+
+cs = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
+cstag.split(cs)
+# =&gt; ['cs:Z:', '=ACGT', '*ac', '+gg', '-cc', '=T']
+</code></pre>
+<h3 id="converts-a-cs-tag-into-its-reverse-complement">Converts a cs tag into its reverse complement</h3>
+<pre><code class="language-python">import cstag
+
+cs = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
+cstag.revcomp(cs)
+# =&gt; cs:Z:=A-gg+cc*tg=ACGT
+</code></pre>
 <h3 id="output-html-report">Output HTML report</h3>
 <pre><code class="language-python">import cstag
 from pathlib import Path
@@ -147,7 +163,15 @@ from cstag.call import call</code></pre>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="cstag.revcomp" href="revcomp.html">cstag.revcomp</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="cstag.split" href="split.html">cstag.split</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -175,6 +199,8 @@ from cstag.call import call</code></pre>
 <li><a href="#shortenlengthen">Shorten/Lengthen</a></li>
 <li><a href="#call-consensus">Call consensus</a></li>
 <li><a href="#mask-low-quality-bases-in-a-cs-tag">Mask low-quality bases in a cs tag</a></li>
+<li><a href="#split-a-cs-tag">Split a cs tag</a></li>
+<li><a href="#converts-a-cs-tag-into-its-reverse-complement">Converts a cs tag into its reverse complement</a></li>
 <li><a href="#output-html-report">Output HTML report</a></li>
 </ul>
 </li>
@@ -189,7 +215,9 @@ from cstag.call import call</code></pre>
 <li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code></li>
 <li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code></li>
 <li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code></li>
+<li><code><a title="cstag.revcomp" href="revcomp.html">cstag.revcomp</a></code></li>
 <li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code></li>
+<li><code><a title="cstag.split" href="split.html">cstag.split</a></code></li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></li>
 </ul>
 </li>
