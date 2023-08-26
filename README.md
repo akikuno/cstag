@@ -13,6 +13,8 @@
 - `cstag.lengthen()`: Convert a cs tag from short to long format
 - `cstag.consensus()`: Generate a consensus cs tag from multiple cs tags
 - `cstag.mask()`: Mask low-quality bases in a cs tag
+- `cstag.split()`: Split a cs tag
+- `cstag.revcomp()`: Converts a cs tag into its reverse complement.
 - `cstag.to_html()`: Output html report
 <!-- - `cstag.to_mids()`: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:) -->
 
@@ -95,6 +97,27 @@ phred_threshold = 10
 cstag.mask(cs, cigar, qual, phred_threshold)
 # => cs:Z:=ACNN*an+ng-cc=T
 ```
+
+### Split a cs tag
+
+```python
+import cstag
+
+cs = "cs:Z:=ACGT*ac+gg-cc=T"
+cstag.split(cs)
+# => ['cs:Z:', '=ACGT', '*ac', '+gg', '-cc', '=T']
+```
+
+### Converts a cs tag into its reverse complement
+
+```python
+import cstag
+
+cs = "cs:Z:=ACGT*ac+gg-cc=T"
+cstag.revcomp(cs)
+# => cs:Z:=A-gg+cc*tg=ACGT
+```
+
 
 ### Output HTML report
 
