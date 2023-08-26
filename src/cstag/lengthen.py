@@ -1,11 +1,11 @@
 import re
 
-def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
+def lengthen(cs_tag: str, cigar: str, seq: str) -> str:
     """Convert short format of cs tag into long format
     Args:
-        CSTAG (str): cs tag in **short** form
-        CIGAR (str): CIGAR string (6th column in SAM file)
-        SEQ (str): segment sequence (10th column in SAM file)
+        cs_tag (str): cs tag in **short** form
+        cigar (str): CIGAR string (6th column in SAM file)
+        seq (str): segment sequence (10th column in SAM file)
     Return:
         str: cs tag in **long** form
 
@@ -18,22 +18,22 @@ def lengthen(CSTAG: str, CIGAR: str, SEQ: str) -> str:
         cs:Z:=ACGT*ag=CGT
     """
 
-    if re.search(r"[ACGT]", CSTAG):
+    if re.search(r"[ACGT]", cs_tag):
         raise Exception("Error: input cs tag is not short format")
 
-    cstags = re.split(r"([-+*~:])", CSTAG.replace("cs:Z:", ""))[1:]
-    cstags = [i + j for i, j in zip(cstags[0::2], cstags[1::2])]
+    cs_tag_split = re.split(r"([-+*~:])", cs_tag.replace("cs:Z:", ""))[1:]
+    cs_tag_split = [i + j for i, j in zip(cs_tag_split[0::2], cs_tag_split[1::2])]
 
-    softclip = re.sub(r"^([0-9]+)S.*", r"\1", CIGAR)
+    softclip = re.sub(r"^([0-9]+)S.*", r"\1", cigar)
     idx = int(softclip) if softclip.isdigit() else 0
 
     cslong = []
-    for cs in cstags:
+    for cs in cs_tag_split:
         if cs == "":
             continue
         if cs[0] == ":":
             cs = int(cs[1:]) + idx
-            cslong.append(":" + SEQ[idx:cs])
+            cslong.append(":" + seq[idx:cs])
             idx = cs
             continue
         cslong.append(cs)
