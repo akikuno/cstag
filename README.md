@@ -45,10 +45,10 @@ md = "2A5^AG7"
 seq = "ACGTACGTACGTACG"
 
 cstag.call(cigar, md, seq)
-# => cs:Z::2*ag:5-ag:4+ac~nn3nn:1
+# => :2*ag:5-ag:4+ac~nn3nn:1
 
 cstag.call(cigar, md, seq, is_long=True)
-# => cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
+# => =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
 ### Shorten/Lengthen
@@ -57,19 +57,19 @@ cstag.call(cigar, md, seq, is_long=True)
 import cstag
 
 # Convert a cs tag from long to short
-cs = "cs:Z:=ACGT*ag=CGT"
+cs = "=ACGT*ag=CGT"
 
 cstag.shorten(cs)
-# => cs:Z::4*ag:3
+# => :4*ag:3
 
 
 # Convert a cs tag from short to long
-cs = "cs:Z::4*ag:3"
+cs = ":4*ag:3"
 cigar = "8M"
 seq = "ACGTACGT"
 
 cstag.lengthen(cs, cigar, seq)
-# => cs:Z:=ACGT*ag=CGT
+# => =ACGT*ag=CGT
 ```
 
 ### Call consensus
@@ -77,12 +77,12 @@ cstag.lengthen(cs, cigar, seq)
 ```python
 import cstag
 
-cs_list = ["cs:Z:=ACGT", "cs:Z:=AC*gt=T", "cs:Z:=C*gt=T", "cs:Z:=C*gt=T", "cs:Z:=ACT+ccc=T"]
+cs_list = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
 cigar_list = ["4M", "4M", "1S3M", "3M", "3M3I1M"]
 pos_list = [1, 1, 1, 2, 1]
 
 cstag.consensus(cs_list, cigar_list, pos_list)
-# => cs:Z:=AC*gt*T
+# => =AC*gt*T
 ```
 
 ### Mask low-quality bases in a cs tag
@@ -90,12 +90,12 @@ cstag.consensus(cs_list, cigar_list, pos_list)
 ```python
 import cstag
 
-cs = "cs:Z:=ACGT*ac+gg-cc=T"
+cs = "=ACGT*ac+gg-cc=T"
 cigar = "5M2I2D1M"
 qual = "AA!!!!AA"
 phred_threshold = 10
 cstag.mask(cs, cigar, qual, phred_threshold)
-# => cs:Z:=ACNN*an+ng-cc=T
+# => =ACNN*an+ng-cc=T
 ```
 
 ### Split a cs tag
@@ -103,9 +103,9 @@ cstag.mask(cs, cigar, qual, phred_threshold)
 ```python
 import cstag
 
-cs = "cs:Z:=ACGT*ac+gg-cc=T"
+cs = "=ACGT*ac+gg-cc=T"
 cstag.split(cs)
-# => ['cs:Z:', '=ACGT', '*ac', '+gg', '-cc', '=T']
+# => ['', '=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
 ### Converts a cs tag into its reverse complement
@@ -113,9 +113,9 @@ cstag.split(cs)
 ```python
 import cstag
 
-cs = "cs:Z:=ACGT*ac+gg-cc=T"
+cs = "=ACGT*ac+gg-cc=T"
 cstag.revcomp(cs)
-# => cs:Z:=A-gg+cc*tg=ACGT
+# => =A-gg+cc*tg=ACGT
 ```
 
 
@@ -125,7 +125,7 @@ cstag.revcomp(cs)
 import cstag
 from pathlib import Path
 
-cs = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+cs = "=AC+GGG=T-ACGT*at~gt10cg=GNNN"
 description = "Example"
 
 cstag_html = cstag.to_html(cs, description)
