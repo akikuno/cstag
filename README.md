@@ -4,9 +4,9 @@
 [![PyPI](https://img.shields.io/pypi/v/cstag.svg?label=PyPI&color=orange&style=flat-square)](https://pypi.org/project/cstag/)
 [![Bioconda](https://img.shields.io/conda/v/bioconda/cstag?label=Bioconda&color=orange&style=flat-square)](https://anaconda.org/bioconda/cstag)
 
-# `cstag`: A Python Module for Manipulating Minimap2's CS Tag
+# cstag
 
-cstag is a Python library designed for handling and manipulating [minimap2's CS tags](https://github.com/lh3/minimap2#cs).
+`cstag`` is a Python library designed for handling and manipulating [minimap2's CS tags](https://github.com/lh3/minimap2#cs).
 
 ## 🌟Features
 
@@ -139,5 +139,5 @@ The resulting `report.html` looks like this :point_down:
 
 ## 📣Feedback
 
-For questions, bug reports, or any other inquiries, feel free to reach out!
+For questions, bug reports, or any other inquiries, feel free to reach out!  
 Please use [GitHub Issues](https://github.com/akikuno/cstag/issues) for reporting.
