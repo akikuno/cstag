@@ -6,7 +6,7 @@
 
 # cstag
 
-`cstag`` is a Python library designed for handling and manipulating [minimap2's CS tags](https://github.com/lh3/minimap2#cs).
+`cstag` is a Python library designed for handling and manipulating [minimap2's CS tags](https://github.com/lh3/minimap2#cs).
 
 ## 🌟Features
 
