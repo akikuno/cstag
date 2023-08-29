@@ -4,39 +4,40 @@
 [![PyPI](https://img.shields.io/pypi/v/cstag.svg?label=PyPI&color=orange&style=flat-square)](https://pypi.org/project/cstag/)
 [![Bioconda](https://img.shields.io/conda/v/bioconda/cstag?label=Bioconda&color=orange&style=flat-square)](https://anaconda.org/bioconda/cstag)
 
-# cstag
+# `cstag`: A Python Module for Manipulating Minimap2's CS Tag
 
-`cstag` is a Python module to manipulate [minimap2's CS tag](https://github.com/lh3/minimap2#cs).
+cstag is a Python library designed for handling and manipulating [minimap2's CS tags](https://github.com/lh3/minimap2#cs).
 
-- `cstag.call()`: Generate a cs tag
-- `cstag.shorten()`: Convert a cs tag from long to short format
-- `cstag.lengthen()`: Convert a cs tag from short to long format
+## 🌟Features
+
+- `cstag.call()`: Generate a CS tag
+- `cstag.shorten()`: Convert a CS tag from long to short format
+- `cstag.lengthen()`: Convert a CS tag from short to long format
 - `cstag.consensus()`: Generate a consensus cs tag from multiple cs tags
-- `cstag.mask()`: Mask low-quality bases in a cs tag
-- `cstag.split()`: Split a cs tag
-- `cstag.revcomp()`: Converts a cs tag into its reverse complement.
+- `cstag.mask()`: Mask low-quality bases in a CS tag
+- `cstag.split()`: Split a CS tag
+- `cstag.revcomp()`: Converts a CS tag into its reverse complement.
 - `cstag.to_html()`: Output html report
-<!-- - `cstag.to_mids()`: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:) -->
 
-See [documentation](https://akikuno.github.io/cstag/cstag/) for more information.
+Visit the [documentation](https://akikuno.github.io/cstag/cstag/) for more details.
 
-## Installation
+## 🛠 Installation
 
-From [PyPI](https://pypi.org/project/cstag/):
+Using [PyPI](https://pypi.org/project/cstag/):
 
 ```bash
 pip install cstag
 ```
 
-From [Bioconda](https://anaconda.org/bioconda/cstag):
+Using [Bioconda](https://anaconda.org/bioconda/cstag):
 
 ```bash
 conda install -c bioconda cstag
 ```
 
-## Examples
+## 💡Usage
 
-### Generate the cs tag
+### Generate CS Tags
 ```python
 import cstag
 
@@ -51,19 +52,19 @@ cstag.call(cigar, md, seq, is_long=True)
 # => =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
-### Shorten/Lengthen
+### Shorten or Lengthen CS Tags
 
 ```python
 import cstag
 
-# Convert a cs tag from long to short
+# Convert a CS tag from long to short
 cs = "=ACGT*ag=CGT"
 
 cstag.shorten(cs)
 # => :4*ag:3
 
 
-# Convert a cs tag from short to long
+# Convert a CS tag from short to long
 cs = ":4*ag:3"
 cigar = "8M"
 seq = "ACGTACGT"
@@ -72,7 +73,7 @@ cstag.lengthen(cs, cigar, seq)
 # => =ACGT*ag=CGT
 ```
 
-### Call consensus
+### Generate a Consensus
 
 ```python
 import cstag
@@ -85,7 +86,7 @@ cstag.consensus(cs_list, cigar_list, pos_list)
 # => =AC*gt*T
 ```
 
-### Mask low-quality bases in a cs tag
+### Mask Low-Quality Bases
 
 ```python
 import cstag
@@ -98,7 +99,7 @@ cstag.mask(cs, cigar, qual, phred_threshold)
 # => =ACNN*an+ng-cc=T
 ```
 
-### Split a cs tag
+### Split a CS Tag
 
 ```python
 import cstag
@@ -108,7 +109,7 @@ cstag.split(cs)
 # => ['', '=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
-### Converts a cs tag into its reverse complement
+### Reverse Complement of a CS Tag
 
 ```python
 import cstag
@@ -119,7 +120,7 @@ cstag.revcomp(cs)
 ```
 
 
-### Output HTML report
+### Generate HTML Report
 
 ```python
 import cstag
@@ -132,6 +133,11 @@ cstag_html = cstag.to_html(cs, description)
 Path("report.html").write_text(cstag_html)
 # => Output "report.html"
 ```
-The `report.html` is :point_down:
+The resulting `report.html` looks like this :point_down:
 
 <img width="414" alt="example_report" src="https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png">
+
+## 📣Feedback
+
+For questions, bug reports, or any other inquiries, feel free to reach out!
+Please use [GitHub Issues](https://github.com/akikuno/cstag/issues) for reporting.
