@@ -1,19 +1,20 @@
 import re
 
 
-def shorten(CSTAG: str) -> str:
+def shorten(cs_tag: str, prefix: bool = False) -> str:
     """Convert long format of cs tag into short format
     Args:
-        CSTAG (str): cs tag in the **long** format
+        cs_tag (str): cs tag in the **long** format
+        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
     Return:
         str: cs tag in the **short** format
     Example:
         >>> import cstag
-        >>> cs = "cs:Z:=ACGT*ag=CGT"
-        >>> cstag.shorten(cs)
+        >>> cs = "=ACGT*ag=CGT"
+        >>> cstag.shorten(cs, prefix=True)
         cs:Z::4*ag:3
     """
-    cstags = re.split(r"([-+*~=])", CSTAG.replace("cs:Z:", ""))[1:]
+    cstags = re.split(r"([-+*~=])", cs_tag.replace("cs:Z:", ""))[1:]
     cstags = [i + j for i, j in zip(cstags[0::2], cstags[1::2])]
 
     csshort = []
@@ -22,6 +23,8 @@ def shorten(CSTAG: str) -> str:
             csshort.append(":" + str(len(cs) - 1))
             continue
         csshort.append(cs)
-
-    return "cs:Z:" + "".join(csshort)
-
+    csshort = "".join(csshort)
+    if prefix is True:
+        return "cs:Z:" + csshort
+    else:
+        return csshort
