@@ -29,52 +29,52 @@
 <pre><code class="python">import re
 
 
-def mask(CSTAG: str, CIGAR: str, QUAL: str, THRESHOLD: int = 10):
+def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10):
     &#34;&#34;&#34;Mask low-quality bases to &#39;N&#39;
     Args:
-        CSTAG (str): cs tag in the **long** format
-        CIGAR (str): CIGAR strings (6th column in SAM file)
-        QUAL (str): ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)
-        THRESHOLD (int): optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as &#39;less than or equal to the threshold&#39;
+        cs_tag (str): cs tag in the **long** format
+        cigar (str): cigar strings (6th column in SAM file)
+        qual (str): ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)
+        threshold (int): optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as &#39;less than or equal to the threshold&#39;
     Return:
         str: Masked cs tag
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; CSTAG = &#34;cs:Z:=ACGT*ac+gg-cc=T&#34;
-        &gt;&gt;&gt; CIGAR = &#34;5M2I2D1M&#34;
-        &gt;&gt;&gt; QUAL = &#34;AA!!!!AA&#34;
-        &gt;&gt;&gt; cstag.mask(CSTAG, QUAL)
+        &gt;&gt;&gt; cs_tag = &#34;cs:Z:=ACGT*ac+gg-cc=T&#34;
+        &gt;&gt;&gt; cigar = &#34;5M2I2D1M&#34;
+        &gt;&gt;&gt; qual = &#34;AA!!!!AA&#34;
+        &gt;&gt;&gt; cstag.mask(cs_tag, qual)
         cs:Z:=ACNN*an+ng-cc=T
     &#34;&#34;&#34;
-    if not re.search(r&#34;[ACGT]&#34;, CSTAG):
+    if not re.search(r&#34;[ACGT]&#34;, cs_tag):
         raise Exception(&#34;Error: cs tag must be a long format&#34;)
-    if not isinstance(THRESHOLD, int):
+    if not isinstance(threshold, int):
         raise Exception(&#34;Error: threshold must be an integer&#34;)
-    if not 0 &lt;= THRESHOLD &lt;= 40:
+    if not 0 &lt;= threshold &lt;= 40:
         raise Exception(&#34;Error: threshold must be within a range between 0 to 40&#34;)
 
-    mask_symbols = [chr(th + 33) for th in range(THRESHOLD + 1)]
+    mask_symbols = [chr(th + 33) for th in range(threshold + 1)]
     mask_symbols = set(mask_symbols)
 
-    cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    cs = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
     list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
-    if CIGAR.split(&#34;S&#34;)[0].isdigit():
-        softclip = int(CIGAR.split(&#34;S&#34;)[0])
-        QUAL = QUAL[softclip:]
+    if cigar.split(&#34;S&#34;)[0].isdigit():
+        softclip = int(cigar.split(&#34;S&#34;)[0])
+        qual = qual[softclip:]
 
     cs_masked = []
     idx = 0
     for cs in list_cs:
         cs = list(cs)
         if cs[0] == &#34;*&#34;:
-            if QUAL[idx] in mask_symbols:
+            if qual[idx] in mask_symbols:
                 cs[-1] = &#34;n&#34;
             idx += 1
         elif cs[0] == &#34;=&#34; or cs[0] == &#34;+&#34;:
             for i in range(len(cs) - 1):
-                if QUAL[idx + i] in mask_symbols:
+                if qual[idx + i] in mask_symbols:
                     cs[i + 1] = &#34;N&#34; if cs[0] == &#34;=&#34; else &#34;n&#34;
             idx += i + 1
         cs_masked.append(&#34;&#34;.join(cs))
@@ -90,81 +90,81 @@ def mask(CSTAG: str, CIGAR: str, QUAL: str, THRESHOLD: int = 10):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="cstag.mask.mask"><code class="name flex">
-<span>def <span class="ident">mask</span></span>(<span>CSTAG: str, CIGAR: str, QUAL: str, THRESHOLD: int = 10)</span>
+<span>def <span class="ident">mask</span></span>(<span>cs_tag: str, cigar: str, qual: str, threshold: int = 10)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Mask low-quality bases to 'N'</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>CSTAG</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>cs_tag</code></strong> :&ensp;<code>str</code></dt>
 <dd>cs tag in the <strong>long</strong> format</dd>
-<dt><strong><code>CIGAR</code></strong> :&ensp;<code>str</code></dt>
-<dd>CIGAR strings (6th column in SAM file)</dd>
-<dt><strong><code>QUAL</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>cigar</code></strong> :&ensp;<code>str</code></dt>
+<dd>cigar strings (6th column in SAM file)</dd>
+<dt><strong><code>qual</code></strong> :&ensp;<code>str</code></dt>
 <dd>ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)</dd>
-<dt><strong><code>THRESHOLD</code></strong> :&ensp;<code>int</code></dt>
+<dt><strong><code>threshold</code></strong> :&ensp;<code>int</code></dt>
 <dd>optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as 'less than or equal to the threshold'</dd>
 </dl>
 <h2 id="return">Return</h2>
 <p>str: Masked cs tag</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; CSTAG = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
-&gt;&gt;&gt; CIGAR = &quot;5M2I2D1M&quot;
-&gt;&gt;&gt; QUAL = &quot;AA!!!!AA&quot;
-&gt;&gt;&gt; cstag.mask(CSTAG, QUAL)
+&gt;&gt;&gt; cs_tag = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
+&gt;&gt;&gt; cigar = &quot;5M2I2D1M&quot;
+&gt;&gt;&gt; qual = &quot;AA!!!!AA&quot;
+&gt;&gt;&gt; cstag.mask(cs_tag, qual)
 cs:Z:=ACNN*an+ng-cc=T
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def mask(CSTAG: str, CIGAR: str, QUAL: str, THRESHOLD: int = 10):
+<pre><code class="python">def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10):
     &#34;&#34;&#34;Mask low-quality bases to &#39;N&#39;
     Args:
-        CSTAG (str): cs tag in the **long** format
-        CIGAR (str): CIGAR strings (6th column in SAM file)
-        QUAL (str): ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)
-        THRESHOLD (int): optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as &#39;less than or equal to the threshold&#39;
+        cs_tag (str): cs tag in the **long** format
+        cigar (str): cigar strings (6th column in SAM file)
+        qual (str): ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)
+        threshold (int): optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as &#39;less than or equal to the threshold&#39;
     Return:
         str: Masked cs tag
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; CSTAG = &#34;cs:Z:=ACGT*ac+gg-cc=T&#34;
-        &gt;&gt;&gt; CIGAR = &#34;5M2I2D1M&#34;
-        &gt;&gt;&gt; QUAL = &#34;AA!!!!AA&#34;
-        &gt;&gt;&gt; cstag.mask(CSTAG, QUAL)
+        &gt;&gt;&gt; cs_tag = &#34;cs:Z:=ACGT*ac+gg-cc=T&#34;
+        &gt;&gt;&gt; cigar = &#34;5M2I2D1M&#34;
+        &gt;&gt;&gt; qual = &#34;AA!!!!AA&#34;
+        &gt;&gt;&gt; cstag.mask(cs_tag, qual)
         cs:Z:=ACNN*an+ng-cc=T
     &#34;&#34;&#34;
-    if not re.search(r&#34;[ACGT]&#34;, CSTAG):
+    if not re.search(r&#34;[ACGT]&#34;, cs_tag):
         raise Exception(&#34;Error: cs tag must be a long format&#34;)
-    if not isinstance(THRESHOLD, int):
+    if not isinstance(threshold, int):
         raise Exception(&#34;Error: threshold must be an integer&#34;)
-    if not 0 &lt;= THRESHOLD &lt;= 40:
+    if not 0 &lt;= threshold &lt;= 40:
         raise Exception(&#34;Error: threshold must be within a range between 0 to 40&#34;)
 
-    mask_symbols = [chr(th + 33) for th in range(THRESHOLD + 1)]
+    mask_symbols = [chr(th + 33) for th in range(threshold + 1)]
     mask_symbols = set(mask_symbols)
 
-    cs = CSTAG.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    cs = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
     list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
     list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
 
-    if CIGAR.split(&#34;S&#34;)[0].isdigit():
-        softclip = int(CIGAR.split(&#34;S&#34;)[0])
-        QUAL = QUAL[softclip:]
+    if cigar.split(&#34;S&#34;)[0].isdigit():
+        softclip = int(cigar.split(&#34;S&#34;)[0])
+        qual = qual[softclip:]
 
     cs_masked = []
     idx = 0
     for cs in list_cs:
         cs = list(cs)
         if cs[0] == &#34;*&#34;:
-            if QUAL[idx] in mask_symbols:
+            if qual[idx] in mask_symbols:
                 cs[-1] = &#34;n&#34;
             idx += 1
         elif cs[0] == &#34;=&#34; or cs[0] == &#34;+&#34;:
             for i in range(len(cs) - 1):
-                if QUAL[idx + i] in mask_symbols:
+                if qual[idx + i] in mask_symbols:
                     cs[i + 1] = &#34;N&#34; if cs[0] == &#34;=&#34; else &#34;n&#34;
             idx += i + 1
         cs_masked.append(&#34;&#34;.join(cs))

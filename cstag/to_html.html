@@ -109,8 +109,8 @@ HTML_FOOTER = &#34;&#34;&#34;
 &#34;&#34;&#34;
 
 
-def validate_cstag(cstag: str) -&gt; None:
-    if not re.search(r&#34;[ACGTN]&#34;, cstag):
+def validate_cstag(cs_tag: str) -&gt; None:
+    if not re.search(r&#34;[ACGTN]&#34;, cs_tag):
         raise Exception(&#34;Error: cs tag must be a long format&#34;)
 
 
@@ -281,7 +281,7 @@ def to_html(cstag: str, description: str = &#34;&#34;) -&gt; str:
 </details>
 </dd>
 <dt id="cstag.to_html.validate_cstag"><code class="name flex">
-<span>def <span class="ident">validate_cstag</span></span>(<span>cstag: str) ‑> None</span>
+<span>def <span class="ident">validate_cstag</span></span>(<span>cs_tag: str) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -289,8 +289,8 @@ def to_html(cstag: str, description: str = &#34;&#34;) -&gt; str:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def validate_cstag(cstag: str) -&gt; None:
-    if not re.search(r&#34;[ACGTN]&#34;, cstag):
+<pre><code class="python">def validate_cstag(cs_tag: str) -&gt; None:
+    if not re.search(r&#34;[ACGTN]&#34;, cs_tag):
         raise Exception(&#34;Error: cs tag must be a long format&#34;)</code></pre>
 </details>
 </dd>

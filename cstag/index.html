@@ -29,105 +29,108 @@
 <a href="https://pypi.org/project/cstag/"><img alt="PyPI" src="https://img.shields.io/pypi/v/cstag.svg?label=PyPI&amp;color=orange&amp;style=flat-square"></a>
 <a href="https://anaconda.org/bioconda/cstag"><img alt="Bioconda" src="https://img.shields.io/conda/v/bioconda/cstag?label=Bioconda&amp;color=orange&amp;style=flat-square"></a></p>
 <h1 id="cstag">cstag</h1>
-<p><code><a title="cstag" href="#cstag">cstag</a></code> is a Python module to manipulate <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tag</a>.</p>
+<p><code><a title="cstag" href="#cstag">cstag</a></code> is a Python library designed for handling and manipulating <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tags</a>.</p>
+<h2 id="features">🌟Features</h2>
 <ul>
-<li><code><a title="cstag.call" href="call.html">cstag.call</a></code>: Generate a cs tag</li>
-<li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code>: Convert a cs tag from long to short format</li>
-<li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code>: Convert a cs tag from short to long format</li>
+<li><code><a title="cstag.call" href="call.html">cstag.call</a></code>: Generate a CS tag</li>
+<li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code>: Convert a CS tag from long to short format</li>
+<li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code>: Convert a CS tag from short to long format</li>
 <li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code>: Generate a consensus cs tag from multiple cs tags</li>
-<li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code>: Mask low-quality bases in a cs tag</li>
-<li><code><a title="cstag.split" href="split.html">cstag.split</a></code>: Split a cs tag</li>
-<li><code><a title="cstag.revcomp" href="revcomp.html">cstag.revcomp</a></code>: Converts a cs tag into its reverse complement.</li>
+<li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code>: Mask low-quality bases in a CS tag</li>
+<li><code><a title="cstag.split" href="split.html">cstag.split</a></code>: Split a CS tag</li>
+<li><code><a title="cstag.revcomp" href="revcomp.html">cstag.revcomp</a></code>: Converts a CS tag into its reverse complement.</li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Output html report</li>
 </ul>
-<!-- - <code>cstag.to\_mids()</code>: to convert cs tag into [compressed MIDS format](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001507#:~:text=S6%20Fig.%20Compressed%20MIDS%20conversion.) (under-development:construction_worker:) -->
-<p>See <a href="https://akikuno.github.io/cstag/cstag/">documentation</a> for more information.</p>
-<h2 id="installation">Installation</h2>
-<p>From <a href="https://pypi.org/project/cstag/">PyPI</a>:</p>
+<p>Visit the <a href="https://akikuno.github.io/cstag/cstag/">documentation</a> for more details.</p>
+<h2 id="installation">🛠 Installation</h2>
+<p>Using <a href="https://pypi.org/project/cstag/">PyPI</a>:</p>
 <pre><code class="language-bash">pip install cstag
 </code></pre>
-<p>From <a href="https://anaconda.org/bioconda/cstag">Bioconda</a>:</p>
+<p>Using <a href="https://anaconda.org/bioconda/cstag">Bioconda</a>:</p>
 <pre><code class="language-bash">conda install -c bioconda cstag
 </code></pre>
-<h2 id="examples">Examples</h2>
-<h3 id="generate-the-cs-tag">Generate the cs tag</h3>
+<h2 id="usage">💡Usage</h2>
+<h3 id="generate-cs-tags">Generate CS Tags</h3>
 <pre><code class="language-python">import cstag
 
 cigar = &quot;8M2D4M2I3N1M&quot;
 md = &quot;2A5^AG7&quot;
 seq = &quot;ACGTACGTACGTACG&quot;
 
-cstag.call(cigar, md, seq, is_short_form=True)
-# =&gt; cs:Z::2*ag:5-ag:4+ac~nn3nn:1
+cstag.call(cigar, md, seq)
+# =&gt; :2*ag:5-ag:4+ac~nn3nn:1
 
-cstag.call(cigar, md, seq, is_short_form=False)
-# =&gt; cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
+cstag.call(cigar, md, seq, is_long=True)
+# =&gt; =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 </code></pre>
-<h3 id="shortenlengthen">Shorten/Lengthen</h3>
+<h3 id="shorten-or-lengthen-cs-tags">Shorten or Lengthen CS Tags</h3>
 <pre><code class="language-python">import cstag
 
-# Convert a cs tag from long to short
-cs = &quot;cs:Z:=ACGT*ag=CGT&quot;
+# Convert a CS tag from long to short
+cs = &quot;=ACGT*ag=CGT&quot;
 
 cstag.shorten(cs)
-# =&gt; cs:Z::4*ag:3
+# =&gt; :4*ag:3
 
 
-# Convert a cs tag from short to long
-cs = &quot;cs:Z::4*ag:3&quot;
+# Convert a CS tag from short to long
+cs = &quot;:4*ag:3&quot;
 cigar = &quot;8M&quot;
 seq = &quot;ACGTACGT&quot;
 
 cstag.lengthen(cs, cigar, seq)
-# =&gt; cs:Z:=ACGT*ag=CGT
+# =&gt; =ACGT*ag=CGT
 </code></pre>
-<h3 id="call-consensus">Call consensus</h3>
+<h3 id="generate-a-consensus">Generate a Consensus</h3>
 <pre><code class="language-python">import cstag
 
-cs_list = [&quot;cs:Z:=ACGT&quot;, &quot;cs:Z:=AC*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=C*gt=T&quot;, &quot;cs:Z:=ACT+ccc=T&quot;]
+cs_list = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
 cigar_list = [&quot;4M&quot;, &quot;4M&quot;, &quot;1S3M&quot;, &quot;3M&quot;, &quot;3M3I1M&quot;]
 pos_list = [1, 1, 1, 2, 1]
 
 cstag.consensus(cs_list, cigar_list, pos_list)
-# =&gt; cs:Z:=AC*gt*T
+# =&gt; =AC*gt*T
 </code></pre>
-<h3 id="mask-low-quality-bases-in-a-cs-tag">Mask low-quality bases in a cs tag</h3>
+<h3 id="mask-low-quality-bases">Mask Low-Quality Bases</h3>
 <pre><code class="language-python">import cstag
 
-cs = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
+cs = &quot;=ACGT*ac+gg-cc=T&quot;
 cigar = &quot;5M2I2D1M&quot;
 qual = &quot;AA!!!!AA&quot;
 phred_threshold = 10
 cstag.mask(cs, cigar, qual, phred_threshold)
-# =&gt; cs:Z:=ACNN*an+ng-cc=T
+# =&gt; =ACNN*an+ng-cc=T
 </code></pre>
-<h3 id="split-a-cs-tag">Split a cs tag</h3>
+<h3 id="split-a-cs-tag">Split a CS Tag</h3>
 <pre><code class="language-python">import cstag
 
-cs = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
+cs = &quot;=ACGT*ac+gg-cc=T&quot;
 cstag.split(cs)
-# =&gt; ['cs:Z:', '=ACGT', '*ac', '+gg', '-cc', '=T']
+# =&gt; ['', '=ACGT', '*ac', '+gg', '-cc', '=T']
 </code></pre>
-<h3 id="converts-a-cs-tag-into-its-reverse-complement">Converts a cs tag into its reverse complement</h3>
+<h3 id="reverse-complement-of-a-cs-tag">Reverse Complement of a CS Tag</h3>
 <pre><code class="language-python">import cstag
 
-cs = &quot;cs:Z:=ACGT*ac+gg-cc=T&quot;
+cs = &quot;=ACGT*ac+gg-cc=T&quot;
 cstag.revcomp(cs)
-# =&gt; cs:Z:=A-gg+cc*tg=ACGT
+# =&gt; =A-gg+cc*tg=ACGT
 </code></pre>
-<h3 id="output-html-report">Output HTML report</h3>
+<h3 id="generate-html-report">Generate HTML Report</h3>
 <pre><code class="language-python">import cstag
 from pathlib import Path
 
-cs = &quot;cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
+cs = &quot;=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
 description = &quot;Example&quot;
 
 cstag_html = cstag.to_html(cs, description)
 Path(&quot;report.html&quot;).write_text(cstag_html)
 # =&gt; Output &quot;report.html&quot;
 </code></pre>
-<p>The <code>report.html</code> is :point_down:</p>
+<p>The resulting <code>report.html</code> looks like this :point_down:</p>
 <p><img width="414" alt="example_report" src="https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png"></p>
+<h2 id="feedback">📣Feedback</h2>
+<p>For questions, bug reports, or any other inquiries, feel free to reach out!<br>
+Please use <a href="https://github.com/akikuno/cstag/issues">GitHub Issues</a> for reporting.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -193,17 +196,19 @@ from cstag.call import call</code></pre>
 <div class="toc">
 <ul>
 <li><a href="#cstag">cstag</a><ul>
-<li><a href="#installation">Installation</a></li>
-<li><a href="#examples">Examples</a><ul>
-<li><a href="#generate-the-cs-tag">Generate the cs tag</a></li>
-<li><a href="#shortenlengthen">Shorten/Lengthen</a></li>
-<li><a href="#call-consensus">Call consensus</a></li>
-<li><a href="#mask-low-quality-bases-in-a-cs-tag">Mask low-quality bases in a cs tag</a></li>
-<li><a href="#split-a-cs-tag">Split a cs tag</a></li>
-<li><a href="#converts-a-cs-tag-into-its-reverse-complement">Converts a cs tag into its reverse complement</a></li>
-<li><a href="#output-html-report">Output HTML report</a></li>
+<li><a href="#features">🌟Features</a></li>
+<li><a href="#installation">🛠 Installation</a></li>
+<li><a href="#usage">💡Usage</a><ul>
+<li><a href="#generate-cs-tags">Generate CS Tags</a></li>
+<li><a href="#shorten-or-lengthen-cs-tags">Shorten or Lengthen CS Tags</a></li>
+<li><a href="#generate-a-consensus">Generate a Consensus</a></li>
+<li><a href="#mask-low-quality-bases">Mask Low-Quality Bases</a></li>
+<li><a href="#split-a-cs-tag">Split a CS Tag</a></li>
+<li><a href="#reverse-complement-of-a-cs-tag">Reverse Complement of a CS Tag</a></li>
+<li><a href="#generate-html-report">Generate HTML Report</a></li>
 </ul>
 </li>
+<li><a href="#feedback">📣Feedback</a></li>
 </ul>
 </li>
 </ul>

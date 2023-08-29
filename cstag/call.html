@@ -31,34 +31,16 @@
 import re
 from cstag.shorten import shorten
 
-###########################################################
-# Define the mapping between the mutation and key
-###########################################################
-
-# use arbitrary characters other than &#39;acgtn&#39; for keys, which are used for deletions.
-mutation_encoding = {
-    &#34;*ac&#34;: &#34;b&#34;,
-    &#34;*ag&#34;: &#34;d&#34;,
-    &#34;*at&#34;: &#34;h&#34;,
-    &#34;*ca&#34;: &#34;v&#34;,
-    &#34;*cg&#34;: &#34;x&#34;,
-    &#34;*ct&#34;: &#34;y&#34;,
-    &#34;*ga&#34;: &#34;m&#34;,
-    &#34;*gc&#34;: &#34;r&#34;,
-    &#34;*gt&#34;: &#34;k&#34;,
-    &#34;*ta&#34;: &#34;w&#34;,
-    &#34;*tc&#34;: &#34;s&#34;,
-    &#34;*tg&#34;: &#34;o&#34;,
-}
-mutation_decoding = {v: k for k, v in mutation_encoding.items()}
-
 
 ###########################################################
 # Trim soft and hard clips from the CIGAR and sequence
 ###########################################################
 
 
-def _split_cigar(cigar: str) -&gt; list[tuple[str, int]]:
+def parse_cigar(cigar: str) -&gt; list[tuple[str, int]]:
+    &#34;&#34;&#34;
+    Parse a CIGAR string into a list of tuples containing operation and length.
+    &#34;&#34;&#34;
     parsed_cigar = []
     start_idx = 0
     for idx, operation in enumerate(cigar):
@@ -70,33 +52,10 @@ def _split_cigar(cigar: str) -&gt; list[tuple[str, int]]:
     return parsed_cigar
 
 
-def _join_cigar(cigar_tuples: list[tuple[str, int]]) -&gt; str:
-    return &#34;&#34;.join(f&#34;{length}{operation}&#34; for operation, length in cigar_tuples)
-
-
-def trim_clips(cigar: str, seq: str) -&gt; tuple[str, str]:
-    if all(x not in cigar for x in &#34;SH&#34;):
-        return cigar, seq
-    cigar_split = _split_cigar(cigar)
-    # trim soft clips of cigar and seq
-    if cigar_split[0][0] == &#34;S&#34;:
-        length_softclip = cigar_split[0][1]
-        seq = seq[length_softclip:]
-        cigar_split = cigar_split[1:]
-    if cigar_split[-1][0] == &#34;S&#34;:
-        length_softclip = cigar_split[-1][1]
-        seq = seq[:-length_softclip]
-        cigar_split = cigar_split[:-1]
-    # trim hard clips of cigar
-    if cigar_split[0][0] == &#34;H&#34;:
-        cigar_split = cigar_split[1:]
-    if cigar_split[-1][0] == &#34;H&#34;:
-        cigar_split = cigar_split[:-1]
-    cigar = _join_cigar(cigar_split)
-    return cigar, seq
-
-
-def _split_md(md: str) -&gt; list[tuple[str, int]]:
+def parse_md(md: str) -&gt; list[tuple[str, int]]:
+    &#34;&#34;&#34;
+    Parse an MD tag into a list of tuples containing operation and length.
+    &#34;&#34;&#34;
     parsed_md = []
     idx = 0
     while idx &lt; len(md):
@@ -117,72 +76,108 @@ def _split_md(md: str) -&gt; list[tuple[str, int]]:
     return parsed_md
 
 
-def generate_cslong_md(seq: str, md: str) -&gt; list[str]:
-    md_split = _split_md(md)
-    cslong_md = []
-    idx = 0
-    for op, length in md_split:
-        if op == &#34;=&#34;:
-            cslong_md.append(f&#34;={seq[idx:idx+length]}&#34;)
-            idx += length
-        elif op.startswith(&#34;^&#34;):
-            cslong_md.append(f&#34;-{op[1:].lower()}&#34;)
+def join_cigar(cigar_tuples: list[tuple[str, int]]) -&gt; str:
+    return &#34;&#34;.join(f&#34;{length}{operation}&#34; for operation, length in cigar_tuples)
+
+
+def trim_clips(cigar: str, seq: str) -&gt; tuple[str, str]:
+    if all(x not in cigar for x in &#34;SH&#34;):
+        return cigar, seq
+    parsed_cigar = parse_cigar(cigar)
+    # trim soft clips of cigar and seq
+    if parsed_cigar[0][0] == &#34;S&#34;:
+        length_softclip = parsed_cigar[0][1]
+        seq = seq[length_softclip:]
+        parsed_cigar = parsed_cigar[1:]
+    if parsed_cigar[-1][0] == &#34;S&#34;:
+        length_softclip = parsed_cigar[-1][1]
+        seq = seq[:-length_softclip]
+        parsed_cigar = parsed_cigar[:-1]
+    # trim hard clips of cigar
+    if parsed_cigar[0][0] == &#34;H&#34;:
+        parsed_cigar = parsed_cigar[1:]
+    if parsed_cigar[-1][0] == &#34;H&#34;:
+        parsed_cigar = parsed_cigar[:-1]
+    cigar = join_cigar(parsed_cigar)
+    return cigar, seq
+
+
+###########################################################
+# Generate CS long
+###########################################################
+def expand_cigar_operations(cigar: str) -&gt; list[str]:
+    parsed_cigar = parse_cigar(cigar)
+    expanded_list = []
+    for op, num in parsed_cigar:
+        if op in [&#34;D&#34;, &#34;N&#34;, &#34;I&#34;]:
+            expanded_list.append(op * num)
         else:
-            cslong_md.append(f&#34;*{op}{seq[idx]}&#34;.lower())
-            idx += 1
-    return cslong_md
+            expanded_list.extend([op] * num)
+    return expanded_list
 
 
-def _encode_substitution(cslong_with_substitutions: list[str]) -&gt; str:
-    &#34;&#34;&#34;
-    Convert substitution representations like &#39;*ac&#39;, &#39;*ag&#39;, etc., to single characters.
+def expand_md_operations(md: str) -&gt; list[str]:
+    parsed_md = parse_md(md)
+    expanded_list = []
+    for op, num in parsed_md:
+        if op.startswith(&#34;^&#34;):
+            expanded_list.append(op)
+            continue
+        expanded_list.extend([op] * num)
+    return expanded_list
 
-    The function aims to make the length of the sequence uniform for easier handling.
-    For example, if the original sequence &#39;ACGT&#39; has &#39;G&#39; substituted by &#39;A&#39;,
-    it would be represented as &#39;AC*agT&#39;. To make the sequence length uniform,
-    this function would convert it to &#39;ACdT&#39;.
-    &#34;&#34;&#34;
-    cslong_converted = []
-    for cs_element in cslong_with_substitutions:
-        if cs_element.startswith(&#34;*&#34;):
-            cslong_converted.append(mutation_encoding[cs_element])
+
+def remove_consecutive_equals(cs_long: list[str]) -&gt; list[str]:
+    if not cs_long:
+        return cs_long
+    for i, cs in enumerate(cs_long):
+        if i == 0:
+            prev_op = cs[0]
+            continue
+        curr_op = cs[0]
+        if prev_op == curr_op == &#34;=&#34;:
+            cs_long[i] = cs[1:]
         else:
-            cslong_converted.append(cs_element[1:])
-    return &#34;&#34;.join(cslong_converted)
+            prev_op = cs[0]
+    return cs_long
 
 
-def generate_cslong_cigar_integrated(cigar: str, cslong_md: list[str]) -&gt; list[str]:
-    cigar_split = _split_cigar(cigar)
-    cslong_encoded = _encode_substitution(cslong_md)
-    idx_n = 0
-    cslong_md_cigar = []
-    for op, length in cigar_split:
-        if op == &#34;N&#34;:
-            cslong_md_cigar.append(f&#34;~nn{length}nn&#34;)
-        elif op == &#34;I&#34;:
-            cslong_md_cigar.append(f&#34;+{cslong_encoded[idx_n:idx_n+length]}&#34;.lower())
-            idx_n += length
-        elif op == &#34;D&#34;:
-            cslong_md_cigar.append(f&#34;-{cslong_encoded[idx_n:idx_n+length]}&#34;.lower())
-            idx_n += length
-        else:
-            cslong_md_cigar.append(f&#34;={cslong_encoded[idx_n:idx_n+length]}&#34;)
-            idx_n += length
-    return cslong_md_cigar
+def generate_cs_long(cigar: str, md: str, seq: str) -&gt; str:
+    cigar_list = expand_cigar_operations(cigar)
+    md_list = expand_md_operations(md)
+    idx_cigar, idx_md, idx_seq = 0, 0, 0
+    cs_long = []
+    while idx_seq &lt; len(seq) and idx_cigar &lt; len(cigar_list) and idx_md &lt; len(md_list):
+        if cigar_list[idx_cigar] == &#34;M&#34;:
+            if md_list[idx_md] == &#34;=&#34;:
+                cs_long.append(f&#34;={seq[idx_seq]}&#34;)
+            else:
+                cs_long.append(f&#34;*{md_list[idx_md]}{seq[idx_seq]}&#34;.lower())
+            idx_cigar += 1
+            idx_md += 1
+            idx_seq += 1
+            continue
+        if cigar_list[idx_cigar][0] == &#34;D&#34;:
+            cs_long.append(md_list[idx_md].replace(&#34;^&#34;, &#34;-&#34;).lower())
+            idx_cigar += 1
+            idx_md += 1
+            continue
+        if cigar_list[idx_cigar][0] == &#34;I&#34;:
+            num_insertion = len(cigar_list[idx_cigar])
+            seq_insertion = &#34;&#34;.join(seq[idx_seq : idx_seq + num_insertion])
+            cs_long.append(f&#34;+{seq_insertion}&#34;.lower())
+            idx_cigar += 1
+            idx_seq += num_insertion
+            continue
+        if cigar_list[idx_cigar][0] == &#34;N&#34;:
+            cs_long.append(f&#34;~nn{len(cigar_list[idx_cigar])}nn&#34;)
+            idx_cigar += 1
+            continue
+    return &#34;&#34;.join(remove_consecutive_equals(cs_long))
 
 
-def decode_substitution(cslong_md_cigar: list[str]) -&gt; list[str]:
-    cslong_decoded = [c for c in re.split(r&#34;([bdhvxymrkwso])&#34;, &#34;&#34;.join(cslong_md_cigar)) if c]
-    for i, cs in enumerate(cslong_decoded):
-        if cs in mutation_decoding:
-            cslong_decoded[i] = mutation_decoding[cs]
-        elif cs[0] not in {&#34;=&#34;, &#34;-&#34;, &#34;+&#34;, &#34;*&#34;, &#34;~&#34;}:
-            cslong_decoded[i] = f&#34;={cs}&#34;
-    return cslong_decoded
-
-
-def format_cslong(cslong: list[str]) -&gt; str:
-    return f&#34;cs:Z:{&#39;&#39;.join(cslong)}&#34;
+def add_prefix(cs_tag: str) -&gt; str:
+    return f&#34;cs:Z:{cs_tag}&#34;
 
 
 ###########################################################
@@ -190,7 +185,7 @@ def format_cslong(cslong: list[str]) -&gt; str:
 ###########################################################
 
 
-def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
+def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = False) -&gt; str:
     &#34;&#34;&#34;
     Generate a cs tag based on CIGAR, MD, and SEQ information.
 
@@ -198,27 +193,26 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
         cigar (str): CIGAR string representing the alignment.
         md (str): MD tag representing mismatching positions/base.
         seq (str): The sequence of the read.
-        is_short_form (bool, optional): Whether to return the cs tag in short form. Defaults to True.
+        is_long (bool, optional): Whether to return the cs tag in long format. Defaults to False.
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
 
     Returns:
         str: A cs tag representing the alignment and differences.
 
     Example:
-        &gt;&gt;&gt; import your_module  # Replace &#39;your_module&#39; with the actual module name
+        &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cigar = &#34;8M2D4M2I3N1M&#34;
         &gt;&gt;&gt; md = &#34;2A5^AG7&#34;
         &gt;&gt;&gt; seq = &#34;ACGTACGTACGTACG&#34;
-        &gt;&gt;&gt; is_short_form = False
-        &gt;&gt;&gt; cstag.call(cigar, md, seq, is_short_form)
-        &#39;cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G&#39;
+        &gt;&gt;&gt; cstag.call(cigar, md, seq, is_long=True)
+        &#39;=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G&#39;
     &#34;&#34;&#34;
     cigar, seq = trim_clips(cigar, seq)
-    cslong_md = generate_cslong_md(seq, md)
-    cslong_md_cigar = generate_cslong_cigar_integrated(cigar, cslong_md)
-    cslong_decoded = decode_substitution(cslong_md_cigar)
-    cs_tag = format_cslong(cslong_decoded)
-    if is_short_form:
+    cs_tag = generate_cs_long(cigar, md, seq)
+    if is_long is False:
         cs_tag = shorten(cs_tag)
+    if prefix is True:
+        cs_tag = add_prefix(cs_tag)
     return cs_tag</code></pre>
 </details>
 </section>
@@ -229,8 +223,21 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="cstag.call.add_prefix"><code class="name flex">
+<span>def <span class="ident">add_prefix</span></span>(<span>cs_tag: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_prefix(cs_tag: str) -&gt; str:
+    return f&#34;cs:Z:{cs_tag}&#34;</code></pre>
+</details>
+</dd>
 <dt id="cstag.call.call"><code class="name flex">
-<span>def <span class="ident">call</span></span>(<span>cigar: str, md: str, seq: str, is_short_form: bool = True) ‑> str</span>
+<span>def <span class="ident">call</span></span>(<span>cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = False) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Generate a cs tag based on CIGAR, MD, and SEQ information.</p>
@@ -242,8 +249,10 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
 <dd>MD tag representing mismatching positions/base.</dd>
 <dt><strong><code>seq</code></strong> :&ensp;<code>str</code></dt>
 <dd>The sequence of the read.</dd>
-<dt><strong><code>is_short_form</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>Whether to return the cs tag in short form. Defaults to True.</dd>
+<dt><strong><code>is_long</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to return the cs tag in long format. Defaults to False.</dd>
+<dt><strong><code>prefix</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -251,19 +260,18 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
 <dd>A cs tag representing the alignment and differences.</dd>
 </dl>
 <h2 id="example">Example</h2>
-<pre><code class="language-python-repl">&gt;&gt;&gt; import your_module  # Replace 'your_module' with the actual module name
+<pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cigar = &quot;8M2D4M2I3N1M&quot;
 &gt;&gt;&gt; md = &quot;2A5^AG7&quot;
 &gt;&gt;&gt; seq = &quot;ACGTACGTACGTACG&quot;
-&gt;&gt;&gt; is_short_form = False
-&gt;&gt;&gt; cstag.call(cigar, md, seq, is_short_form)
-'cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G'
+&gt;&gt;&gt; cstag.call(cigar, md, seq, is_long=True)
+'=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G'
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
+<pre><code class="python">def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = False) -&gt; str:
     &#34;&#34;&#34;
     Generate a cs tag based on CIGAR, MD, and SEQ information.
 
@@ -271,32 +279,31 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
         cigar (str): CIGAR string representing the alignment.
         md (str): MD tag representing mismatching positions/base.
         seq (str): The sequence of the read.
-        is_short_form (bool, optional): Whether to return the cs tag in short form. Defaults to True.
+        is_long (bool, optional): Whether to return the cs tag in long format. Defaults to False.
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
 
     Returns:
         str: A cs tag representing the alignment and differences.
 
     Example:
-        &gt;&gt;&gt; import your_module  # Replace &#39;your_module&#39; with the actual module name
+        &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cigar = &#34;8M2D4M2I3N1M&#34;
         &gt;&gt;&gt; md = &#34;2A5^AG7&#34;
         &gt;&gt;&gt; seq = &#34;ACGTACGTACGTACG&#34;
-        &gt;&gt;&gt; is_short_form = False
-        &gt;&gt;&gt; cstag.call(cigar, md, seq, is_short_form)
-        &#39;cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G&#39;
+        &gt;&gt;&gt; cstag.call(cigar, md, seq, is_long=True)
+        &#39;=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G&#39;
     &#34;&#34;&#34;
     cigar, seq = trim_clips(cigar, seq)
-    cslong_md = generate_cslong_md(seq, md)
-    cslong_md_cigar = generate_cslong_cigar_integrated(cigar, cslong_md)
-    cslong_decoded = decode_substitution(cslong_md_cigar)
-    cs_tag = format_cslong(cslong_decoded)
-    if is_short_form:
+    cs_tag = generate_cs_long(cigar, md, seq)
+    if is_long is False:
         cs_tag = shorten(cs_tag)
+    if prefix is True:
+        cs_tag = add_prefix(cs_tag)
     return cs_tag</code></pre>
 </details>
 </dd>
-<dt id="cstag.call.decode_substitution"><code class="name flex">
-<span>def <span class="ident">decode_substitution</span></span>(<span>cslong_md_cigar: list[str]) ‑> list[str]</span>
+<dt id="cstag.call.expand_cigar_operations"><code class="name flex">
+<span>def <span class="ident">expand_cigar_operations</span></span>(<span>cigar: str) ‑> list[str]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -304,60 +311,19 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def decode_substitution(cslong_md_cigar: list[str]) -&gt; list[str]:
-    cslong_decoded = [c for c in re.split(r&#34;([bdhvxymrkwso])&#34;, &#34;&#34;.join(cslong_md_cigar)) if c]
-    for i, cs in enumerate(cslong_decoded):
-        if cs in mutation_decoding:
-            cslong_decoded[i] = mutation_decoding[cs]
-        elif cs[0] not in {&#34;=&#34;, &#34;-&#34;, &#34;+&#34;, &#34;*&#34;, &#34;~&#34;}:
-            cslong_decoded[i] = f&#34;={cs}&#34;
-    return cslong_decoded</code></pre>
-</details>
-</dd>
-<dt id="cstag.call.format_cslong"><code class="name flex">
-<span>def <span class="ident">format_cslong</span></span>(<span>cslong: list[str]) ‑> str</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def format_cslong(cslong: list[str]) -&gt; str:
-    return f&#34;cs:Z:{&#39;&#39;.join(cslong)}&#34;</code></pre>
-</details>
-</dd>
-<dt id="cstag.call.generate_cslong_cigar_integrated"><code class="name flex">
-<span>def <span class="ident">generate_cslong_cigar_integrated</span></span>(<span>cigar: str, cslong_md: list[str]) ‑> list[str]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def generate_cslong_cigar_integrated(cigar: str, cslong_md: list[str]) -&gt; list[str]:
-    cigar_split = _split_cigar(cigar)
-    cslong_encoded = _encode_substitution(cslong_md)
-    idx_n = 0
-    cslong_md_cigar = []
-    for op, length in cigar_split:
-        if op == &#34;N&#34;:
-            cslong_md_cigar.append(f&#34;~nn{length}nn&#34;)
-        elif op == &#34;I&#34;:
-            cslong_md_cigar.append(f&#34;+{cslong_encoded[idx_n:idx_n+length]}&#34;.lower())
-            idx_n += length
-        elif op == &#34;D&#34;:
-            cslong_md_cigar.append(f&#34;-{cslong_encoded[idx_n:idx_n+length]}&#34;.lower())
-            idx_n += length
+<pre><code class="python">def expand_cigar_operations(cigar: str) -&gt; list[str]:
+    parsed_cigar = parse_cigar(cigar)
+    expanded_list = []
+    for op, num in parsed_cigar:
+        if op in [&#34;D&#34;, &#34;N&#34;, &#34;I&#34;]:
+            expanded_list.append(op * num)
         else:
-            cslong_md_cigar.append(f&#34;={cslong_encoded[idx_n:idx_n+length]}&#34;)
-            idx_n += length
-    return cslong_md_cigar</code></pre>
+            expanded_list.extend([op] * num)
+    return expanded_list</code></pre>
 </details>
 </dd>
-<dt id="cstag.call.generate_cslong_md"><code class="name flex">
-<span>def <span class="ident">generate_cslong_md</span></span>(<span>seq: str, md: str) ‑> list[str]</span>
+<dt id="cstag.call.expand_md_operations"><code class="name flex">
+<span>def <span class="ident">expand_md_operations</span></span>(<span>md: str) ‑> list[str]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -365,20 +331,152 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def generate_cslong_md(seq: str, md: str) -&gt; list[str]:
-    md_split = _split_md(md)
-    cslong_md = []
+<pre><code class="python">def expand_md_operations(md: str) -&gt; list[str]:
+    parsed_md = parse_md(md)
+    expanded_list = []
+    for op, num in parsed_md:
+        if op.startswith(&#34;^&#34;):
+            expanded_list.append(op)
+            continue
+        expanded_list.extend([op] * num)
+    return expanded_list</code></pre>
+</details>
+</dd>
+<dt id="cstag.call.generate_cs_long"><code class="name flex">
+<span>def <span class="ident">generate_cs_long</span></span>(<span>cigar: str, md: str, seq: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_cs_long(cigar: str, md: str, seq: str) -&gt; str:
+    cigar_list = expand_cigar_operations(cigar)
+    md_list = expand_md_operations(md)
+    idx_cigar, idx_md, idx_seq = 0, 0, 0
+    cs_long = []
+    while idx_seq &lt; len(seq) and idx_cigar &lt; len(cigar_list) and idx_md &lt; len(md_list):
+        if cigar_list[idx_cigar] == &#34;M&#34;:
+            if md_list[idx_md] == &#34;=&#34;:
+                cs_long.append(f&#34;={seq[idx_seq]}&#34;)
+            else:
+                cs_long.append(f&#34;*{md_list[idx_md]}{seq[idx_seq]}&#34;.lower())
+            idx_cigar += 1
+            idx_md += 1
+            idx_seq += 1
+            continue
+        if cigar_list[idx_cigar][0] == &#34;D&#34;:
+            cs_long.append(md_list[idx_md].replace(&#34;^&#34;, &#34;-&#34;).lower())
+            idx_cigar += 1
+            idx_md += 1
+            continue
+        if cigar_list[idx_cigar][0] == &#34;I&#34;:
+            num_insertion = len(cigar_list[idx_cigar])
+            seq_insertion = &#34;&#34;.join(seq[idx_seq : idx_seq + num_insertion])
+            cs_long.append(f&#34;+{seq_insertion}&#34;.lower())
+            idx_cigar += 1
+            idx_seq += num_insertion
+            continue
+        if cigar_list[idx_cigar][0] == &#34;N&#34;:
+            cs_long.append(f&#34;~nn{len(cigar_list[idx_cigar])}nn&#34;)
+            idx_cigar += 1
+            continue
+    return &#34;&#34;.join(remove_consecutive_equals(cs_long))</code></pre>
+</details>
+</dd>
+<dt id="cstag.call.join_cigar"><code class="name flex">
+<span>def <span class="ident">join_cigar</span></span>(<span>cigar_tuples: list[tuple[str, int]]) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def join_cigar(cigar_tuples: list[tuple[str, int]]) -&gt; str:
+    return &#34;&#34;.join(f&#34;{length}{operation}&#34; for operation, length in cigar_tuples)</code></pre>
+</details>
+</dd>
+<dt id="cstag.call.parse_cigar"><code class="name flex">
+<span>def <span class="ident">parse_cigar</span></span>(<span>cigar: str) ‑> list[tuple[str, int]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parse a CIGAR string into a list of tuples containing operation and length.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parse_cigar(cigar: str) -&gt; list[tuple[str, int]]:
+    &#34;&#34;&#34;
+    Parse a CIGAR string into a list of tuples containing operation and length.
+    &#34;&#34;&#34;
+    parsed_cigar = []
+    start_idx = 0
+    for idx, operation in enumerate(cigar):
+        if operation.isdigit():
+            continue
+        length = int(cigar[start_idx:idx])
+        parsed_cigar.append((operation, length))
+        start_idx = idx + 1
+    return parsed_cigar</code></pre>
+</details>
+</dd>
+<dt id="cstag.call.parse_md"><code class="name flex">
+<span>def <span class="ident">parse_md</span></span>(<span>md: str) ‑> list[tuple[str, int]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parse an MD tag into a list of tuples containing operation and length.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parse_md(md: str) -&gt; list[tuple[str, int]]:
+    &#34;&#34;&#34;
+    Parse an MD tag into a list of tuples containing operation and length.
+    &#34;&#34;&#34;
+    parsed_md = []
     idx = 0
-    for op, length in md_split:
-        if op == &#34;=&#34;:
-            cslong_md.append(f&#34;={seq[idx:idx+length]}&#34;)
-            idx += length
-        elif op.startswith(&#34;^&#34;):
-            cslong_md.append(f&#34;-{op[1:].lower()}&#34;)
-        else:
-            cslong_md.append(f&#34;*{op}{seq[idx]}&#34;.lower())
+    while idx &lt; len(md):
+        if md[idx].isdigit():
+            start = idx
+            while idx &lt; len(md) and md[idx].isdigit():
+                idx += 1
+            parsed_md.append((&#34;=&#34;, int(md[start:idx])))
+        elif md[idx] == &#34;^&#34;:  # Deletion
+            start = idx
             idx += 1
-    return cslong_md</code></pre>
+            while idx &lt; len(md) and not md[idx].isdigit():
+                idx += 1
+            parsed_md.append((md[start:idx], idx - start - 1))
+        else:  # Mismatch
+            parsed_md.append((md[idx], 1))
+            idx += 1
+    return parsed_md</code></pre>
+</details>
+</dd>
+<dt id="cstag.call.remove_consecutive_equals"><code class="name flex">
+<span>def <span class="ident">remove_consecutive_equals</span></span>(<span>cs_long: list[str]) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_consecutive_equals(cs_long: list[str]) -&gt; list[str]:
+    if not cs_long:
+        return cs_long
+    for i, cs in enumerate(cs_long):
+        if i == 0:
+            prev_op = cs[0]
+            continue
+        curr_op = cs[0]
+        if prev_op == curr_op == &#34;=&#34;:
+            cs_long[i] = cs[1:]
+        else:
+            prev_op = cs[0]
+    return cs_long</code></pre>
 </details>
 </dd>
 <dt id="cstag.call.trim_clips"><code class="name flex">
@@ -393,22 +491,22 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
 <pre><code class="python">def trim_clips(cigar: str, seq: str) -&gt; tuple[str, str]:
     if all(x not in cigar for x in &#34;SH&#34;):
         return cigar, seq
-    cigar_split = _split_cigar(cigar)
+    parsed_cigar = parse_cigar(cigar)
     # trim soft clips of cigar and seq
-    if cigar_split[0][0] == &#34;S&#34;:
-        length_softclip = cigar_split[0][1]
+    if parsed_cigar[0][0] == &#34;S&#34;:
+        length_softclip = parsed_cigar[0][1]
         seq = seq[length_softclip:]
-        cigar_split = cigar_split[1:]
-    if cigar_split[-1][0] == &#34;S&#34;:
-        length_softclip = cigar_split[-1][1]
+        parsed_cigar = parsed_cigar[1:]
+    if parsed_cigar[-1][0] == &#34;S&#34;:
+        length_softclip = parsed_cigar[-1][1]
         seq = seq[:-length_softclip]
-        cigar_split = cigar_split[:-1]
+        parsed_cigar = parsed_cigar[:-1]
     # trim hard clips of cigar
-    if cigar_split[0][0] == &#34;H&#34;:
-        cigar_split = cigar_split[1:]
-    if cigar_split[-1][0] == &#34;H&#34;:
-        cigar_split = cigar_split[:-1]
-    cigar = _join_cigar(cigar_split)
+    if parsed_cigar[0][0] == &#34;H&#34;:
+        parsed_cigar = parsed_cigar[1:]
+    if parsed_cigar[-1][0] == &#34;H&#34;:
+        parsed_cigar = parsed_cigar[:-1]
+    cigar = join_cigar(parsed_cigar)
     return cigar, seq</code></pre>
 </details>
 </dd>
@@ -430,11 +528,15 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -&gt; str:
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="cstag.call.add_prefix" href="#cstag.call.add_prefix">add_prefix</a></code></li>
 <li><code><a title="cstag.call.call" href="#cstag.call.call">call</a></code></li>
-<li><code><a title="cstag.call.decode_substitution" href="#cstag.call.decode_substitution">decode_substitution</a></code></li>
-<li><code><a title="cstag.call.format_cslong" href="#cstag.call.format_cslong">format_cslong</a></code></li>
-<li><code><a title="cstag.call.generate_cslong_cigar_integrated" href="#cstag.call.generate_cslong_cigar_integrated">generate_cslong_cigar_integrated</a></code></li>
-<li><code><a title="cstag.call.generate_cslong_md" href="#cstag.call.generate_cslong_md">generate_cslong_md</a></code></li>
+<li><code><a title="cstag.call.expand_cigar_operations" href="#cstag.call.expand_cigar_operations">expand_cigar_operations</a></code></li>
+<li><code><a title="cstag.call.expand_md_operations" href="#cstag.call.expand_md_operations">expand_md_operations</a></code></li>
+<li><code><a title="cstag.call.generate_cs_long" href="#cstag.call.generate_cs_long">generate_cs_long</a></code></li>
+<li><code><a title="cstag.call.join_cigar" href="#cstag.call.join_cigar">join_cigar</a></code></li>
+<li><code><a title="cstag.call.parse_cigar" href="#cstag.call.parse_cigar">parse_cigar</a></code></li>
+<li><code><a title="cstag.call.parse_md" href="#cstag.call.parse_md">parse_md</a></code></li>
+<li><code><a title="cstag.call.remove_consecutive_equals" href="#cstag.call.remove_consecutive_equals">remove_consecutive_equals</a></code></li>
 <li><code><a title="cstag.call.trim_clips" href="#cstag.call.trim_clips">trim_clips</a></code></li>
 </ul>
 </li>

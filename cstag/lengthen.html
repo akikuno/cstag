@@ -28,22 +28,25 @@
 </summary>
 <pre><code class="python">import re
 
-def lengthen(cs_tag: str, cigar: str, seq: str) -&gt; str:
+
+def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -&gt; str:
     &#34;&#34;&#34;Convert short format of cs tag into long format
     Args:
         cs_tag (str): cs tag in **short** form
         cigar (str): CIGAR string (6th column in SAM file)
         seq (str): segment sequence (10th column in SAM file)
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
+
     Return:
         str: cs tag in **long** form
 
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; cs = &#34;cs:Z::4*ag:3&#34;
+        &gt;&gt;&gt; cs = &#34;:4*ag:3&#34;
         &gt;&gt;&gt; cigar = &#34;8M&#34;
         &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
         &gt;&gt;&gt; cstag.lengthen(cs, cigar, seq)
-        cs:Z:=ACGT*ag=CGT
+        =ACGT*ag=CGT
     &#34;&#34;&#34;
 
     if re.search(r&#34;[ACGT]&#34;, cs_tag):
@@ -69,8 +72,12 @@ def lengthen(cs_tag: str, cigar: str, seq: str) -&gt; str:
             idx += 1
         if cs[0] == &#34;+&#34;:
             idx += len(cs) - 1
+    cslong = &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)
 
-    return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
+    if prefix is True:
+        return &#34;cs:Z:&#34; + cslong
+    else:
+        return cslong</code></pre>
 </details>
 </section>
 <section>
@@ -81,7 +88,7 @@ def lengthen(cs_tag: str, cigar: str, seq: str) -&gt; str:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="cstag.lengthen.lengthen"><code class="name flex">
-<span>def <span class="ident">lengthen</span></span>(<span>cs_tag: str, cigar: str, seq: str) ‑> str</span>
+<span>def <span class="ident">lengthen</span></span>(<span>cs_tag: str, cigar: str, seq: str, prefix: bool = False) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert short format of cs tag into long format</p>
@@ -93,37 +100,41 @@ def lengthen(cs_tag: str, cigar: str, seq: str) -&gt; str:
 <dd>CIGAR string (6th column in SAM file)</dd>
 <dt><strong><code>seq</code></strong> :&ensp;<code>str</code></dt>
 <dd>segment sequence (10th column in SAM file)</dd>
+<dt><strong><code>prefix</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False</dd>
 </dl>
 <h2 id="return">Return</h2>
 <p>str: cs tag in <strong>long</strong> form</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; cs = &quot;cs:Z::4*ag:3&quot;
+&gt;&gt;&gt; cs = &quot;:4*ag:3&quot;
 &gt;&gt;&gt; cigar = &quot;8M&quot;
 &gt;&gt;&gt; seq = &quot;ACGTACGT&quot;
 &gt;&gt;&gt; cstag.lengthen(cs, cigar, seq)
-cs:Z:=ACGT*ag=CGT
+=ACGT*ag=CGT
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def lengthen(cs_tag: str, cigar: str, seq: str) -&gt; str:
+<pre><code class="python">def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -&gt; str:
     &#34;&#34;&#34;Convert short format of cs tag into long format
     Args:
         cs_tag (str): cs tag in **short** form
         cigar (str): CIGAR string (6th column in SAM file)
         seq (str): segment sequence (10th column in SAM file)
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
+
     Return:
         str: cs tag in **long** form
 
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; cs = &#34;cs:Z::4*ag:3&#34;
+        &gt;&gt;&gt; cs = &#34;:4*ag:3&#34;
         &gt;&gt;&gt; cigar = &#34;8M&#34;
         &gt;&gt;&gt; seq = &#34;ACGTACGT&#34;
         &gt;&gt;&gt; cstag.lengthen(cs, cigar, seq)
-        cs:Z:=ACGT*ag=CGT
+        =ACGT*ag=CGT
     &#34;&#34;&#34;
 
     if re.search(r&#34;[ACGT]&#34;, cs_tag):
@@ -149,8 +160,12 @@ cs:Z:=ACGT*ag=CGT
             idx += 1
         if cs[0] == &#34;+&#34;:
             idx += len(cs) - 1
+    cslong = &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)
 
-    return &#34;cs:Z:&#34; + &#34;&#34;.join(cslong).replace(&#34;:&#34;, &#34;=&#34;)</code></pre>
+    if prefix is True:
+        return &#34;cs:Z:&#34; + cslong
+    else:
+        return cslong</code></pre>
 </details>
 </dd>
 </dl>
