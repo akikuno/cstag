@@ -1,13 +1,13 @@
 import pytest
 from src.cstag.call import (
-    _split_cigar,
-    _split_md,
-    _join_cigar,
+    parse_cigar,
+    parse_md,
+    join_cigar,
     trim_clips,
-    generate_cslong_md,
-    _encode_substitution,
-    generate_cslong_cigar_integrated,
-    decode_substitution,
+    # generate_cslong_md,
+    # _encode_substitution,
+    # generate_cslong_cigar_integrated,
+    # decode_substitution,
     call,
 )
 
@@ -26,8 +26,8 @@ from src.cstag.call import (
         ("5H10M5H", [("H", 5), ("M", 10), ("H", 5)]),
     ],
 )
-def test_split_cigar(cigar, expected):
-    assert _split_cigar(cigar) == expected
+def testparse_cigar(cigar, expected):
+    assert parse_cigar(cigar) == expected
 
 
 @pytest.mark.parametrize(
@@ -45,8 +45,8 @@ def test_split_cigar(cigar, expected):
         ("1ATGC1", [("=", 1), ("A", 1), ("T", 1), ("G", 1), ("C", 1), ("=", 1)]),  # Multiple adjacent mismatches
     ],
 )
-def test_split_md(md_input, expected_output):
-    assert _split_md(md_input) == expected_output
+def testparse_md(md_input, expected_output):
+    assert parse_md(md_input) == expected_output
 
 
 # join_cigarのテスト
@@ -63,8 +63,8 @@ def test_split_md(md_input, expected_output):
         ([("S", 5), ("M", 10), ("H", 5)], "5S10M5H"),
     ],
 )
-def test_join_cigar(cigar_tuples, expected):
-    assert _join_cigar(cigar_tuples) == expected
+def testjoin_cigar(cigar_tuples, expected):
+    assert join_cigar(cigar_tuples) == expected
 
 
 # trim_clipsのテスト
@@ -87,61 +87,6 @@ def test_trim_clips(cigar, seq, expected_cigar, expected_seq):
 
 
 ###########################################################
-
-
-###########################################################
-# Test cases
-def test_generate_cslong_md():
-    assert generate_cslong_md("ACGTACGT", "8") == ["=ACGTACGT"]
-    assert generate_cslong_md("ACGTACGT", "4^TACG4") == ["=ACGT", "-tacg", "=ACGT"]
-    assert generate_cslong_md("ACGTACGT", "3A1T2") == ["=ACG", "*at", "=A", "*tc", "=GT"]
-    assert generate_cslong_md("ACGTACGT", "2^TA4T1") == ["=AC", "-ta", "=GTAC", "*tg", "=T"]
-    assert generate_cslong_md("ACGTA", "2^TA1G1") == ["=AC", "-ta", "=G", "*gt", "=A"]
-    assert generate_cslong_md("ACGTAA", "1A1^T1G1") == ["=A", "*ac", "=G", "-t", "=T", "*ga", "=A"]
-
-
-def test_encode_substitution():
-    assert _encode_substitution(["=ACGT", "*ta", "=ACGT"]) == "ACGTwACGT"
-    assert _encode_substitution(["=ACGT", "-atcg", "=ACGT"]) == "ACGTatcgACGT"
-    assert _encode_substitution(["=ACGT", "*ta", "*gt"]) == "ACGTwk"
-    assert _encode_substitution(["=AC", "-at", "=GT", "*tc", "=AT"]) == "ACatGTsAT"
-    assert _encode_substitution(["=A", "*tc", "-t", "=G", "*tg", "=T"]) == "AstGoT"
-
-
-@pytest.mark.parametrize(
-    "cigar, cslong_md, expected",
-    [
-        ("6M3D5M", ["=CGATCG", "-ata", "=AATAG"], ["=CGATCG", "-ata", "=AATAG"]),
-        ("5M1N5M", ["=CGATCGTAGC"], ["=CGATC", "~nn1nn", "=GTAGC"]),
-        ("5M3I5M", ["=CGATCGTATAGCC"], ["=CGATC", "+gta", "=TAGCC"]),
-        ("5M3D5M3I5M", ["=CGATC", "-gta", "=TAGCTGTATAG"], ["=CGATC", "-gta", "=TAGCT", "+gta", "=TAG"]),
-        ("5M3D5M3I", ["=CGATC", "-gta", "=TAGCTGTA"], ["=CGATC", "-gta", "=TAGCT", "+gta"]),
-        ("5M3D", ["=CGATC", "-gta"], ["=CGATC", "-gta"]),
-        ("5M1N", ["=CGATC"], ["=CGATC", "~nn1nn"]),
-    ],
-)
-def test_generate_cslong_cigar_integrated(cigar, cslong_md, expected):
-    result = generate_cslong_cigar_integrated(cigar, cslong_md)
-    assert result == expected
-
-
-@pytest.mark.parametrize(
-    "cslong, expected",
-    [
-        ("=ACGTdCGT", ["=ACGT", "*ag", "=CGT"]),
-        ("=ACGThCGT", ["=ACGT", "*at", "=CGT"]),
-        ("=ACGTbCGT", ["=ACGT", "*ac", "=CGT"]),
-        ("=ACGTm=CGT", ["=ACGT", "*ga", "=CGT"]),
-        ("=ACGTm", ["=ACGT", "*ga"]),
-        ("=ACGT", ["=ACGT"]),
-    ],
-)
-def test_decode_substitution(cslong, expected):
-    result = decode_substitution(cslong)
-    assert result == expected
-
-
-###########################################################
 # main
 ###########################################################
 
@@ -158,8 +103,11 @@ def test_decode_substitution(cslong, expected):
         ("3S5M", "5", "NNNACGTA", "=ACGTA"),
         ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", "=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G"),
         ("5M", "0C4", "ACGTA", "*ca=CGTA"),
-        ("5M", "2CC1", "ACGTA", "=AC*cg*ct=A"),
         ("5M", "4C0", "ACGTA", "=ACGT*ca"),
+        ("5M", "0C3C0", "ACGTA", "*ca=CGT*ca"),
+        ("5M", "0C3C0", "ACGTA", "*ca=CGT*ca"),
+        ("5M", "2CC1", "ACGTA", "=AC*cg*ct=A"),
+        ("3M2D1M2I1M3N1M", "3^GG0A2", "AAATCCTT", "=AAA-gg*at+cc=T~nn3nn=T"),
     ],
 )
 def test_generate_cs_tag_long_form(cigar, md, seq, expected):
@@ -178,6 +126,9 @@ def test_generate_cs_tag_long_form(cigar, md, seq, expected):
         ("3M1D1M1D4M", "3^C1^A4", "ACGGCTAG", ":3-c:1-a:4"),
         ("3S5M", "5", "NNNACGTA", ":5"),
         ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", ":2*ag:5-ag:4+ac~nn3nn:1"),
+        ("5M", "0C3C0", "ACGTA", "*ca:3*ca"),
+        ("5M", "2CC1", "ACGTA", ":2*cg*ct:1"),
+        ("3M2D1M2I1M3N1M", "3^GG0A2", "AAATCCTT", ":3-gg*at+cc:1~nn3nn:1"),
     ],
 )
 def test_generate_cs_tag_short_form(cigar, md, seq, expected):

@@ -3,34 +3,16 @@ from __future__ import annotations
 import re
 from cstag.shorten import shorten
 
-###########################################################
-# Define the mapping between the mutation and key
-###########################################################
-
-# use arbitrary characters other than 'acgtn' for keys, which are used for deletions.
-mutation_encoding = {
-    "*ac": "b",
-    "*ag": "d",
-    "*at": "h",
-    "*ca": "v",
-    "*cg": "x",
-    "*ct": "y",
-    "*ga": "m",
-    "*gc": "r",
-    "*gt": "k",
-    "*ta": "w",
-    "*tc": "s",
-    "*tg": "o",
-}
-mutation_decoding = {v: k for k, v in mutation_encoding.items()}
-
 
 ###########################################################
 # Trim soft and hard clips from the CIGAR and sequence
 ###########################################################
 
 
-def _split_cigar(cigar: str) -> list[tuple[str, int]]:
+def parse_cigar(cigar: str) -> list[tuple[str, int]]:
+    """
+    Parse a CIGAR string into a list of tuples containing operation and length.
+    """
     parsed_cigar = []
     start_idx = 0
     for idx, operation in enumerate(cigar):
@@ -42,33 +24,10 @@ def _split_cigar(cigar: str) -> list[tuple[str, int]]:
     return parsed_cigar
 
 
-def _join_cigar(cigar_tuples: list[tuple[str, int]]) -> str:
-    return "".join(f"{length}{operation}" for operation, length in cigar_tuples)
-
-
-def trim_clips(cigar: str, seq: str) -> tuple[str, str]:
-    if all(x not in cigar for x in "SH"):
-        return cigar, seq
-    cigar_split = _split_cigar(cigar)
-    # trim soft clips of cigar and seq
-    if cigar_split[0][0] == "S":
-        length_softclip = cigar_split[0][1]
-        seq = seq[length_softclip:]
-        cigar_split = cigar_split[1:]
-    if cigar_split[-1][0] == "S":
-        length_softclip = cigar_split[-1][1]
-        seq = seq[:-length_softclip]
-        cigar_split = cigar_split[:-1]
-    # trim hard clips of cigar
-    if cigar_split[0][0] == "H":
-        cigar_split = cigar_split[1:]
-    if cigar_split[-1][0] == "H":
-        cigar_split = cigar_split[:-1]
-    cigar = _join_cigar(cigar_split)
-    return cigar, seq
-
-
-def _split_md(md: str) -> list[tuple[str, int]]:
+def parse_md(md: str) -> list[tuple[str, int]]:
+    """
+    Parse an MD tag into a list of tuples containing operation and length.
+    """
     parsed_md = []
     idx = 0
     while idx < len(md):
@@ -89,79 +48,104 @@ def _split_md(md: str) -> list[tuple[str, int]]:
     return parsed_md
 
 
-def generate_cslong_md(seq: str, md: str) -> list[str]:
-    md_split = _split_md(md)
-    cslong_md = []
-    idx = 0
-    for op, length in md_split:
-        if op == "=":
-            cslong_md.append(f"={seq[idx:idx+length]}")
-            idx += length
-        elif op.startswith("^"):
-            cslong_md.append(f"-{op[1:].lower()}")
+def join_cigar(cigar_tuples: list[tuple[str, int]]) -> str:
+    return "".join(f"{length}{operation}" for operation, length in cigar_tuples)
+
+
+def trim_clips(cigar: str, seq: str) -> tuple[str, str]:
+    if all(x not in cigar for x in "SH"):
+        return cigar, seq
+    parsed_cigar = parse_cigar(cigar)
+    # trim soft clips of cigar and seq
+    if parsed_cigar[0][0] == "S":
+        length_softclip = parsed_cigar[0][1]
+        seq = seq[length_softclip:]
+        parsed_cigar = parsed_cigar[1:]
+    if parsed_cigar[-1][0] == "S":
+        length_softclip = parsed_cigar[-1][1]
+        seq = seq[:-length_softclip]
+        parsed_cigar = parsed_cigar[:-1]
+    # trim hard clips of cigar
+    if parsed_cigar[0][0] == "H":
+        parsed_cigar = parsed_cigar[1:]
+    if parsed_cigar[-1][0] == "H":
+        parsed_cigar = parsed_cigar[:-1]
+    cigar = join_cigar(parsed_cigar)
+    return cigar, seq
+
+
+###########################################################
+# Generate CS long
+###########################################################
+def expand_cigar_operations(cigar: str) -> list[str]:
+    parsed_cigar = parse_cigar(cigar)
+    expanded_list = []
+    for op, num in parsed_cigar:
+        if op in ["D", "N", "I"]:
+            expanded_list.append(op * num)
         else:
-            cslong_md.append(f"*{op}{seq[idx]}".lower())
-            idx += 1
-    """trim only operators:
-    if md contains zero, it contains only op.
-    eg. md = "0C3T0" -> ['=', '*ca', '=AAA', '*tc', '=']
-    these '='s should be trimmed.
-    """
-    cslong_md = [c for c in cslong_md if len(c) > 1]
-    return cslong_md
+            expanded_list.extend([op] * num)
+    return expanded_list
 
 
-def _encode_substitution(cslong_with_substitutions: list[str]) -> str:
-    """
-    Convert substitution representations like '*ac', '*ag', etc., to single characters.
+def expand_md_operations(md: str) -> list[str]:
+    parsed_md = parse_md(md)
+    expanded_list = []
+    for op, num in parsed_md:
+        if op.startswith("^"):
+            expanded_list.append(op)
+            continue
+        expanded_list.extend([op] * num)
+    return expanded_list
 
-    The function aims to make the length of the sequence uniform for easier handling.
-    For example, if the original sequence 'ACGT' has 'G' substituted by 'A',
-    it would be represented as 'AC*agT'. To make the sequence length uniform,
-    this function would convert it to 'ACdT'.
-    """
-    cslong_converted = []
-    for cs_element in cslong_with_substitutions:
-        if cs_element.startswith("*"):
-            cslong_converted.append(mutation_encoding[cs_element])
+
+def remove_consecutive_equals(cs_long: list[str]) -> list[str]:
+    if not cs_long:
+        return cs_long
+    for i, cs in enumerate(cs_long):
+        if i == 0:
+            prev_op = cs[0]
+            continue
+        curr_op = cs[0]
+        if prev_op == curr_op == "=":
+            cs_long[i] = cs[1:]
         else:
-            cslong_converted.append(cs_element[1:])
-    return "".join(cslong_converted)
+            prev_op = cs[0]
+    return cs_long
 
 
-def remove_equal_sign(text: str) -> str:
-    # Retain occurrences of "=[ACGTN]" and remove all other "=" signs
-    return re.sub(r"=(?![ACGT])", "", text)
-
-
-def generate_cslong_cigar_integrated(cigar: str, cslong_md: list[str]) -> list[str]:
-    cigar_split = _split_cigar(cigar)
-    cslong_encoded = _encode_substitution(cslong_md)
-    idx_n = 0
-    cslong_md_cigar = []
-    for op, length in cigar_split:
-        if op == "N":
-            cslong_md_cigar.append(f"~nn{length}nn")
-        elif op == "I":
-            cslong_md_cigar.append(f"+{cslong_encoded[idx_n:idx_n+length]}".lower())
-            idx_n += length
-        elif op == "D":
-            cslong_md_cigar.append(f"-{cslong_encoded[idx_n:idx_n+length]}".lower())
-            idx_n += length
-        else:
-            cslong_md_cigar.append(f"={cslong_encoded[idx_n:idx_n+length]}")
-            idx_n += length
-    return [remove_equal_sign(cs) for cs in cslong_md_cigar]
-
-
-def decode_substitution(cslong_md_cigar: list[str]) -> list[str]:
-    cslong_decoded = [c for c in re.split(r"([bdhvxymrkwso])", "".join(cslong_md_cigar)) if c]
-    for i, cs in enumerate(cslong_decoded):
-        if cs in mutation_decoding:
-            cslong_decoded[i] = mutation_decoding[cs]
-        elif cs[0] not in {"=", "-", "+", "*", "~"}:
-            cslong_decoded[i] = f"={cs}"
-    return cslong_decoded
+def generate_cs_long(cigar: str, md: str, seq: str) -> str:
+    cigar_list = expand_cigar_operations(cigar)
+    md_list = expand_md_operations(md)
+    idx_cigar, idx_md, idx_seq = 0, 0, 0
+    cs_long = []
+    while idx_seq < len(seq) and idx_cigar < len(cigar_list) and idx_md < len(md_list):
+        if cigar_list[idx_cigar] == "M":
+            if md_list[idx_md] == "=":
+                cs_long.append(f"={seq[idx_seq]}")
+            else:
+                cs_long.append(f"*{md_list[idx_md]}{seq[idx_seq]}".lower())
+            idx_cigar += 1
+            idx_md += 1
+            idx_seq += 1
+            continue
+        if cigar_list[idx_cigar][0] == "D":
+            cs_long.append(md_list[idx_md].replace("^", "-").lower())
+            idx_cigar += 1
+            idx_md += 1
+            continue
+        if cigar_list[idx_cigar][0] == "I":
+            num_insertion = len(cigar_list[idx_cigar])
+            seq_insertion = "".join(seq[idx_seq : idx_seq + num_insertion])
+            cs_long.append(f"+{seq_insertion}".lower())
+            idx_cigar += 1
+            idx_seq += num_insertion
+            continue
+        if cigar_list[idx_cigar][0] == "N":
+            cs_long.append(f"~nn{len(cigar_list[idx_cigar])}nn")
+            idx_cigar += 1
+            continue
+    return "".join(remove_consecutive_equals(cs_long))
 
 
 def add_prefix(cs_tag: str) -> str:
@@ -196,10 +180,7 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
         '=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G'
     """
     cigar, seq = trim_clips(cigar, seq)
-    cslong_md = generate_cslong_md(seq, md)
-    cslong_md_cigar = generate_cslong_cigar_integrated(cigar, cslong_md)
-    cslong_decoded = decode_substitution(cslong_md_cigar)
-    cs_tag = "".join(cslong_decoded)
+    cs_tag = generate_cs_long(cigar, md, seq)
     if is_long is False:
         cs_tag = shorten(cs_tag)
     if prefix is True:
