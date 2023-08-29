@@ -172,7 +172,7 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
         str: A cs tag representing the alignment and differences.
 
     Example:
-        >>> import your_module  # Replace 'your_module' with the actual module name
+        >>> import cstag
         >>> cigar = "8M2D4M2I3N1M"
         >>> md = "2A5^AG7"
         >>> seq = "ACGTACGTACGTACG"
