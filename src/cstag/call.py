@@ -102,6 +102,12 @@ def generate_cslong_md(seq: str, md: str) -> list[str]:
         else:
             cslong_md.append(f"*{op}{seq[idx]}".lower())
             idx += 1
+    """trim only operators:
+    if md contains zero, it contains only op.
+    eg. md = "0C3T0" -> ['=', '*ca', '=AAA', '*tc', '=']
+    these '='s should be trimmed.
+    """
+    cslong_md = [c for c in cslong_md if len(c) > 1]
     return cslong_md
 
 
@@ -123,6 +129,11 @@ def _encode_substitution(cslong_with_substitutions: list[str]) -> str:
     return "".join(cslong_converted)
 
 
+def remove_equal_sign(text: str) -> str:
+    # Retain occurrences of "=[ACGTN]" and remove all other "=" signs
+    return re.sub(r"=(?![ACGT])", "", text)
+
+
 def generate_cslong_cigar_integrated(cigar: str, cslong_md: list[str]) -> list[str]:
     cigar_split = _split_cigar(cigar)
     cslong_encoded = _encode_substitution(cslong_md)
@@ -140,7 +151,7 @@ def generate_cslong_cigar_integrated(cigar: str, cslong_md: list[str]) -> list[s
         else:
             cslong_md_cigar.append(f"={cslong_encoded[idx_n:idx_n+length]}")
             idx_n += length
-    return cslong_md_cigar
+    return [remove_equal_sign(cs) for cs in cslong_md_cigar]
 
 
 def decode_substitution(cslong_md_cigar: list[str]) -> list[str]:
@@ -153,8 +164,8 @@ def decode_substitution(cslong_md_cigar: list[str]) -> list[str]:
     return cslong_decoded
 
 
-def format_cslong(cslong: list[str]) -> str:
-    return f"cs:Z:{''.join(cslong)}"
+def add_prefix(cs_tag: str) -> str:
+    return f"cs:Z:{cs_tag}"
 
 
 ###########################################################
@@ -162,7 +173,7 @@ def format_cslong(cslong: list[str]) -> str:
 ###########################################################
 
 
-def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -> str:
+def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = False) -> str:
     """
     Generate a cs tag based on CIGAR, MD, and SEQ information.
 
@@ -170,7 +181,8 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -> str:
         cigar (str): CIGAR string representing the alignment.
         md (str): MD tag representing mismatching positions/base.
         seq (str): The sequence of the read.
-        is_short_form (bool, optional): Whether to return the cs tag in short form. Defaults to True.
+        is_long (bool, optional): Whether to return the cs tag in long format. Defaults to False.
+        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
 
     Returns:
         str: A cs tag representing the alignment and differences.
@@ -180,15 +192,16 @@ def call(cigar: str, md: str, seq: str, is_short_form: bool = True) -> str:
         >>> cigar = "8M2D4M2I3N1M"
         >>> md = "2A5^AG7"
         >>> seq = "ACGTACGTACGTACG"
-        >>> is_short_form = False
-        >>> cstag.call(cigar, md, seq, is_short_form)
-        'cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G'
+        >>> cstag.call(cigar, md, seq, is_long=True)
+        '=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G'
     """
     cigar, seq = trim_clips(cigar, seq)
     cslong_md = generate_cslong_md(seq, md)
     cslong_md_cigar = generate_cslong_cigar_integrated(cigar, cslong_md)
     cslong_decoded = decode_substitution(cslong_md_cigar)
-    cs_tag = format_cslong(cslong_decoded)
-    if is_short_form:
+    cs_tag = "".join(cslong_decoded)
+    if is_long is False:
         cs_tag = shorten(cs_tag)
+    if prefix is True:
+        cs_tag = add_prefix(cs_tag)
     return cs_tag

@@ -81,8 +81,8 @@ HTML_FOOTER = """
 """
 
 
-def validate_cstag(cstag: str) -> None:
-    if not re.search(r"[ACGTN]", cstag):
+def validate_cstag(cs_tag: str) -> None:
+    if not re.search(r"[ACGTN]", cs_tag):
         raise Exception("Error: cs tag must be a long format")
 
 

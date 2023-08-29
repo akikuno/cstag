@@ -149,34 +149,37 @@ def test_decode_substitution(cslong, expected):
 @pytest.mark.parametrize(
     "cigar, md, seq, expected",
     [
-        ("8M2D4M2I", "8^AG6", "ACGTACGTACGTAC", "cs:Z:=ACGTACGT-ag=ACGT+ac"),
-        ("5M", "5", "ACGTA", "cs:Z:=ACGTA"),
-        ("5M", "3C1", "ACGTG", "cs:Z:=ACG*ct=G"),
-        ("5M1I3M", "9", "ACGTAGCTA", "cs:Z:=ACGTA+g=CTA"),
-        ("5M1D4M", "5^A4", "ACGTGGCTA", "cs:Z:=ACGTG-a=GCTA"),
-        ("3M1D1M1D4M", "3^C1^A4", "ACGGCTAG", "cs:Z:=ACG-c=G-a=CTAG"),
-        ("3S5M", "5", "NNNACGTA", "cs:Z:=ACGTA"),
-        ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", "cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G"),
+        ("8M2D4M2I", "8^AG6", "ACGTACGTACGTAC", "=ACGTACGT-ag=ACGT+ac"),
+        ("5M", "5", "ACGTA", "=ACGTA"),
+        ("5M", "3C1", "ACGTG", "=ACG*ct=G"),
+        ("5M1I3M", "9", "ACGTAGCTA", "=ACGTA+g=CTA"),
+        ("5M1D4M", "5^A4", "ACGTGGCTA", "=ACGTG-a=GCTA"),
+        ("3M1D1M1D4M", "3^C1^A4", "ACGGCTAG", "=ACG-c=G-a=CTAG"),
+        ("3S5M", "5", "NNNACGTA", "=ACGTA"),
+        ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", "=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G"),
+        ("5M", "0C4", "ACGTA", "*ca=CGTA"),
+        ("5M", "2CC1", "ACGTA", "=AC*cg*ct=A"),
+        ("5M", "4C0", "ACGTA", "=ACGT*ca"),
     ],
 )
 def test_generate_cs_tag_long_form(cigar, md, seq, expected):
-    result = call(cigar, md, seq, is_short_form=False)
+    result = call(cigar, md, seq, is_long=True)
     assert result == expected
 
 
 @pytest.mark.parametrize(
     "cigar, md, seq, expected",
     [
-        ("8M2D4M2I", "8^AG6", "ACGTACGTACGTAC", "cs:Z::8-ag:4+ac"),
-        ("5M", "5", "ACGTA", "cs:Z::5"),
-        ("5M", "3C1", "ACGTG", "cs:Z::3*ct:1"),
-        ("5M1I3M", "9", "ACGTAGCTA", "cs:Z::5+g:3"),
-        ("5M1D4M", "5^A4", "ACGTGGCTA", "cs:Z::5-a:4"),
-        ("3M1D1M1D4M", "3^C1^A4", "ACGGCTAG", "cs:Z::3-c:1-a:4"),
-        ("3S5M", "5", "NNNACGTA", "cs:Z::5"),
-        ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", "cs:Z::2*ag:5-ag:4+ac~nn3nn:1"),
+        ("8M2D4M2I", "8^AG6", "ACGTACGTACGTAC", ":8-ag:4+ac"),
+        ("5M", "5", "ACGTA", ":5"),
+        ("5M", "3C1", "ACGTG", ":3*ct:1"),
+        ("5M1I3M", "9", "ACGTAGCTA", ":5+g:3"),
+        ("5M1D4M", "5^A4", "ACGTGGCTA", ":5-a:4"),
+        ("3M1D1M1D4M", "3^C1^A4", "ACGGCTAG", ":3-c:1-a:4"),
+        ("3S5M", "5", "NNNACGTA", ":5"),
+        ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", ":2*ag:5-ag:4+ac~nn3nn:1"),
     ],
 )
 def test_generate_cs_tag_short_form(cigar, md, seq, expected):
-    result = call(cigar, md, seq, is_short_form=True)
+    result = call(cigar, md, seq, is_long=False)
     assert result == expected

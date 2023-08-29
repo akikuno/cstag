@@ -44,10 +44,10 @@ cigar = "8M2D4M2I3N1M"
 md = "2A5^AG7"
 seq = "ACGTACGTACGTACG"
 
-cstag.call(cigar, md, seq, is_short_form=True)
+cstag.call(cigar, md, seq)
 # => cs:Z::2*ag:5-ag:4+ac~nn3nn:1
 
-cstag.call(cigar, md, seq, is_short_form=False)
+cstag.call(cigar, md, seq, is_long=True)
 # => cs:Z:=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 

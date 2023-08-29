@@ -1,21 +1,24 @@
 import re
 
-def lengthen(cs_tag: str, cigar: str, seq: str) -> str:
+
+def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -> str:
     """Convert short format of cs tag into long format
     Args:
         cs_tag (str): cs tag in **short** form
         cigar (str): CIGAR string (6th column in SAM file)
         seq (str): segment sequence (10th column in SAM file)
+        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
+
     Return:
         str: cs tag in **long** form
 
     Example:
         >>> import cstag
-        >>> cs = "cs:Z::4*ag:3"
+        >>> cs = ":4*ag:3"
         >>> cigar = "8M"
         >>> seq = "ACGTACGT"
         >>> cstag.lengthen(cs, cigar, seq)
-        cs:Z:=ACGT*ag=CGT
+        =ACGT*ag=CGT
     """
 
     if re.search(r"[ACGT]", cs_tag):
@@ -41,5 +44,9 @@ def lengthen(cs_tag: str, cigar: str, seq: str) -> str:
             idx += 1
         if cs[0] == "+":
             idx += len(cs) - 1
+    cslong = "".join(cslong).replace(":", "=")
 
-    return "cs:Z:" + "".join(cslong).replace(":", "=")
+    if prefix is True:
+        return "cs:Z:" + cslong
+    else:
+        return cslong
