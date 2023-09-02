@@ -100,6 +100,30 @@ def normalize_read_lengths(cs_list: list[deque[str]], starts: list[int]) -> list
     return cs_list
 
 
+def preprocess_for_consensus(cs_tags: list[str], cigars: list[str], positions: list[int]) -> list[deque[str]]:
+    """
+    Preprocess cs_tags, cigars, and positions for consensus generation.
+
+    Args:
+        cs_tags (list[str]): List of CS tags in the long format.
+        cigars (list[str]): List of cigars strings.
+        positions (list[int]): List of 1-based leftmost mapping positions.
+
+    Returns:
+        list: A tuple containing a list of deques representing the normalized reads
+    """
+    # Step 1: Calculate the starts positions for each read
+    starts = calculate_read_starts(positions, cigars)
+
+    # Step 2: Split and process each CS tag
+    cs_tags_normalized_length = split_cs_tags(cs_tags)
+
+    # Step 3: Normalize the lengths of each read
+    cs_tags_normalized_length = normalize_read_lengths(cs_tags_normalized_length, starts)
+
+    return cs_tags_normalized_length
+
+
 def get_consensus(cs_list: list[deque[str]]) -> str:
     cs_consensus = []
     for cs in zip(*cs_list):
@@ -149,14 +173,8 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
     for cs_tag in cs_tags:
         validate_long_format(cs_tag)
 
-    # Calculate the starts positions for each read
-    starts = calculate_read_starts(positions, cigars)
+    cs_tags_normalized_length = preprocess_for_consensus(cs_tags, cigars, positions)
 
-    cs_list = split_cs_tags(cs_tags)
-
-    # Normalize the lengths of each read
-    cs_list = normalize_read_lengths(cs_list, starts)
-
-    cs_consensus = get_consensus(cs_list)
+    cs_consensus = get_consensus(cs_tags_normalized_length)
 
     return f"cs:Z:{cs_consensus}" if prefix else cs_consensus
