@@ -49,7 +49,7 @@ seq = "ACGTACGTACGTACG"
 cstag.call(cigar, md, seq)
 # => :2*ag:5-ag:4+ac~nn3nn:1
 
-cstag.call(cigar, md, seq, is_long=True)
+cstag.call(cigar, md, seq, long=True)
 # => =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
@@ -107,7 +107,7 @@ import cstag
 
 cs = "=ACGT*ac+gg-cc=T"
 cstag.split(cs)
-# => ['', '=ACGT', '*ac', '+gg', '-cc', '=T']
+# => ['=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
 ### Reverse Complement of a CS Tag
@@ -127,11 +127,11 @@ cstag.revcomp(cs)
 import cstag
 from pathlib import Path
 
-cs = "=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+cs_tag = "=AC+GGG=T-ACGT*at~gt10cg=GNNN"
 description = "Example"
 
-cstag_html = cstag.to_html(cs, description)
-Path("report.html").write_text(cstag_html)
+cs_tag_html = cstag.to_html(cs_tag, description)
+Path("report.html").write_text(cs_tag_html)
 # => Output "report.html"
 ```
 The resulting `report.html` looks like this :point_down:

@@ -1,13 +1,16 @@
 import re
 
+from cstag.utils.validator import validate_long_format, validate_threshold
 
-def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10):
+
+def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False):
     """Mask low-quality bases to 'N'
     Args:
         cs_tag (str): cs tag in the **long** format
         cigar (str): cigar strings (6th column in SAM file)
         qual (str): ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)
-        threshold (int): optional: Phred Quality Score (defalt = 10). The low-quality bases are defined as 'less than or equal to the threshold'
+        threshold (int, optional): Phred Quality Score (defalt = 10). The low-quality bases are defined as 'less than or equal to the threshold'
+        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
     Return:
         str: Masked cs tag
     Example:
@@ -18,12 +21,9 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10):
         >>> cstag.mask(cs_tag, qual)
         cs:Z:=ACNN*an+ng-cc=T
     """
-    if not re.search(r"[ACGT]", cs_tag):
-        raise Exception("Error: cs tag must be a long format")
-    if not isinstance(threshold, int):
-        raise Exception("Error: threshold must be an integer")
-    if not 0 <= threshold <= 40:
-        raise Exception("Error: threshold must be within a range between 0 to 40")
+
+    validate_long_format(cs_tag)
+    validate_threshold(threshold)
 
     mask_symbols = [chr(th + 33) for th in range(threshold + 1)]
     mask_symbols = set(mask_symbols)
@@ -50,5 +50,6 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10):
                     cs[i + 1] = "N" if cs[0] == "=" else "n"
             idx += i + 1
         cs_masked.append("".join(cs))
+    cs_masked = "".join(cs_masked)
 
-    return "cs:Z:" + "".join(cs_masked)
+    return f"cs:Z:{cs_masked}" if prefix else cs_masked

@@ -1,5 +1,7 @@
 import re
 
+from cstag.utils.validator import validate_long_format
+
 HTML_HEADER = """<!DOCTYPE html>
     <html>
     <head>
@@ -81,68 +83,67 @@ HTML_FOOTER = """
 """
 
 
-def validate_cstag(cs_tag: str) -> None:
-    if not re.search(r"[ACGTN]", cs_tag):
-        raise Exception("Error: cs tag must be a long format")
+def build_html_parts(cs: str, css_class: str) -> str:
+    return f"<span class='{css_class}'>{cs.upper()}</span>"
 
 
-def process_cstag(cstag: str) -> str:
-    cstag = cstag.replace("cs:Z:", "")
-    cstag_split_n = re.split(r"(N+)", cstag)
-    cs_mark_n = "".join(["@" + cs if cs.startswith("N") else cs for cs in cstag_split_n])
-    list_cs = [lst for lst in re.split(r"([-+*~=@])", cs_mark_n) if lst]
-    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
-    html_cs = []
+def process_cs_tag(cs_tag: str) -> str:
+    # Format cs_tag
+    cs_tag = cs_tag.replace("cs:Z:", "")
+    cs_tag_split_n = [cs for cs in re.split(r"(N+)", cs_tag) if cs not in ("", "=")]
+    cs_tag_mark_n = "".join(["@" + cs if cs.startswith("N") else cs for cs in cs_tag_split_n])
+    cs_tag_split = [cs for cs in re.split(r"([-+*~=@])", cs_tag_mark_n) if cs]
+    cs_tag_combined = [tag + contents for tag, contents in zip(cs_tag_split[0::2], cs_tag_split[1::2])]
+    # Build html
+    html_parts = []
     idx = 0
-    while idx < len(list_cs):
-        cs = list_cs[idx]
+    while idx < len(cs_tag_combined):
+        cs = cs_tag_combined[idx]
         if cs.startswith("="):
-            html_cs.append(cs[1:])
+            html_parts.append(cs[1:])
         elif cs.startswith("@"):
-            cs = re.sub(r"(N+)", r"<span class='Unknown'>\1</span>", cs[1:])
-            html_cs.append(cs)
-        elif cs[0] == "*":
-            html_cs.append(f"<span class='Sub'>{cs[2].upper()}")
-            while idx < len(list_cs) - 1 and list_cs[idx + 1].startswith("*"):
-                html_cs.append(f"{list_cs[idx+1][2].upper()}")
+            html_parts.append(build_html_parts(cs[1:], "Unknown"))
+        elif cs.startswith("*"):
+            substitutions = [cs[2]]
+            while idx < len(cs_tag_combined) - 1 and cs_tag_combined[idx + 1].startswith("*"):
+                substitutions.append(cs_tag_combined[idx + 1][2])
                 idx += 1
-            html_cs.append("</span>")
-        elif cs[0] == "+":
-            html_cs.append(f"<span class='Ins'>{cs[1:].upper()}</span>")
-        elif cs[0] == "-":
-            html_cs.append(f"<span class='Del'>{cs[1:].upper()}</span>")
-        elif cs[0] == "~":
-            left = cs[1:3].upper()
+            html_parts.append(build_html_parts("".join(substitutions), "Sub"))
+        elif cs.startswith("+"):
+            html_parts.append(build_html_parts(cs[1:], "Ins"))
+        elif cs.startswith("-"):
+            html_parts.append(build_html_parts(cs[1:], "Del"))
+        elif cs.startswith("~"):
+            left, right = cs[1:3], cs[-2:]
             splice = "-" * int(cs[3:-2])
-            right = cs[-2:].upper()
-            html_cs.append(f"<span class='Splice'>{left + splice + right}</span>")
+            html_parts.append(build_html_parts(f"{left}{splice}{right}", "Splice"))
         idx += 1
-    html_cs = "".join(html_cs)
-    return f"<p class='p_seq'>{html_cs}</p>"
+
+    return f"<p class='p_seq'>{''.join(html_parts)}</p>"
 
 
-def to_html(cstag: str, description: str = "") -> str:
+def to_html(cs_tag: str, description: str = "") -> str:
     """Output HTML string showing a sequence with mutations colored
     Args:
-        cstag (str): cs tag in the **long** format
+        cs_tag (str): cs tag in the **long** format
         description (str): (optional) header information in the output string
     Return:
         HTML string
     Example:
         >>> import cstag
-        >>> cstag = "cs:Z:=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+        >>> cs_tag = "=AC+GGG=T-ACGT*at~gt10cg=GNNN"
         >>> description = "Example"
-        >>> html_string = cstag.to_html(cstag, description)
+        >>> html_string = cstag.to_html(cs_tag, description)
     """
-    validate_cstag(cstag)
+    validate_long_format(cs_tag)
     description_str = f"<h1>{description}</h1>" if description else ""
-    html_cs = process_cstag(cstag)
+    html_parts = process_cs_tag(cs_tag)
     report = "\n".join(
         [
             HTML_HEADER,
             description_str,
             HTML_LEGEND,
-            html_cs,
+            html_parts,
             HTML_FOOTER,
         ]
     )

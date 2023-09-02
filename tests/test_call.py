@@ -4,10 +4,6 @@ from src.cstag.call import (
     parse_md,
     join_cigar,
     trim_clips,
-    # generate_cslong_md,
-    # _encode_substitution,
-    # generate_cslong_cigar_integrated,
-    # decode_substitution,
     call,
 )
 
@@ -111,7 +107,7 @@ def test_trim_clips(cigar, seq, expected_cigar, expected_seq):
     ],
 )
 def test_generate_cs_tag_long_form(cigar, md, seq, expected):
-    result = call(cigar, md, seq, is_long=True)
+    result = call(cigar, md, seq, long=True)
     assert result == expected
 
 
@@ -132,5 +128,5 @@ def test_generate_cs_tag_long_form(cigar, md, seq, expected):
     ],
 )
 def test_generate_cs_tag_short_form(cigar, md, seq, expected):
-    result = call(cigar, md, seq, is_long=False)
+    result = call(cigar, md, seq, long=False)
     assert result == expected
