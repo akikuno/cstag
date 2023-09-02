@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import re
 
 from cstag.utils.validator import validate_long_format, validate_threshold
 
 
-def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False):
+def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False) -> str:
     """Mask low-quality bases to 'N'
     Args:
         cs_tag (str): cs tag in the **long** format
@@ -15,11 +17,11 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
         str: Masked cs tag
     Example:
         >>> import cstag
-        >>> cs_tag = "cs:Z:=ACGT*ac+gg-cc=T"
+        >>> cs_tag = "=ACGT*ac+gg-cc=T"
         >>> cigar = "5M2I2D1M"
         >>> qual = "AA!!!!AA"
         >>> cstag.mask(cs_tag, qual)
-        cs:Z:=ACNN*an+ng-cc=T
+        =ACNN*an+ng-cc=T
     """
 
     validate_long_format(cs_tag)

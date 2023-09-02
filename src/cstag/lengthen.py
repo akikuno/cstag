@@ -1,5 +1,6 @@
-import re
+from __future__ import annotations
 
+import re
 from cstag.utils.validator import validate_short_format
 
 

@@ -16,6 +16,13 @@ def test_basic_with_prefix():
     assert cstag.mask(CSTAG, CIGAR, QUAL, prefix=True) == "cs:Z:=ACNN*an+ng-cc=T"
 
 
+def test_all_n():
+    CSTAG = "=ACGT"
+    CIGAR = "4M"
+    QUAL = "!!!!"
+    assert cstag.mask(CSTAG, CIGAR, QUAL) == "=NNNN"
+
+
 def test_softclip():
     CSTAG = "=ACGT*ac+gg-cc=T"
     CIGAR = "2S5M2I2D1M"
