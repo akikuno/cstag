@@ -18,7 +18,8 @@
 - `cstag.mask()`: Mask low-quality bases in a CS tag
 - `cstag.split()`: Split a CS tag
 - `cstag.revcomp()`: Converts a CS tag into its reverse complement.
-- `cstag.to_html()`: Output html report
+- `cstag.to_vcf()`: Output VCF
+- `cstag.to_html()`: Output HTML
 
 Visit the [documentation](https://akikuno.github.io/cstag/cstag/) for more details.
 
@@ -46,11 +47,11 @@ cigar = "8M2D4M2I3N1M"
 md = "2A5^AG7"
 seq = "ACGTACGTACGTACG"
 
-cstag.call(cigar, md, seq)
-# => :2*ag:5-ag:4+ac~nn3nn:1
+print(cstag.call(cigar, md, seq))
+# :2*ag:5-ag:4+ac~nn3nn:1
 
 cstag.call(cigar, md, seq, long=True)
-# => =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
+#  =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
 ### Shorten or Lengthen CS Tags
@@ -62,7 +63,7 @@ import cstag
 cs = "=ACGT*ag=CGT"
 
 cstag.shorten(cs)
-# => :4*ag:3
+#  :4*ag:3
 
 
 # Convert a CS tag from short to long
@@ -71,7 +72,7 @@ cigar = "8M"
 seq = "ACGTACGT"
 
 cstag.lengthen(cs, cigar, seq)
-# => =ACGT*ag=CGT
+#  =ACGT*ag=CGT
 ```
 
 ### Generate a Consensus
@@ -84,7 +85,7 @@ cigar_list = ["4M", "4M", "1S3M", "3M", "3M3I1M"]
 pos_list = [1, 1, 1, 2, 1]
 
 cstag.consensus(cs_list, cigar_list, pos_list)
-# => =AC*gt*T
+#  =AC*gt*T
 ```
 
 ### Mask Low-Quality Bases
@@ -97,7 +98,7 @@ cigar = "5M2I2D1M"
 qual = "AA!!!!AA"
 phred_threshold = 10
 cstag.mask(cs, cigar, qual, phred_threshold)
-# => =ACNN*an+ng-cc=T
+#  =ACNN*an+ng-cc=T
 ```
 
 ### Split a CS Tag
@@ -107,7 +108,7 @@ import cstag
 
 cs = "=ACGT*ac+gg-cc=T"
 cstag.split(cs)
-# => ['=ACGT', '*ac', '+gg', '-cc', '=T']
+#  ['=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
 ### Reverse Complement of a CS Tag
@@ -117,9 +118,25 @@ import cstag
 
 cs = "=ACGT*ac+gg-cc=T"
 cstag.revcomp(cs)
-# => =A-gg+cc*tg=ACGT
+#  =A-gg+cc*tg=ACGT
 ```
 
+### Generate VCF Report
+
+```python
+import cstag
+cs_tag = "=AC*gt=T-gg=C+tt=A"
+chrom = "chr1"
+pos = 1
+print(cstag.to_vcf(cstag, chrom, pos))
+"""
+##fileformat=VCFv4.2
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	3	.	G	T	.	.	.
+chr1	4	.	TGG	T	.	.	.
+chr1	5	.	C	CTT	.	.	.
+"""
+```
 
 ### Generate HTML Report
 
@@ -132,7 +149,7 @@ description = "Example"
 
 cs_tag_html = cstag.to_html(cs_tag, description)
 Path("report.html").write_text(cs_tag_html)
-# => Output "report.html"
+# Output "report.html"
 ```
 The resulting `report.html` looks like this :point_down:
 

@@ -10,3 +10,4 @@ from cstag.mask import mask
 from cstag.split import split
 from cstag.revcomp import revcomp
 from cstag.to_html import to_html
+from cstag.to_vcf import to_vcf
