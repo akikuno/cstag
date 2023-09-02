@@ -3,29 +3,31 @@ from src.cstag.split import split
 
 
 @pytest.mark.parametrize(
-    "input_str, expected_output",
+    "input_str, prefix, expected_output",
     [
         # Test for empty string
-        ("", []),
+        ("", False, []),
         # Test for no operators
-        ("cs:Z:", ["cs:Z:"]),
+        ("cs:Z:", False, []),
+        # prefix=True
+        ("cs:Z:", True, ["cs:Z:"]),
         # Tests for short form
-        ("cs:Z::4", ["cs:Z:", ":4"]),
-        ("cs:Z::4:3", ["cs:Z:", ":4", ":3"]),
-        ("cs:Z::4*ag:3", ["cs:Z:", ":4", "*ag", ":3"]),
-        ("cs:Z::4+ag:3", ["cs:Z:", ":4", "+ag", ":3"]),
-        ("cs:Z::4-ag:3", ["cs:Z:", ":4", "-ag", ":3"]),
-        ("cs:Z::4~gt1ac:3", ["cs:Z:", ":4", "~gt1ac", ":3"]),
-        ("cs:Z::2*ag+t-ccc~gt1ac:2", ["cs:Z:", ":2", "*ag", "+t", "-ccc", "~gt1ac", ":2"]),
+        (":4", False, [":4"]),
+        (":4:3", False, [":4", ":3"]),
+        (":4*ag:3", False, [":4", "*ag", ":3"]),
+        (":4+ag:3", False, [":4", "+ag", ":3"]),
+        (":4-ag:3", False, [":4", "-ag", ":3"]),
+        (":4~gt1ac:3", False, [":4", "~gt1ac", ":3"]),
+        (":2*ag+t-ccc~gt1ac:2", False, [":2", "*ag", "+t", "-ccc", "~gt1ac", ":2"]),
         # Tests for long form
-        ("cs:Z:=ACGT", ["cs:Z:", "=ACGT"]),
-        ("cs:Z:=ACGT=CGTA", ["cs:Z:", "=ACGT", "=CGTA"]),
-        ("cs:Z:=ACGT*ag=CGT", ["cs:Z:", "=ACGT", "*ag", "=CGT"]),
-        ("cs:Z:=ACGT+ag=CGT", ["cs:Z:", "=ACGT", "+ag", "=CGT"]),
-        ("cs:Z:=ACGT-ag=CGT", ["cs:Z:", "=ACGT", "-ag", "=CGT"]),
-        ("cs:Z:=ACGT~gt1ac=CGT", ["cs:Z:", "=ACGT", "~gt1ac", "=CGT"]),
-        ("cs:Z:=AC*ag+t-ccc~gt1ac=AC", ["cs:Z:", "=AC", "*ag", "+t", "-ccc", "~gt1ac", "=AC"]),
+        ("=ACGT", False, ["=ACGT"]),
+        ("=ACGT=CGTA", False, ["=ACGT", "=CGTA"]),
+        ("=ACGT*ag=CGT", False, ["=ACGT", "*ag", "=CGT"]),
+        ("=ACGT+ag=CGT", False, ["=ACGT", "+ag", "=CGT"]),
+        ("=ACGT-ag=CGT", False, ["=ACGT", "-ag", "=CGT"]),
+        ("=ACGT~gt1ac=CGT", False, ["=ACGT", "~gt1ac", "=CGT"]),
+        ("=AC*ag+t-ccc~gt1ac=AC", False, ["=AC", "*ag", "+t", "-ccc", "~gt1ac", "=AC"]),
     ],
 )
-def test_split(input_str, expected_output):
-    assert split(input_str) == expected_output
+def test_split(input_str, prefix, expected_output):
+    assert split(input_str, prefix) == expected_output

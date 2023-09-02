@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import re
+from cstag.utils.validator import validate_short_format
 
 
 def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -> str:
@@ -20,9 +23,7 @@ def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -> str:
         >>> cstag.lengthen(cs, cigar, seq)
         =ACGT*ag=CGT
     """
-
-    if re.search(r"[ACGT]", cs_tag):
-        raise Exception("Error: input cs tag is not short format")
+    validate_short_format(cs_tag)
 
     cs_tag_split = re.split(r"([-+*~:])", cs_tag.replace("cs:Z:", ""))[1:]
     cs_tag_split = [i + j for i, j in zip(cs_tag_split[0::2], cs_tag_split[1::2])]
@@ -46,7 +47,4 @@ def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -> str:
             idx += len(cs) - 1
     cslong = "".join(cslong).replace(":", "=")
 
-    if prefix is True:
-        return "cs:Z:" + cslong
-    else:
-        return cslong
+    return f"cs:Z:{cslong}" if prefix else cslong

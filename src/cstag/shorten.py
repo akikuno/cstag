@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 
 
@@ -24,7 +26,5 @@ def shorten(cs_tag: str, prefix: bool = False) -> str:
             continue
         csshort.append(cs)
     csshort = "".join(csshort)
-    if prefix is True:
-        return "cs:Z:" + csshort
-    else:
-        return csshort
+
+    return f"cs:Z:{csshort}" if prefix else csshort

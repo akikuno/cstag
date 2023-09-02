@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-from collections import deque
 
 map_revcomp = {
     "A": "T",
@@ -23,26 +22,27 @@ def _extract_numbers(strings: str) -> list[str]:
     return numbers
 
 
-def revcomp(cs_tag: str) -> str:
+def revcomp(cs_tag: str, prefix: bool = False) -> str:
     """Converts a cs tag into its reverse complement.
     Args:
         cs_tag (str): a cs tag
+        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
+
     Return:
         str: reverse complement of a cs tag
 
     Example:
         >>> import cstag
-        >>> cs = "cs:Z::=AAAA*ag=CTG"
+        >>> cs = "=AAAA*ag=CTG"
         >>> cstag.revcomp(cs)
-        cs:Z:=CAG*tc=TTTT
+        =CAG*tc=TTTT
     """
     pattern = r"(\=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})"
-    cs_tag_revcomp = deque()
+    cs_tag_revcomp = []
+    cs_tag = cs_tag.replace("cs:Z:", "")
     for cs in re.split(pattern, cs_tag)[::-1]:
         if cs == "":
             continue
-        elif cs == "cs:Z:":
-            cs_tag_revcomp.appendleft(cs)
         elif cs[0] == ":":
             cs_tag_revcomp.append(cs)
         elif cs[0] == "*":
@@ -56,4 +56,9 @@ def revcomp(cs_tag: str) -> str:
             op = cs[0]
             cs_revcomp = "".join([map_revcomp[c] for c in cs[1:]])[::-1]
             cs_tag_revcomp.append(f"{op}{cs_revcomp}")
-    return "".join(cs_tag_revcomp)
+    cs_tag_revcomp = "".join(cs_tag_revcomp)
+
+    if prefix is True:
+        return "cs:Z:" + cs_tag_revcomp
+    else:
+        return cs_tag_revcomp
