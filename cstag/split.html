@@ -31,21 +31,29 @@
 import re
 
 
-def split(cs_tag: str) -&gt; list[str]:
+def split(cs_tag: str, prefix: bool = False) -&gt; list[str]:
     &#34;&#34;&#34;Split a cs tag
     Args:
         cs_tag (str): a cs tag
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
     Return:
         list[str]: splits a cs tag by operators
 
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; cs = &#34;cs:Z::4*ag:3&#34;
+        &gt;&gt;&gt; cs = &#34;:4*ag:3&#34;
         &gt;&gt;&gt; cstag.split(cs)
-        [&#34;cs:Z:&#34;, &#34;:4&#34;, &#34;*ag&#34;, &#34;:3&#34;]
+        [&#34;:4&#34;, &#34;*ag&#34;, &#34;:3&#34;]
     &#34;&#34;&#34;
+    cs_tag = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+
     pattern = r&#34;(\=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})&#34;
-    return [cs for cs in re.split(pattern, cs_tag) if cs]</code></pre>
+    cs_split = [cs for cs in re.split(pattern, cs_tag) if cs]
+
+    if prefix is True:
+        return [&#34;cs:Z:&#34;] + cs_split
+    else:
+        return cs_split</code></pre>
 </details>
 </section>
 <section>
@@ -56,7 +64,7 @@ def split(cs_tag: str) -&gt; list[str]:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="cstag.split.split"><code class="name flex">
-<span>def <span class="ident">split</span></span>(<span>cs_tag: str) ‑> list[str]</span>
+<span>def <span class="ident">split</span></span>(<span>cs_tag: str, prefix: bool = False) ‑> list[str]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Split a cs tag</p>
@@ -64,34 +72,44 @@ def split(cs_tag: str) -&gt; list[str]:
 <dl>
 <dt><strong><code>cs_tag</code></strong> :&ensp;<code>str</code></dt>
 <dd>a cs tag</dd>
+<dt><strong><code>prefix</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False</dd>
 </dl>
 <h2 id="return">Return</h2>
 <p>list[str]: splits a cs tag by operators</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; cs = &quot;cs:Z::4*ag:3&quot;
+&gt;&gt;&gt; cs = &quot;:4*ag:3&quot;
 &gt;&gt;&gt; cstag.split(cs)
-[&quot;cs:Z:&quot;, &quot;:4&quot;, &quot;*ag&quot;, &quot;:3&quot;]
+[&quot;:4&quot;, &quot;*ag&quot;, &quot;:3&quot;]
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def split(cs_tag: str) -&gt; list[str]:
+<pre><code class="python">def split(cs_tag: str, prefix: bool = False) -&gt; list[str]:
     &#34;&#34;&#34;Split a cs tag
     Args:
         cs_tag (str): a cs tag
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
     Return:
         list[str]: splits a cs tag by operators
 
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; cs = &#34;cs:Z::4*ag:3&#34;
+        &gt;&gt;&gt; cs = &#34;:4*ag:3&#34;
         &gt;&gt;&gt; cstag.split(cs)
-        [&#34;cs:Z:&#34;, &#34;:4&#34;, &#34;*ag&#34;, &#34;:3&#34;]
+        [&#34;:4&#34;, &#34;*ag&#34;, &#34;:3&#34;]
     &#34;&#34;&#34;
+    cs_tag = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+
     pattern = r&#34;(\=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})&#34;
-    return [cs for cs in re.split(pattern, cs_tag) if cs]</code></pre>
+    cs_split = [cs for cs in re.split(pattern, cs_tag) if cs]
+
+    if prefix is True:
+        return [&#34;cs:Z:&#34;] + cs_split
+    else:
+        return cs_split</code></pre>
 </details>
 </dd>
 </dl>

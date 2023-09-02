@@ -26,7 +26,9 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import re
+<pre><code class="python">from __future__ import annotations
+
+import re
 
 
 def shorten(cs_tag: str, prefix: bool = False) -&gt; str:
@@ -52,10 +54,8 @@ def shorten(cs_tag: str, prefix: bool = False) -&gt; str:
             continue
         csshort.append(cs)
     csshort = &#34;&#34;.join(csshort)
-    if prefix is True:
-        return &#34;cs:Z:&#34; + csshort
-    else:
-        return csshort</code></pre>
+
+    return f&#34;cs:Z:{csshort}&#34; if prefix else csshort</code></pre>
 </details>
 </section>
 <section>
@@ -112,10 +112,8 @@ cs:Z::4*ag:3
             continue
         csshort.append(cs)
     csshort = &#34;&#34;.join(csshort)
-    if prefix is True:
-        return &#34;cs:Z:&#34; + csshort
-    else:
-        return csshort</code></pre>
+
+    return f&#34;cs:Z:{csshort}&#34; if prefix else csshort</code></pre>
 </details>
 </dd>
 </dl>

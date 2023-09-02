@@ -61,7 +61,7 @@ seq = &quot;ACGTACGTACGTACG&quot;
 cstag.call(cigar, md, seq)
 # =&gt; :2*ag:5-ag:4+ac~nn3nn:1
 
-cstag.call(cigar, md, seq, is_long=True)
+cstag.call(cigar, md, seq, long=True)
 # =&gt; =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 </code></pre>
 <h3 id="shorten-or-lengthen-cs-tags">Shorten or Lengthen CS Tags</h3>
@@ -107,7 +107,7 @@ cstag.mask(cs, cigar, qual, phred_threshold)
 
 cs = &quot;=ACGT*ac+gg-cc=T&quot;
 cstag.split(cs)
-# =&gt; ['', '=ACGT', '*ac', '+gg', '-cc', '=T']
+# =&gt; ['=ACGT', '*ac', '+gg', '-cc', '=T']
 </code></pre>
 <h3 id="reverse-complement-of-a-cs-tag">Reverse Complement of a CS Tag</h3>
 <pre><code class="language-python">import cstag
@@ -120,11 +120,11 @@ cstag.revcomp(cs)
 <pre><code class="language-python">import cstag
 from pathlib import Path
 
-cs = &quot;=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
+cs_tag = &quot;=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
 description = &quot;Example&quot;
 
-cstag_html = cstag.to_html(cs, description)
-Path(&quot;report.html&quot;).write_text(cstag_html)
+cs_tag_html = cstag.to_html(cs_tag, description)
+Path(&quot;report.html&quot;).write_text(cs_tag_html)
 # =&gt; Output &quot;report.html&quot;
 </code></pre>
 <p>The resulting <code>report.html</code> looks like this :point_down:</p>
@@ -140,12 +140,14 @@ Please use <a href="https://github.com/akikuno/cstag/issues">GitHub Issues</a> f
 .. include:: ../../README.md
 &#34;&#34;&#34;
 
+from cstag.call import call
 from cstag.shorten import shorten
 from cstag.lengthen import lengthen
 from cstag.consensus import consensus
-from cstag.to_html import to_html
 from cstag.mask import mask
-from cstag.call import call</code></pre>
+from cstag.split import split
+from cstag.revcomp import revcomp
+from cstag.to_html import to_html</code></pre>
 </details>
 </section>
 <section>
@@ -180,6 +182,10 @@ from cstag.call import call</code></pre>
 <div class="desc"></div>
 </dd>
 <dt><code class="name"><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="cstag.utils" href="utils/index.html">cstag.utils</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -225,6 +231,7 @@ from cstag.call import call</code></pre>
 <li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code></li>
 <li><code><a title="cstag.split" href="split.html">cstag.split</a></code></li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></li>
+<li><code><a title="cstag.utils" href="utils/index.html">cstag.utils</a></code></li>
 </ul>
 </li>
 </ul>

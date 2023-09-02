@@ -28,7 +28,6 @@
 </summary>
 <pre><code class="python">from __future__ import annotations
 
-import re
 from cstag.shorten import shorten
 
 
@@ -185,7 +184,7 @@ def add_prefix(cs_tag: str) -&gt; str:
 ###########################################################
 
 
-def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = False) -&gt; str:
+def call(cigar: str, md: str, seq: str, long: bool = False, prefix: bool = False) -&gt; str:
     &#34;&#34;&#34;
     Generate a cs tag based on CIGAR, MD, and SEQ information.
 
@@ -193,7 +192,7 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
         cigar (str): CIGAR string representing the alignment.
         md (str): MD tag representing mismatching positions/base.
         seq (str): The sequence of the read.
-        is_long (bool, optional): Whether to return the cs tag in long format. Defaults to False.
+        long (bool, optional): Whether to return the cs tag in long format. Defaults to False.
         prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
 
     Returns:
@@ -204,12 +203,12 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
         &gt;&gt;&gt; cigar = &#34;8M2D4M2I3N1M&#34;
         &gt;&gt;&gt; md = &#34;2A5^AG7&#34;
         &gt;&gt;&gt; seq = &#34;ACGTACGTACGTACG&#34;
-        &gt;&gt;&gt; cstag.call(cigar, md, seq, is_long=True)
+        &gt;&gt;&gt; cstag.call(cigar, md, seq, long=True)
         &#39;=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G&#39;
     &#34;&#34;&#34;
     cigar, seq = trim_clips(cigar, seq)
     cs_tag = generate_cs_long(cigar, md, seq)
-    if is_long is False:
+    if long is False:
         cs_tag = shorten(cs_tag)
     if prefix is True:
         cs_tag = add_prefix(cs_tag)
@@ -237,7 +236,7 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
 </details>
 </dd>
 <dt id="cstag.call.call"><code class="name flex">
-<span>def <span class="ident">call</span></span>(<span>cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = False) ‑> str</span>
+<span>def <span class="ident">call</span></span>(<span>cigar: str, md: str, seq: str, long: bool = False, prefix: bool = False) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Generate a cs tag based on CIGAR, MD, and SEQ information.</p>
@@ -249,7 +248,7 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
 <dd>MD tag representing mismatching positions/base.</dd>
 <dt><strong><code>seq</code></strong> :&ensp;<code>str</code></dt>
 <dd>The sequence of the read.</dd>
-<dt><strong><code>is_long</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dt><strong><code>long</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>Whether to return the cs tag in long format. Defaults to False.</dd>
 <dt><strong><code>prefix</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False</dd>
@@ -264,14 +263,14 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
 &gt;&gt;&gt; cigar = &quot;8M2D4M2I3N1M&quot;
 &gt;&gt;&gt; md = &quot;2A5^AG7&quot;
 &gt;&gt;&gt; seq = &quot;ACGTACGTACGTACG&quot;
-&gt;&gt;&gt; cstag.call(cigar, md, seq, is_long=True)
+&gt;&gt;&gt; cstag.call(cigar, md, seq, long=True)
 '=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G'
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = False) -&gt; str:
+<pre><code class="python">def call(cigar: str, md: str, seq: str, long: bool = False, prefix: bool = False) -&gt; str:
     &#34;&#34;&#34;
     Generate a cs tag based on CIGAR, MD, and SEQ information.
 
@@ -279,7 +278,7 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
         cigar (str): CIGAR string representing the alignment.
         md (str): MD tag representing mismatching positions/base.
         seq (str): The sequence of the read.
-        is_long (bool, optional): Whether to return the cs tag in long format. Defaults to False.
+        long (bool, optional): Whether to return the cs tag in long format. Defaults to False.
         prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
 
     Returns:
@@ -290,12 +289,12 @@ def call(cigar: str, md: str, seq: str, is_long: bool = False, prefix: bool = Fa
         &gt;&gt;&gt; cigar = &#34;8M2D4M2I3N1M&#34;
         &gt;&gt;&gt; md = &#34;2A5^AG7&#34;
         &gt;&gt;&gt; seq = &#34;ACGTACGTACGTACG&#34;
-        &gt;&gt;&gt; cstag.call(cigar, md, seq, is_long=True)
+        &gt;&gt;&gt; cstag.call(cigar, md, seq, long=True)
         &#39;=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G&#39;
     &#34;&#34;&#34;
     cigar, seq = trim_clips(cigar, seq)
     cs_tag = generate_cs_long(cigar, md, seq)
-    if is_long is False:
+    if long is False:
         cs_tag = shorten(cs_tag)
     if prefix is True:
         cs_tag = add_prefix(cs_tag)
