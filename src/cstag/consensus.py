@@ -4,7 +4,7 @@ import re
 from itertools import chain
 from collections import deque, Counter
 
-from cstag.utils.validator import validate_long_format
+from cstag.utils.validator import validate_cs_tag, validate_long_format
 
 
 def split_cs_tags(cs_tags: list[str]) -> list[deque[str]]:
@@ -104,6 +104,7 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) ->
         raise ValueError("Element numbers of each argument must be the same")
 
     for cs_tag in cs_tags:
+        validate_cs_tag(cs_tag)
         validate_long_format(cs_tag)
 
     cs_tag_split = split_cs_tags(cs_tags)

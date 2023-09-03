@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from cstag.utils.validator import validate_long_format
+from cstag.utils.validator import validate_cs_tag, validate_long_format
 
 HTML_HEADER = """<!DOCTYPE html>
     <html>
@@ -137,6 +137,7 @@ def to_html(cs_tag: str, description: str = "") -> str:
         >>> description = "Example"
         >>> html_string = cstag.to_html(cs_tag, description)
     """
+    validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
     description_str = f"<h1>{description}</h1>" if description else ""
     html_parts = process_cs_tag(cs_tag)

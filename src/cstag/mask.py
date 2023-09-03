@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from cstag.utils.validator import validate_long_format, validate_threshold
+from cstag.utils.validator import validate_cs_tag, validate_long_format, validate_threshold
 
 
 def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False) -> str:
@@ -23,7 +23,7 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
         >>> cstag.mask(cs_tag, qual)
         =ACNN*an+ng-cc=T
     """
-
+    validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
     validate_threshold(threshold)
 

@@ -3,6 +3,13 @@ from __future__ import annotations
 import re
 
 
+def validate_cs_tag(cs_tag: str) -> None:
+    pattern = re.compile(r"^(=|[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})*$")
+
+    if not pattern.fullmatch(cs_tag.replace("cs:Z:", "")):
+        raise ValueError(f"Invalid cs_tag: {cs_tag}")
+
+
 def validate_short_format(cs_tag: str) -> None:
     if re.search(r"=[ACGTN]+", cs_tag):
         raise ValueError("cs tag must be in short format")

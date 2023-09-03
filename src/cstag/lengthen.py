@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from cstag.utils.validator import validate_short_format
+from cstag.utils.validator import validate_cs_tag, validate_short_format
 
 
 def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -> str:
@@ -23,6 +23,7 @@ def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -> str:
         >>> cstag.lengthen(cs, cigar, seq)
         =ACGT*ag=CGT
     """
+    validate_cs_tag(cs_tag)
     validate_short_format(cs_tag)
 
     cs_tag_split = re.split(r"([-+*~:])", cs_tag.replace("cs:Z:", ""))[1:]

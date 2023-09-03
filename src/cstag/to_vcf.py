@@ -3,7 +3,7 @@ from __future__ import annotations
 from cstag.split import split
 from collections import deque
 
-from cstag.utils.validator import validate_long_format
+from cstag.utils.validator import validate_cs_tag, validate_long_format
 
 
 def find_ref_for_insertion(cs_tag_split: list[str], idx: int) -> str | None:
@@ -84,7 +84,7 @@ def to_vcf(cs_tag: str, chrom: str, pos: int) -> str:
         chr1	4	.	TGG	T	.	.	.
         chr1	5	.	C	CTT	.	.	.
     """
-
+    validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
 
     cs_tag_split = split(cs_tag)
