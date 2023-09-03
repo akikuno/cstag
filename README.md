@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/cstag.svg?label=Python&color=blue&style=flat-square)](https://pypi.org/project/cstag/)
 [![PyPI](https://img.shields.io/pypi/v/cstag.svg?label=PyPI&color=orange&style=flat-square)](https://pypi.org/project/cstag/)
 [![Bioconda](https://img.shields.io/conda/v/bioconda/cstag?label=Bioconda&color=orange&style=flat-square)](https://anaconda.org/bioconda/cstag)
-[![DOI](https://zenodo.org/badge/468937655.svg)](https://zenodo.org/badge/latestdoi/468937655)
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.8312113-green.svg?style=flat-square)](https://zenodo.org/badge/latestdoi/468937655)
 
 # cstag
 
