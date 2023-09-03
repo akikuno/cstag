@@ -7,47 +7,6 @@ from collections import deque, Counter
 from cstag.utils.validator import validate_long_format
 
 
-def extract_softclips(cigars: list[str]) -> list[int]:
-    """
-    Extract the length of softclips from each cigars string.
-
-    Args:
-        cigars (list[str]): list of cigars strings.
-
-    Returns:
-        list[int]: list of softclip lengths for each cigars string.
-    """
-    softclip_lengths = []
-    for cigar in cigars:
-        # Check if the cigars string starts with a softclip (e.g., "4S3M")
-        if re.match(r"^[0-9]+S", cigar):
-            # Extract the length of the softclip using regex and convert it to an integer
-            softclip_length = int(re.sub(r"^([0-9]+)S.*", r"\1", cigar))
-        else:
-            # No softclip, so the length is 0
-            softclip_length = 0
-        softclip_lengths.append(softclip_length)
-    return softclip_lengths
-
-
-def calculate_read_starts(positions: list[int], cigars: list[str]) -> list[int]:
-    """
-    Calculate the start positions of each read based on positions and cigars strings.
-
-    Args:
-        positions (list[int]): 1-based leftmost mapping positions.
-        cigars (list[str]): cigars strings indicating the mapping of each read.
-
-    Returns:
-        list[int]: Calculated start positions for each read.
-    """
-    pos_min = min(positions)
-    pos_offsets = [pos - pos_min for pos in positions]
-    softclips = extract_softclips(cigars)
-    starts = [p + s for p, s in zip(pos_offsets, softclips)]
-    return starts
-
-
 def split_cs_tags(cs_tags: list[str]) -> list[deque[str]]:
     """
     Split and process each cs tag in cs_tags.
@@ -100,30 +59,6 @@ def normalize_read_lengths(cs_list: list[deque[str]], starts: list[int]) -> list
     return cs_list
 
 
-def preprocess_for_consensus(cs_tags: list[str], cigars: list[str], positions: list[int]) -> list[deque[str]]:
-    """
-    Preprocess cs_tags, cigars, and positions for consensus generation.
-
-    Args:
-        cs_tags (list[str]): List of CS tags in the long format.
-        cigars (list[str]): List of cigars strings.
-        positions (list[int]): List of 1-based leftmost mapping positions.
-
-    Returns:
-        list: A tuple containing a list of deques representing the normalized reads
-    """
-    # Step 1: Calculate the starts positions for each read
-    starts = calculate_read_starts(positions, cigars)
-
-    # Step 2: Split and process each CS tag
-    cs_tags_normalized_length = split_cs_tags(cs_tags)
-
-    # Step 3: Normalize the lengths of each read
-    cs_tags_normalized_length = normalize_read_lengths(cs_tags_normalized_length, starts)
-
-    return cs_tags_normalized_length
-
-
 def get_consensus(cs_list: list[deque[str]]) -> str:
     cs_consensus = []
     for cs in zip(*cs_list):
@@ -150,11 +85,10 @@ def get_consensus(cs_list: list[deque[str]]) -> str:
 ###########################################################
 
 
-def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefix: bool = False) -> str:
+def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -> str:
     """generate consensus of cs tags
     Args:
         cs_tags (list): cs tags in the **long** format
-        cigars (list): cigars strings (6th column in SAM file)
         positions (list): 1-based leftmost mapping position (4th column in SAM file)
         prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
     Return:
@@ -162,18 +96,21 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
     Example:
         >>> import cstag
         >>> cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
-        >>> cigars = ["4M","4M","1S3M", "3M", "3M3I1M"]
-        >>> positions = [6,6,6,7,6]
-        >>> cstag.consensus(cs_tags, cigars, positions)
+        >>> positions = [1,1,1,2,1]
+        >>> cstag.consensus(cs_tags, positions)
         =AC*gt=T
     """
-    if not (len(cs_tags) == len(cigars) == len(positions) > 0):
+    if not (len(cs_tags) == len(positions) > 0):
         raise ValueError("Element numbers of each argument must be the same")
 
     for cs_tag in cs_tags:
         validate_long_format(cs_tag)
 
-    cs_tags_normalized_length = preprocess_for_consensus(cs_tags, cigars, positions)
+    cs_tag_split = split_cs_tags(cs_tags)
+
+    positions_zero_indexed = [pos - 1 for pos in positions]
+
+    cs_tags_normalized_length = normalize_read_lengths(cs_tag_split, positions_zero_indexed)
 
     cs_consensus = get_consensus(cs_tags_normalized_length)
 

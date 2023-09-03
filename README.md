@@ -51,7 +51,7 @@ print(cstag.call(cigar, md, seq))
 # :2*ag:5-ag:4+ac~nn3nn:1
 
 cstag.call(cigar, md, seq, long=True)
-#  =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
+# =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
 ### Shorten or Lengthen CS Tags
@@ -63,7 +63,7 @@ import cstag
 cs = "=ACGT*ag=CGT"
 
 cstag.shorten(cs)
-#  :4*ag:3
+# :4*ag:3
 
 
 # Convert a CS tag from short to long
@@ -72,7 +72,7 @@ cigar = "8M"
 seq = "ACGTACGT"
 
 cstag.lengthen(cs, cigar, seq)
-#  =ACGT*ag=CGT
+# =ACGT*ag=CGT
 ```
 
 ### Generate a Consensus
@@ -80,12 +80,11 @@ cstag.lengthen(cs, cigar, seq)
 ```python
 import cstag
 
-cs_list = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
-cigar_list = ["4M", "4M", "1S3M", "3M", "3M3I1M"]
-pos_list = [1, 1, 1, 2, 1]
+cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
+positions = [1, 1, 2, 2, 1]
 
-cstag.consensus(cs_list, cigar_list, pos_list)
-#  =AC*gt*T
+cstag.consensus(cs_tags, positions)
+# =AC*gt*T
 ```
 
 ### Mask Low-Quality Bases
@@ -98,7 +97,7 @@ cigar = "5M2I2D1M"
 qual = "AA!!!!AA"
 phred_threshold = 10
 cstag.mask(cs, cigar, qual, phred_threshold)
-#  =ACNN*an+ng-cc=T
+# =ACNN*an+ng-cc=T
 ```
 
 ### Split a CS Tag
@@ -108,7 +107,7 @@ import cstag
 
 cs = "=ACGT*ac+gg-cc=T"
 cstag.split(cs)
-#  ['=ACGT', '*ac', '+gg', '-cc', '=T']
+# ['=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
 ### Reverse Complement of a CS Tag
@@ -118,7 +117,7 @@ import cstag
 
 cs = "=ACGT*ac+gg-cc=T"
 cstag.revcomp(cs)
-#  =A-gg+cc*tg=ACGT
+# =A-gg+cc*tg=ACGT
 ```
 
 ### Generate VCF Report
