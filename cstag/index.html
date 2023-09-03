@@ -63,7 +63,7 @@ print(cstag.call(cigar, md, seq))
 # :2*ag:5-ag:4+ac~nn3nn:1
 
 cstag.call(cigar, md, seq, long=True)
-#  =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
+# =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 </code></pre>
 <h3 id="shorten-or-lengthen-cs-tags">Shorten or Lengthen CS Tags</h3>
 <pre><code class="language-python">import cstag
@@ -72,7 +72,7 @@ cstag.call(cigar, md, seq, long=True)
 cs = &quot;=ACGT*ag=CGT&quot;
 
 cstag.shorten(cs)
-#  :4*ag:3
+# :4*ag:3
 
 
 # Convert a CS tag from short to long
@@ -81,17 +81,16 @@ cigar = &quot;8M&quot;
 seq = &quot;ACGTACGT&quot;
 
 cstag.lengthen(cs, cigar, seq)
-#  =ACGT*ag=CGT
+# =ACGT*ag=CGT
 </code></pre>
 <h3 id="generate-a-consensus">Generate a Consensus</h3>
 <pre><code class="language-python">import cstag
 
-cs_list = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
-cigar_list = [&quot;4M&quot;, &quot;4M&quot;, &quot;1S3M&quot;, &quot;3M&quot;, &quot;3M3I1M&quot;]
-pos_list = [1, 1, 1, 2, 1]
+cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
+positions = [1, 1, 2, 2, 1]
 
-cstag.consensus(cs_list, cigar_list, pos_list)
-#  =AC*gt*T
+cstag.consensus(cs_tags, positions)
+# =AC*gt*T
 </code></pre>
 <h3 id="mask-low-quality-bases">Mask Low-Quality Bases</h3>
 <pre><code class="language-python">import cstag
@@ -101,21 +100,21 @@ cigar = &quot;5M2I2D1M&quot;
 qual = &quot;AA!!!!AA&quot;
 phred_threshold = 10
 cstag.mask(cs, cigar, qual, phred_threshold)
-#  =ACNN*an+ng-cc=T
+# =ACNN*an+ng-cc=T
 </code></pre>
 <h3 id="split-a-cs-tag">Split a CS Tag</h3>
 <pre><code class="language-python">import cstag
 
 cs = &quot;=ACGT*ac+gg-cc=T&quot;
 cstag.split(cs)
-#  ['=ACGT', '*ac', '+gg', '-cc', '=T']
+# ['=ACGT', '*ac', '+gg', '-cc', '=T']
 </code></pre>
 <h3 id="reverse-complement-of-a-cs-tag">Reverse Complement of a CS Tag</h3>
 <pre><code class="language-python">import cstag
 
 cs = &quot;=ACGT*ac+gg-cc=T&quot;
 cstag.revcomp(cs)
-#  =A-gg+cc*tg=ACGT
+# =A-gg+cc*tg=ACGT
 </code></pre>
 <h3 id="generate-vcf-report">Generate VCF Report</h3>
 <pre><code class="language-python">import cstag

@@ -35,47 +35,6 @@ from collections import deque, Counter
 from cstag.utils.validator import validate_long_format
 
 
-def extract_softclips(cigars: list[str]) -&gt; list[int]:
-    &#34;&#34;&#34;
-    Extract the length of softclips from each cigars string.
-
-    Args:
-        cigars (list[str]): list of cigars strings.
-
-    Returns:
-        list[int]: list of softclip lengths for each cigars string.
-    &#34;&#34;&#34;
-    softclip_lengths = []
-    for cigar in cigars:
-        # Check if the cigars string starts with a softclip (e.g., &#34;4S3M&#34;)
-        if re.match(r&#34;^[0-9]+S&#34;, cigar):
-            # Extract the length of the softclip using regex and convert it to an integer
-            softclip_length = int(re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, cigar))
-        else:
-            # No softclip, so the length is 0
-            softclip_length = 0
-        softclip_lengths.append(softclip_length)
-    return softclip_lengths
-
-
-def calculate_read_starts(positions: list[int], cigars: list[str]) -&gt; list[int]:
-    &#34;&#34;&#34;
-    Calculate the start positions of each read based on positions and cigars strings.
-
-    Args:
-        positions (list[int]): 1-based leftmost mapping positions.
-        cigars (list[str]): cigars strings indicating the mapping of each read.
-
-    Returns:
-        list[int]: Calculated start positions for each read.
-    &#34;&#34;&#34;
-    pos_min = min(positions)
-    pos_offsets = [pos - pos_min for pos in positions]
-    softclips = extract_softclips(cigars)
-    starts = [p + s for p, s in zip(pos_offsets, softclips)]
-    return starts
-
-
 def split_cs_tags(cs_tags: list[str]) -&gt; list[deque[str]]:
     &#34;&#34;&#34;
     Split and process each cs tag in cs_tags.
@@ -128,30 +87,6 @@ def normalize_read_lengths(cs_list: list[deque[str]], starts: list[int]) -&gt; l
     return cs_list
 
 
-def preprocess_for_consensus(cs_tags: list[str], cigars: list[str], positions: list[int]) -&gt; list[deque[str]]:
-    &#34;&#34;&#34;
-    Preprocess cs_tags, cigars, and positions for consensus generation.
-
-    Args:
-        cs_tags (list[str]): List of CS tags in the long format.
-        cigars (list[str]): List of cigars strings.
-        positions (list[int]): List of 1-based leftmost mapping positions.
-
-    Returns:
-        list: A tuple containing a list of deques representing the normalized reads
-    &#34;&#34;&#34;
-    # Step 1: Calculate the starts positions for each read
-    starts = calculate_read_starts(positions, cigars)
-
-    # Step 2: Split and process each CS tag
-    cs_tags_normalized_length = split_cs_tags(cs_tags)
-
-    # Step 3: Normalize the lengths of each read
-    cs_tags_normalized_length = normalize_read_lengths(cs_tags_normalized_length, starts)
-
-    return cs_tags_normalized_length
-
-
 def get_consensus(cs_list: list[deque[str]]) -&gt; str:
     cs_consensus = []
     for cs in zip(*cs_list):
@@ -178,11 +113,10 @@ def get_consensus(cs_list: list[deque[str]]) -&gt; str:
 ###########################################################
 
 
-def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefix: bool = False) -&gt; str:
+def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&gt; str:
     &#34;&#34;&#34;generate consensus of cs tags
     Args:
         cs_tags (list): cs tags in the **long** format
-        cigars (list): cigars strings (6th column in SAM file)
         positions (list): 1-based leftmost mapping position (4th column in SAM file)
         prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
     Return:
@@ -190,18 +124,21 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs_tags = [&#34;=ACGT&#34;, &#34;=AC*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=ACT+ccc=T&#34;]
-        &gt;&gt;&gt; cigars = [&#34;4M&#34;,&#34;4M&#34;,&#34;1S3M&#34;, &#34;3M&#34;, &#34;3M3I1M&#34;]
-        &gt;&gt;&gt; positions = [6,6,6,7,6]
-        &gt;&gt;&gt; cstag.consensus(cs_tags, cigars, positions)
+        &gt;&gt;&gt; positions = [1,1,1,2,1]
+        &gt;&gt;&gt; cstag.consensus(cs_tags, positions)
         =AC*gt=T
     &#34;&#34;&#34;
-    if not (len(cs_tags) == len(cigars) == len(positions) &gt; 0):
+    if not (len(cs_tags) == len(positions) &gt; 0):
         raise ValueError(&#34;Element numbers of each argument must be the same&#34;)
 
     for cs_tag in cs_tags:
         validate_long_format(cs_tag)
 
-    cs_tags_normalized_length = preprocess_for_consensus(cs_tags, cigars, positions)
+    cs_tag_split = split_cs_tags(cs_tags)
+
+    positions_zero_indexed = [pos - 1 for pos in positions]
+
+    cs_tags_normalized_length = normalize_read_lengths(cs_tag_split, positions_zero_indexed)
 
     cs_consensus = get_consensus(cs_tags_normalized_length)
 
@@ -215,47 +152,8 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="cstag.consensus.calculate_read_starts"><code class="name flex">
-<span>def <span class="ident">calculate_read_starts</span></span>(<span>positions: list[int], cigars: list[str]) ‑> list[int]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate the start positions of each read based on positions and cigars strings.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>positions</code></strong> :&ensp;<code>list[int]</code></dt>
-<dd>1-based leftmost mapping positions.</dd>
-<dt><strong><code>cigars</code></strong> :&ensp;<code>list[str]</code></dt>
-<dd>cigars strings indicating the mapping of each read.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>list[int]</code></dt>
-<dd>Calculated start positions for each read.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calculate_read_starts(positions: list[int], cigars: list[str]) -&gt; list[int]:
-    &#34;&#34;&#34;
-    Calculate the start positions of each read based on positions and cigars strings.
-
-    Args:
-        positions (list[int]): 1-based leftmost mapping positions.
-        cigars (list[str]): cigars strings indicating the mapping of each read.
-
-    Returns:
-        list[int]: Calculated start positions for each read.
-    &#34;&#34;&#34;
-    pos_min = min(positions)
-    pos_offsets = [pos - pos_min for pos in positions]
-    softclips = extract_softclips(cigars)
-    starts = [p + s for p, s in zip(pos_offsets, softclips)]
-    return starts</code></pre>
-</details>
-</dd>
 <dt id="cstag.consensus.consensus"><code class="name flex">
-<span>def <span class="ident">consensus</span></span>(<span>cs_tags: list[str], cigars: list[str], positions: list[int], prefix: bool = False) ‑> str</span>
+<span>def <span class="ident">consensus</span></span>(<span>cs_tags: list[str], positions: list[int], prefix: bool = False) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>generate consensus of cs tags</p>
@@ -263,8 +161,6 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
 <dl>
 <dt><strong><code>cs_tags</code></strong> :&ensp;<code>list</code></dt>
 <dd>cs tags in the <strong>long</strong> format</dd>
-<dt><strong><code>cigars</code></strong> :&ensp;<code>list</code></dt>
-<dd>cigars strings (6th column in SAM file)</dd>
 <dt><strong><code>positions</code></strong> :&ensp;<code>list</code></dt>
 <dd>1-based leftmost mapping position (4th column in SAM file)</dd>
 <dt><strong><code>prefix</code></strong> :&ensp;<code>bool</code>, optional</dt>
@@ -275,20 +171,18 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
-&gt;&gt;&gt; cigars = [&quot;4M&quot;,&quot;4M&quot;,&quot;1S3M&quot;, &quot;3M&quot;, &quot;3M3I1M&quot;]
-&gt;&gt;&gt; positions = [6,6,6,7,6]
-&gt;&gt;&gt; cstag.consensus(cs_tags, cigars, positions)
+&gt;&gt;&gt; positions = [1,1,1,2,1]
+&gt;&gt;&gt; cstag.consensus(cs_tags, positions)
 =AC*gt=T
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefix: bool = False) -&gt; str:
+<pre><code class="python">def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&gt; str:
     &#34;&#34;&#34;generate consensus of cs tags
     Args:
         cs_tags (list): cs tags in the **long** format
-        cigars (list): cigars strings (6th column in SAM file)
         positions (list): 1-based leftmost mapping position (4th column in SAM file)
         prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
     Return:
@@ -296,64 +190,25 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs_tags = [&#34;=ACGT&#34;, &#34;=AC*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=ACT+ccc=T&#34;]
-        &gt;&gt;&gt; cigars = [&#34;4M&#34;,&#34;4M&#34;,&#34;1S3M&#34;, &#34;3M&#34;, &#34;3M3I1M&#34;]
-        &gt;&gt;&gt; positions = [6,6,6,7,6]
-        &gt;&gt;&gt; cstag.consensus(cs_tags, cigars, positions)
+        &gt;&gt;&gt; positions = [1,1,1,2,1]
+        &gt;&gt;&gt; cstag.consensus(cs_tags, positions)
         =AC*gt=T
     &#34;&#34;&#34;
-    if not (len(cs_tags) == len(cigars) == len(positions) &gt; 0):
+    if not (len(cs_tags) == len(positions) &gt; 0):
         raise ValueError(&#34;Element numbers of each argument must be the same&#34;)
 
     for cs_tag in cs_tags:
         validate_long_format(cs_tag)
 
-    cs_tags_normalized_length = preprocess_for_consensus(cs_tags, cigars, positions)
+    cs_tag_split = split_cs_tags(cs_tags)
+
+    positions_zero_indexed = [pos - 1 for pos in positions]
+
+    cs_tags_normalized_length = normalize_read_lengths(cs_tag_split, positions_zero_indexed)
 
     cs_consensus = get_consensus(cs_tags_normalized_length)
 
     return f&#34;cs:Z:{cs_consensus}&#34; if prefix else cs_consensus</code></pre>
-</details>
-</dd>
-<dt id="cstag.consensus.extract_softclips"><code class="name flex">
-<span>def <span class="ident">extract_softclips</span></span>(<span>cigars: list[str]) ‑> list[int]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Extract the length of softclips from each cigars string.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>cigars</code></strong> :&ensp;<code>list[str]</code></dt>
-<dd>list of cigars strings.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>list[int]</code></dt>
-<dd>list of softclip lengths for each cigars string.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def extract_softclips(cigars: list[str]) -&gt; list[int]:
-    &#34;&#34;&#34;
-    Extract the length of softclips from each cigars string.
-
-    Args:
-        cigars (list[str]): list of cigars strings.
-
-    Returns:
-        list[int]: list of softclip lengths for each cigars string.
-    &#34;&#34;&#34;
-    softclip_lengths = []
-    for cigar in cigars:
-        # Check if the cigars string starts with a softclip (e.g., &#34;4S3M&#34;)
-        if re.match(r&#34;^[0-9]+S&#34;, cigar):
-            # Extract the length of the softclip using regex and convert it to an integer
-            softclip_length = int(re.sub(r&#34;^([0-9]+)S.*&#34;, r&#34;\1&#34;, cigar))
-        else:
-            # No softclip, so the length is 0
-            softclip_length = 0
-        softclip_lengths.append(softclip_length)
-    return softclip_lengths</code></pre>
 </details>
 </dd>
 <dt id="cstag.consensus.get_consensus"><code class="name flex">
@@ -429,53 +284,6 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
     return cs_list</code></pre>
 </details>
 </dd>
-<dt id="cstag.consensus.preprocess_for_consensus"><code class="name flex">
-<span>def <span class="ident">preprocess_for_consensus</span></span>(<span>cs_tags: list[str], cigars: list[str], positions: list[int]) ‑> list[collections.deque[str]]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Preprocess cs_tags, cigars, and positions for consensus generation.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>cs_tags</code></strong> :&ensp;<code>list[str]</code></dt>
-<dd>List of CS tags in the long format.</dd>
-<dt><strong><code>cigars</code></strong> :&ensp;<code>list[str]</code></dt>
-<dd>List of cigars strings.</dd>
-<dt><strong><code>positions</code></strong> :&ensp;<code>list[int]</code></dt>
-<dd>List of 1-based leftmost mapping positions.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>list</code></dt>
-<dd>A tuple containing a list of deques representing the normalized reads</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def preprocess_for_consensus(cs_tags: list[str], cigars: list[str], positions: list[int]) -&gt; list[deque[str]]:
-    &#34;&#34;&#34;
-    Preprocess cs_tags, cigars, and positions for consensus generation.
-
-    Args:
-        cs_tags (list[str]): List of CS tags in the long format.
-        cigars (list[str]): List of cigars strings.
-        positions (list[int]): List of 1-based leftmost mapping positions.
-
-    Returns:
-        list: A tuple containing a list of deques representing the normalized reads
-    &#34;&#34;&#34;
-    # Step 1: Calculate the starts positions for each read
-    starts = calculate_read_starts(positions, cigars)
-
-    # Step 2: Split and process each CS tag
-    cs_tags_normalized_length = split_cs_tags(cs_tags)
-
-    # Step 3: Normalize the lengths of each read
-    cs_tags_normalized_length = normalize_read_lengths(cs_tags_normalized_length, starts)
-
-    return cs_tags_normalized_length</code></pre>
-</details>
-</dd>
 <dt id="cstag.consensus.split_cs_tags"><code class="name flex">
 <span>def <span class="ident">split_cs_tags</span></span>(<span>cs_tags: list[str]) ‑> list[collections.deque[str]]</span>
 </code></dt>
@@ -543,12 +351,9 @@ def consensus(cs_tags: list[str], cigars: list[str], positions: list[int], prefi
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="cstag.consensus.calculate_read_starts" href="#cstag.consensus.calculate_read_starts">calculate_read_starts</a></code></li>
 <li><code><a title="cstag.consensus.consensus" href="#cstag.consensus.consensus">consensus</a></code></li>
-<li><code><a title="cstag.consensus.extract_softclips" href="#cstag.consensus.extract_softclips">extract_softclips</a></code></li>
 <li><code><a title="cstag.consensus.get_consensus" href="#cstag.consensus.get_consensus">get_consensus</a></code></li>
 <li><code><a title="cstag.consensus.normalize_read_lengths" href="#cstag.consensus.normalize_read_lengths">normalize_read_lengths</a></code></li>
-<li><code><a title="cstag.consensus.preprocess_for_consensus" href="#cstag.consensus.preprocess_for_consensus">preprocess_for_consensus</a></code></li>
 <li><code><a title="cstag.consensus.split_cs_tags" href="#cstag.consensus.split_cs_tags">split_cs_tags</a></code></li>
 </ul>
 </li>
