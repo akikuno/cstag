@@ -17,11 +17,13 @@
 - `cstag.consensus()`: Generate a consensus cs tag from multiple cs tags
 - `cstag.mask()`: Mask low-quality bases in a CS tag
 - `cstag.split()`: Split a CS tag
-- `cstag.revcomp()`: Converts a CS tag into its reverse complement.
-- `cstag.to_vcf()`: Output VCF
-- `cstag.to_html()`: Output HTML
+- `cstag.revcomp()`: Converts a CS tag into its reverse complement
+- `cstag.to_sequence()`: Output a reference subsequence in the alignment
+- `cstag.to_vcf()`: Output a VCF
+- `cstag.to_html()`: Output a HTML
 
-Visit the [documentation](https://akikuno.github.io/cstag/cstag/) for more details.
+Visit the [documentation](https://akikuno.github.io/cstag/cstag/) for more details.  
+For adding CS tags to SAM/BAM files, [`cstag-cli`](https://github.com/akikuno/cstag-cli) is at your service.  
 
 ## 🛠 Installation
 
@@ -118,6 +120,15 @@ import cstag
 cs = "=ACGT*ac+gg-cc=T"
 cstag.revcomp(cs)
 # =A-gg+cc*tg=ACGT
+```
+
+### Reconstruct the reference subsequence in the alignment
+
+```python
+import cstag
+cs_tag = "=AC*gt=T-gg=C+tt=A"
+cstag.to_sequence(cs_tag)
+# ACTTCTTA
 ```
 
 ### Generate VCF Report
