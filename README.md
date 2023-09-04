@@ -143,7 +143,7 @@ chr1	5	.	C	CTT	.	.	.
 import cstag
 from pathlib import Path
 
-cs_tag = "=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+cs_tag = "=AC+ggg=T-acgt*at~gt10ag=GNNN"
 description = "Example"
 
 cs_tag_html = cstag.to_html(cs_tag, description)
@@ -152,7 +152,7 @@ Path("report.html").write_text(cs_tag_html)
 ```
 The resulting `report.html` looks like this :point_down:
 
-<img width="414" alt="example_report" src="https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png">
+<img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png">
 
 ## 📣Feedback
 
