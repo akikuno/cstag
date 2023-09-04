@@ -142,7 +142,7 @@ def process_cs_tag(cs_tag: str) -> str:
 def to_html(cs_tag: str, description: str = "") -> str:
     """Output HTML string showing a sequence with mutations colored
     Args:
-        cs_tag (str): cs tag in the **long** format
+        cs_tag (str): CS tag in the **long** format
         description (str): (optional) header information in the output string
     Return:
         HTML string
