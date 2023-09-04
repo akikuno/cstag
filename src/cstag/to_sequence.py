@@ -5,6 +5,20 @@ from cstag.utils.validator import validate_cs_tag, validate_long_format
 
 
 def to_sequence(cs_tag: str) -> str:
+    """Reconstruct the reference subsequence in the alignment
+
+    Args:
+        cs_tag (str): CS tag in the **long** format
+
+    Returns:
+        str: The sequence string derived from the CS tag.
+
+    Example:
+        >>> import cstag
+        >>> cs_tag = "=AC*gt=T-gg=C+tt=A"
+        >>> cstag.to_sequence(cs_tag)
+        "ACTTCTTA"
+    """
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
 
