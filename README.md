@@ -62,18 +62,18 @@ cstag.call(cigar, md, seq, long=True)
 import cstag
 
 # Convert a CS tag from long to short
-cs = "=ACGT*ag=CGT"
+cs_tag = "=ACGT*ag=CGT"
 
-cstag.shorten(cs)
+cstag.shorten(cs_tag)
 # :4*ag:3
 
 
 # Convert a CS tag from short to long
-cs = ":4*ag:3"
+cs_tag = ":4*ag:3"
 cigar = "8M"
 seq = "ACGTACGT"
 
-cstag.lengthen(cs, cigar, seq)
+cstag.lengthen(cs_tag, cigar, seq)
 # =ACGT*ag=CGT
 ```
 
@@ -94,11 +94,11 @@ cstag.consensus(cs_tags, positions)
 ```python
 import cstag
 
-cs = "=ACGT*ac+gg-cc=T"
+cs_tag = "=ACGT*ac+gg-cc=T"
 cigar = "5M2I2D1M"
 qual = "AA!!!!AA"
 phred_threshold = 10
-cstag.mask(cs, cigar, qual, phred_threshold)
+cstag.mask(cs_tag, cigar, qual, phred_threshold)
 # =ACNN*an+ng-cc=T
 ```
 
@@ -107,8 +107,8 @@ cstag.mask(cs, cigar, qual, phred_threshold)
 ```python
 import cstag
 
-cs = "=ACGT*ac+gg-cc=T"
-cstag.split(cs)
+cs_tag = "=ACGT*ac+gg-cc=T"
+cstag.split(cs_tag)
 # ['=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
@@ -117,8 +117,8 @@ cstag.split(cs)
 ```python
 import cstag
 
-cs = "=ACGT*ac+gg-cc=T"
-cstag.revcomp(cs)
+cs_tag = "=ACGT*ac+gg-cc=T"
+cstag.revcomp(cs_tag)
 # =A-gg+cc*tg=ACGT
 ```
 
