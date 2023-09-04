@@ -56,14 +56,32 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[tupl
     return variant_annotations
 
 
+def process_cs_tag(cs_tag: str, chrom: str, pos: int) -> str:
+    validate_cs_tag(cs_tag)
+    validate_long_format(cs_tag)
+
+    cs_tag_split = split(cs_tag)
+
+    # Call POS, REF, ALT
+    variants = get_variant_annotations(cs_tag_split, pos)
+
+    # Write VCF
+    HEADER = "##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n"
+    vcf = HEADER.strip().split("\n")
+    for pos, ref, alt in variants:
+        vcf.append(f"{chrom}\t{pos}\t.\t{ref}\t{alt}\t.\t.\t.")
+
+    return "\n".join(vcf)
+
+
 ###########################################################
 # main
 ###########################################################
 
 
-def to_vcf(cs_tag: str, chrom: str, pos: int) -> str:
+def to_vcf(cs_tags: str | list[str], chrom: str | list[str], pos: int | list[str]) -> str:
     """
-    Convert a CS tag to VCF (Variant Call Format) string.
+    Convert CS tags to VCF (Variant Call Format) string.
 
     Args:
         cs_tag (str): The CS tag representing the sequence alignment.
@@ -84,19 +102,5 @@ def to_vcf(cs_tag: str, chrom: str, pos: int) -> str:
         chr1	4	.	TGG	T	.	.	.
         chr1	5	.	C	CTT	.	.	.
     """
-    validate_cs_tag(cs_tag)
-    validate_long_format(cs_tag)
-
-    cs_tag_split = split(cs_tag)
-
-    # Call POS, REF, ALT
-    variants = get_variant_annotations(cs_tag_split, pos)
-
-    # Write VCF
-    HEADER = "##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n"
-
-    vcf = HEADER.strip().split("\n")
-    for pos, ref, alt in variants:
-        vcf.append(f"{chrom}\t{pos}\t.\t{ref}\t{alt}\t.\t.\t.")
-
-    return "\n".join(vcf)
+    if isinstance(cs_tags, str):
+        return process_cs_tag(cs_tags, chrom, pos)

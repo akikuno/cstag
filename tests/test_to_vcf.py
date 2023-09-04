@@ -1,4 +1,4 @@
-from src.cstag.to_vcf import find_ref_for_insertion, find_ref_for_deletion, get_variant_annotations, to_vcf
+from src.cstag.to_vcf import find_ref_for_insertion, find_ref_for_deletion, get_variant_annotations, process_cs_tag
 
 
 # find_ref_for_insertionのテスト
@@ -35,8 +35,8 @@ def test_get_variant_annotations():
     assert get_variant_annotations(["=AC", "*ga", "=AC", "*ct"], 10) == [(12, "G", "A"), (15, "C", "T")]
 
 
-# to_vcf関数のテスト
-def test_to_vcf():
+# process_cs_tag関数のテスト
+def test_process_cs_tag():
     cs_tag1 = "=AC*gt=T-gg=C+tt=A"
     chrom1 = "chr1"
     pos1 = 1
@@ -45,7 +45,7 @@ def test_to_vcf():
 chr1	3	.	G	T	.	.	.
 chr1	4	.	TGG	T	.	.	.
 chr1	5	.	C	CTT	.	.	."""
-    assert to_vcf(cs_tag1, chrom1, pos1) == expected_output1
+    assert process_cs_tag(cs_tag1, chrom1, pos1) == expected_output1
 
     cs_tag2 = "=AC*ga"
     chrom2 = "2"
@@ -53,4 +53,4 @@ chr1	5	.	C	CTT	.	.	."""
     expected_output2 = """##fileformat=VCFv4.2
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
 2	3	.	G	A	.	.	."""
-    assert to_vcf(cs_tag2, chrom2, pos2) == expected_output2
+    assert process_cs_tag(cs_tag2, chrom2, pos2) == expected_output2
