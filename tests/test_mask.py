@@ -31,10 +31,10 @@ def test_softclip():
 
 
 def test_splicing():
-    CSTAG = "=ACGT~gt10~ca=T"
+    CSTAG = "=ACGT~gt10ca=T"
     CIGAR = "5M10N1M"
     QUAL = "AA!!A"
-    assert cstag.mask(CSTAG, CIGAR, QUAL) == "=ACNN~gt10~ca=T"
+    assert cstag.mask(CSTAG, CIGAR, QUAL) == "=ACNN~gt10ca=T"
 
 
 def test_threshold_2():
