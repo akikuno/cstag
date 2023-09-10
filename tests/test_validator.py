@@ -1,5 +1,11 @@
 import pytest
-from src.cstag.utils.validator import validate_cs_tag, validate_short_format, validate_long_format, validate_threshold
+from src.cstag.utils.validator import (
+    validate_cs_tag,
+    validate_short_format,
+    validate_long_format,
+    validate_threshold,
+    validate_pos,
+)
 
 
 def test_validate_cs_tag_normal_cases():
@@ -93,3 +99,15 @@ def test_validate_threshold():
         validate_threshold(-1)
     with pytest.raises(ValueError):
         validate_threshold(41)
+
+
+def test_validate_pos():
+    validate_pos(1)
+    validate_pos(5)
+    validate_pos(100)
+
+    with pytest.raises(ValueError, match=r"pos must be a positive integer, but got 0"):
+        validate_pos(0)
+
+    with pytest.raises(ValueError, match=r"pos must be a positive integer, but got -1"):
+        validate_pos(-1)

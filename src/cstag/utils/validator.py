@@ -28,3 +28,8 @@ def validate_threshold(threshold: int) -> None:
 
     if not 0 <= threshold <= 40:
         raise ValueError("threshold must be within a range between 0 to 40")
+
+
+def validate_pos(pos: int) -> None:
+    if pos < 1:
+        raise ValueError(f"pos must be a positive integer, but got {pos}")

@@ -73,6 +73,10 @@ def process_cs_tag(cs_tag: str, chrom: str, pos: int) -> str:
 
     return "\n".join(vcf)
 
+def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int]) -> str:
+    _ = [validate_cs_tag(cs_tag) for cs_tag in cs_tags]
+    _ = [validate_long_format(cs_tag) for cs_tag in cs_tags]
+
 
 ###########################################################
 # main
