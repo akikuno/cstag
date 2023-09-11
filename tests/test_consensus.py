@@ -87,12 +87,6 @@ def test_deletion():
     assert consensus(CSTAG, POS) == "=NC-ggggg=GT"
 
 
-def test_positions():
-    CSTAG = ["=ACGT", "=CGT", "=GT"]
-    POS = [1, 2, 3]
-    assert consensus(CSTAG, POS) == "=NCGT"
-
-
 def test_splicing():
     CSTAG = [
         "=ACGT",
@@ -102,3 +96,21 @@ def test_splicing():
     ]
     POS = [1, 1, 2, 2]
     assert consensus(CSTAG, POS) == "=NC~gc100ag=T"
+
+
+def test_positions():
+    CSTAG = ["=ACGT", "=CGT", "=GT"]
+    POS = [1, 2, 3]
+    assert consensus(CSTAG, POS) == "=NCGT"
+
+
+def test_positions_more_than_one():
+    CSTAG = [
+        "=ACGT",
+        "=AC*gt=T",
+        "=C*gt=T",
+        "=C*gt=T",
+        "=ACT+ccc=T",
+    ]
+    POS = [101, 101, 102, 102, 101]
+    assert consensus(CSTAG, POS) == "=AC*gt=T"

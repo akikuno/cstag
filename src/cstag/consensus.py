@@ -37,31 +37,39 @@ def split_cs_tags(cs_tags: list[str]) -> list[deque[str]]:
     return cs_tags_splitted
 
 
-def normalize_read_lengths(cs_list: list[deque[str]], starts: list[int]) -> list[deque[str]]:
+def normalize_positions(positions: list[int]) -> list[int]:
     """
-    Normalize the lengths of each read in cs_list based on their starts positions.
+    Normalize the positions in the given list by shifting them so that the minimum position becomes zero.
+    """
+    pos_min = min(positions)
+    return [pos - pos_min for pos in positions]
+
+
+def normalize_read_lengths(cs_tags: list[deque[str]], starts: list[int]) -> list[deque[str]]:
+    """
+    Normalize the lengths of each read in cs_tags based on their starts positions.
 
     Args:
-        cs_list (list[deque[str]]): list of deques representing the reads.
+        cs_tags (list[deque[str]]): list of deques representing the reads.
         starts (list[int]): Starting positions of each read.
 
     Returns:
         list[deque[str]]: list of deques representing the reads, now normalized to the same length.
     """
-    cs_maxlen = max(len(cs) + start for cs, start in zip(cs_list, starts))
+    cs_maxlen = max(len(cs) + start for cs, start in zip(cs_tags, starts))
 
     for i, start in enumerate(starts):
         if start > 0:
-            cs_list[i].extendleft(["N"] * start)
-        if len(cs_list[i]) < cs_maxlen:
-            cs_list[i].extend(["N"] * (cs_maxlen - len(cs_list[i])))
+            cs_tags[i].extendleft(["N"] * start)
+        if len(cs_tags[i]) < cs_maxlen:
+            cs_tags[i].extend(["N"] * (cs_maxlen - len(cs_tags[i])))
 
-    return cs_list
+    return cs_tags
 
 
-def get_consensus(cs_list: list[deque[str]]) -> str:
+def get_consensus(cs_tags: list[list[str]]) -> str:
     cs_consensus = []
-    for cs in zip(*cs_list):
+    for cs in zip(*cs_tags):
         # Get the most common cs tag(s)
         most_common_tags = Counter(cs).most_common()
 
@@ -109,9 +117,9 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) ->
 
     cs_tag_split = split_cs_tags(cs_tags)
 
-    positions_zero_indexed = [pos - 1 for pos in positions]
+    positions_normalized = normalize_positions(positions)
 
-    cs_tags_normalized_length = normalize_read_lengths(cs_tag_split, positions_zero_indexed)
+    cs_tags_normalized_length = normalize_read_lengths(cs_tag_split, positions_normalized)
 
     cs_consensus = get_consensus(cs_tags_normalized_length)
 
