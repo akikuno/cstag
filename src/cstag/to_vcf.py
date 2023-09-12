@@ -1,9 +1,32 @@
 from __future__ import annotations
 
-from cstag.split import split
 from collections import deque
+from typing import NamedTuple
 
-from cstag.utils.validator import validate_cs_tag, validate_long_format
+from cstag.split import split
+from cstag.utils.validator import validate_cs_tag, validate_long_format, validate_pos
+
+
+class CsInfo(NamedTuple):
+    cs_tag: str
+    pos_start: int
+    pos_end: int
+    chrom: str | None = None
+
+
+class VcfInfo(NamedTuple):
+    dp: int | None = None
+    rd: int | None = None
+    ad: int | None = None
+    vaf: float | None = None
+
+
+class Vcf(NamedTuple):
+    chrom: str | None = None
+    pos: int | None = None
+    ref: str | None = None
+    alt: str | None = None
+    info: VcfInfo = VcfInfo()
 
 
 def find_ref_for_insertion(cs_tag_split: list[str], idx: int) -> str | None:
@@ -33,7 +56,7 @@ def find_ref_for_deletion(cs_tag_split: list[str], idx: int) -> str:
     return "".join(ref)
 
 
-def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[tuple[int, str, str]]:
+def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[Vcf]:
     variant_annotations = []
     pos = position
     for idx, cs in enumerate(cs_tag_split):
@@ -41,15 +64,15 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[tupl
             pos += len(cs) - 1
         elif cs.startswith("*"):
             ref, alt = cs[1].upper(), cs[2].upper()
-            variant_annotations.append((pos, ref, alt))
+            variant_annotations.append(Vcf(pos=pos, ref=ref, alt=alt))
             pos += 1
         elif cs.startswith("+"):
             ref = find_ref_for_insertion(cs_tag_split, idx)
             alt = ref + cs[1:].upper()
-            variant_annotations.append((pos - 1, ref, alt))
+            variant_annotations.append(Vcf(pos=pos - 1, ref=ref, alt=alt))
         elif cs.startswith("-"):
             ref = find_ref_for_deletion(cs_tag_split, idx)
-            variant_annotations.append((pos - 1, ref, ref[0]))
+            variant_annotations.append(Vcf(pos=pos - 1, ref=ref, alt=ref[0]))
         elif cs.startswith("~"):
             continue
 
@@ -59,6 +82,7 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[tupl
 def process_cs_tag(cs_tag: str, chrom: str, pos: int) -> str:
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
+    validate_pos(pos)
 
     cs_tag_split = split(cs_tag)
 
@@ -68,14 +92,16 @@ def process_cs_tag(cs_tag: str, chrom: str, pos: int) -> str:
     # Write VCF
     HEADER = "##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n"
     vcf = HEADER.strip().split("\n")
-    for pos, ref, alt in variants:
-        vcf.append(f"{chrom}\t{pos}\t.\t{ref}\t{alt}\t.\t.\t.")
+    for v in variants:
+        vcf.append(f"{chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\t.")
 
     return "\n".join(vcf)
+
 
 def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int]) -> str:
     _ = [validate_cs_tag(cs_tag) for cs_tag in cs_tags]
     _ = [validate_long_format(cs_tag) for cs_tag in cs_tags]
+    _ = [validate_pos(pos) for pos in positions]
 
 
 ###########################################################
