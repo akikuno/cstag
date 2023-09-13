@@ -186,7 +186,8 @@ cs_tag_html = cstag.to_html(cs_tag, description)
 Path("report.html").write_text(cs_tag_html)
 # Output "report.html"
 ```
-The resulting `report.html` looks like this :point_down:
+
+When you open the outputted report.html in a browser, it will appear as follows:  
 
 <img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png">
 
