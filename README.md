@@ -7,23 +7,25 @@
 
 # cstag
 
-`cstag` is a Python library designed for handling and manipulating [minimap2's CS tags](https://github.com/lh3/minimap2#cs).
+`cstag` is a Python library tailored for the manipulation and handling of [minimap2's CS tags](https://github.com/lh3/minimap2#cs).
 
-## 🌟Features
+
+## 🌟 Features
 
 - `cstag.call()`: Generate a CS tag
-- `cstag.shorten()`: Convert a CS tag from long to short format
-- `cstag.lengthen()`: Convert a CS tag from short to long format
-- `cstag.consensus()`: Generate a consensus cs tag from multiple cs tags
-- `cstag.mask()`: Mask low-quality bases in a CS tag
-- `cstag.split()`: Split a CS tag
-- `cstag.revcomp()`: Converts a CS tag into its reverse complement
-- `cstag.to_sequence()`: Output a reference subsequence in the alignment
-- `cstag.to_vcf()`: Output a VCF
-- `cstag.to_html()`: Output a HTML
+- `cstag.shorten()`: Convert a CS tag from its long to short format
+- `cstag.lengthen()`: Convert a CS tag from its short to long format
+- `cstag.consensus()`: Create a consensus CS tag from multiple CS tags
+- `cstag.mask()`: Mask low-quality bases within a CS tag
+- `cstag.split()`: Break down a CS tag into its constituent parts
+- `cstag.revcomp()`: Convert a CS tag to its reverse complement
+- `cstag.to_sequence()`: Reconstruct a reference subsequence from the alignment
+- `cstag.to_vcf()`: Generate a VCF file
+- `cstag.to_html()`: Produce an HTML representation
 
-Visit the [documentation](https://akikuno.github.io/cstag/cstag/) for more details.  
-For adding CS tags to SAM/BAM files, [`cstag-cli`](https://github.com/akikuno/cstag-cli) is at your service.  
+For comprehensive documentation, please visit [our docs](https://akikuno.github.io/cstag/cstag/).  
+To add CS tags to SAM/BAM files, check out [`cstag-cli`](https://github.com/akikuno/cstag-cli).  
+
 
 ## 🛠 Installation
 
@@ -39,9 +41,10 @@ Using [Bioconda](https://anaconda.org/bioconda/cstag):
 conda install -c bioconda cstag
 ```
 
-## 💡Usage
+## 💡 Usage
 
-### Generate CS Tags
+### Generating CS Tags
+
 ```python
 import cstag
 
@@ -56,7 +59,7 @@ cstag.call(cigar, md, seq, long=True)
 # =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
-### Shorten or Lengthen CS Tags
+### Shortening or Lengthening CS Tags
 
 ```python
 import cstag
@@ -77,7 +80,7 @@ cstag.lengthen(cs_tag, cigar, seq)
 # =ACGT*ag=CGT
 ```
 
-### Generate a Consensus
+### Creating a Consensus
 
 ```python
 import cstag
@@ -89,7 +92,7 @@ cstag.consensus(cs_tags, positions)
 # =AC*gt*T
 ```
 
-### Mask Low-Quality Bases
+### Masking Low-Quality Bases
 
 ```python
 import cstag
@@ -102,7 +105,7 @@ cstag.mask(cs_tag, cigar, qual, phred_threshold)
 # =ACNN*an+ng-cc=T
 ```
 
-### Split a CS Tag
+### Splitting a CS Tag
 
 ```python
 import cstag
@@ -122,7 +125,7 @@ cstag.revcomp(cs_tag)
 # =A-gg+cc*tg=ACGT
 ```
 
-### Reconstruct the reference subsequence in the alignment
+### Reconstructing the Reference Subsequence
 
 ```python
 import cstag
@@ -131,14 +134,14 @@ cstag.to_sequence(cs_tag)
 # ACTTCTTA
 ```
 
-### Generate VCF Report
+### Generating a VCF Report
 
 ```python
 import cstag
 cs_tag = "=AC*gt=T-gg=C+tt=A"
 chrom = "chr1"
 pos = 1
-print(cstag.to_vcf(cstag, chrom, pos))
+print(cstag.to_vcf(cs_tag, chrom, pos))
 """
 ##fileformat=VCFv4.2
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
@@ -148,7 +151,29 @@ chr1	5	.	C	CTT	.	.	.
 """
 ```
 
-### Generate HTML Report
+The multiple CS tags allow to report the variant allele frequency (VAF).
+
+```python
+import cstag
+cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T"]
+chroms = ["chr1", "chr1", "chr1", "chr2", "chr2"]
+positions = [2, 2, 3, 10, 100]
+print(cstag.to_vcf(cs_tags, chroms, positions))
+"""
+##fileformat=VCFv4.2
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">
+##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">
+##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele frequency (AD/DP)">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	4	.	G	T	.	.	DP=3;RD=1;AD=2;VAF=0.667
+chr2	102	.	G	T	.	.	DP=1;RD=0;AD=1;VAF=1.0
+"""
+```
+
+
+
+### Generating an HTML Report
 
 ```python
 import cstag
@@ -165,7 +190,8 @@ The resulting `report.html` looks like this :point_down:
 
 <img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png">
 
-## 📣Feedback
 
-For questions, bug reports, or any other inquiries, feel free to reach out!  
-Please use [GitHub Issues](https://github.com/akikuno/cstag/issues) for reporting.
+## 📣 Feedback and Support
+
+For questions, bug reports, or other forms of feedback, we'd love to hear from you!  
+Please use [GitHub Issues](https://github.com/akikuno/cstag/issues) for all reporting purposes.  
