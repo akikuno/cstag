@@ -1,5 +1,13 @@
+from __future__ import annotations
+
 from typing import NamedTuple
-from src.cstag.to_vcf import find_ref_for_insertion, find_ref_for_deletion, get_variant_annotations, process_cs_tag
+from src.cstag.to_vcf import (
+    find_ref_for_insertion,
+    find_ref_for_deletion,
+    get_variant_annotations,
+    process_cs_tag,
+    process_cs_tags,
+)
 
 
 class VcfInfo(NamedTuple):
@@ -94,3 +102,24 @@ chr1	5	.	C	CTT	.	.	."""
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
 2	3	.	G	A	.	.	."""
     assert process_cs_tag(cs_tag2, chrom2, pos2) == expected_output2
+
+
+###########################################################
+# Multuple CS tags
+###########################################################
+
+
+def test_process_cs_tags_base():
+    cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T", "=AC~nn10nn=GT"]
+    chroms = ["chr1", "chr1", "chr1", "chr2", "chr2", "chr3"]
+    positions = [2, 2, 3, 10, 100, 5]
+    expected_output = """##fileformat=VCFv4.2\n##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">\n##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">\n##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">\n##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele fractions (AD/DP)">\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t4\t.\tG\tT\t.\t.\tDP=3;RD=1;AD=2;VAF=0.667\nchr2\t102\t.\tG\tT\t.\t.\tDP=1;RD=0;AD=1;VAF=1.0"""
+    assert process_cs_tags(cs_tags, chroms, positions) == expected_output
+
+
+# def test_process_cs_tags_crhoms_sort():
+#     cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T", "=AC*gt=T"]
+#     chroms = ["chr1", "chr1", "chr1", "chr2", "chr10", "chr2"]
+#     positions = [2, 2, 3, 10, 100, 5]
+#     expected_output = """##fileformat=VCFv4.2\n##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">\n##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">\n##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">\n##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele fractions (AD/DP)">\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t4\t.\tG\tT\t.\t.\tDP=3;RD=1;AD=2;VAF=0.667\nchr2\t102\t.\tG\tT\t.\t.\tDP=1;RD=0;AD=1;VAF=1.0"""
+#     assert process_cs_tags(cs_tags, chroms, positions) == expected_output

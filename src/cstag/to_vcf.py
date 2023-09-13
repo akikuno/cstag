@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from itertools import chain
 from typing import NamedTuple
 from collections import deque, defaultdict, Counter
@@ -29,6 +30,10 @@ class Vcf(NamedTuple):
     ref: str | None = None
     alt: str | None = None
     info: VcfInfo = VcfInfo()
+
+
+def remove_spaces_around_newlines(text: str) -> str:
+    return re.sub(r"\s*\n\s*", "\n", text)
 
 
 ###########################################################
@@ -91,10 +96,11 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[Vcf]
 ###########################################################
 
 
-def process_cs_tag(cs_tag: str, chrom: str, pos: int) -> str:
+def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -> str:
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
     validate_pos(pos)
+    chrom = str(chrom)
 
     cs_tag_split = split(cs_tag)
 
@@ -103,7 +109,7 @@ def process_cs_tag(cs_tag: str, chrom: str, pos: int) -> str:
 
     # Write VCF
     HEADER = "##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n"
-    vcf = HEADER.strip().split("\n")
+    vcf = remove_spaces_around_newlines(HEADER).strip().split("\n")
     for v in variants:
         vcf.append(f"{chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\t.")
 
@@ -241,6 +247,7 @@ def chrom_sort_key(chrom: str) -> int:
 
 
 def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int]) -> str:
+    # validate inputs
     _ = [validate_cs_tag(cs_tag) for cs_tag in cs_tags]
     _ = [validate_long_format(cs_tag) for cs_tag in cs_tags]
     _ = [validate_pos(pos) for pos in positions]
@@ -263,7 +270,24 @@ def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int])
             vcf_info += add_vcf_fields(variant_annotations, chrom, reference_depth)
 
     # Sort by chrom and pos
-    return sorted(vcf_info, key=lambda x: (chrom_sort_key(x.chrom), x.pos))
+    variants = sorted(vcf_info, key=lambda x: (chrom_sort_key(x.chrom), x.pos))
+
+    # Write VCF
+    HEADER = """##fileformat=VCFv4.2
+    ##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+    ##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">
+    ##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">
+    ##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele fractions (AD/DP)">
+    #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n
+    """
+
+    vcf = remove_spaces_around_newlines(HEADER).strip().split("\n")
+    for v in variants:
+        vcf.append(
+            f"{v.chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\tDP={v.info.dp};RD={v.info.rd};AD={v.info.ad};VAF={v.info.vaf}"
+        )
+
+    return "\n".join(vcf)
 
 
 ###########################################################
@@ -271,7 +295,7 @@ def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int])
 ###########################################################
 
 
-def to_vcf(cs_tags: str | list[str], chrom: str | int | list[str] | list[int], pos: int | list[int]) -> str:
+def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) -> str:
     """
     Convert CS tag(s) to VCF (Variant Call Format) string.
 
@@ -295,8 +319,8 @@ def to_vcf(cs_tags: str | list[str], chrom: str | int | list[str] | list[int], p
         chr1	5	.	C	CTT	.	.	.
     """
     if isinstance(cs_tags, str):
-        return process_cs_tag(cs_tags, chrom, pos)
+        return process_cs_tag(cs_tags, chroms, positions)
     elif isinstance(cs_tags, list):
-        return process_cs_tags(cs_tags, chrom, pos)
+        return process_cs_tags(cs_tags, chroms, positions)
     else:
         raise TypeError(f"cs_tags must be str or list, not {type(cs_tags)}")
