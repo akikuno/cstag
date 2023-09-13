@@ -185,7 +185,7 @@ Path("report.html").write_text(cs_tag_html)
 # Output "report.html"
 ```
 
-You can visualize mutations indicated by the CS tag using the generated `report.html`` file as shown below:
+You can visualize mutations indicated by the CS tag using the generated `report.html` file as shown below:
 
 <img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png">
 
