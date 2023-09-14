@@ -1,13 +1,54 @@
 import pytest
-from src.cstag.utils.validator import validate_short_format, validate_long_format, validate_threshold
+from src.cstag.utils.validator import (
+    validate_cs_tag,
+    validate_short_format,
+    validate_long_format,
+    validate_threshold,
+    validate_pos,
+)
+
+
+def test_validate_cs_tag_normal_cases():
+    try:
+        validate_cs_tag("=ACGT*ag+cc-tt~ac12gt")
+        validate_cs_tag("=A*ag+c-t~gt1ag")
+        validate_cs_tag("=A")
+        validate_cs_tag(":1")
+        validate_cs_tag("*ag")
+        validate_cs_tag("+c")
+        validate_cs_tag("-t")
+        validate_cs_tag("~ac1gt")
+    except ValueError:
+        pytest.fail("ValueError was raised but should not have been")
+
+
+def test_validate_cs_tag_abnormal_cases():
+    with pytest.raises(ValueError):
+        validate_cs_tag("=ACGT:INVALID")
+    with pytest.raises(ValueError):
+        validate_cs_tag("=A:")
+    with pytest.raises(ValueError):
+        validate_cs_tag("*a")
+    with pytest.raises(ValueError):
+        validate_cs_tag("+")
+    with pytest.raises(ValueError):
+        validate_cs_tag("-")
+    with pytest.raises(ValueError):
+        validate_cs_tag("~acgt")
+
+
+def test_validate_cs_tag_edge_cases():
+    try:
+        validate_cs_tag("")
+    except ValueError:
+        pytest.fail("ValueError was raised but should not have been")
 
 
 def test_validate_short_format():
     # Test with valid cs tags
     try:
-        validate_short_format(":A")
         validate_short_format(":123")
-        validate_short_format(":*")
+        validate_short_format(":123*gt")
     except ValueError:
         pytest.fail("Unexpected ValueError with valid cs tags")
 
@@ -58,3 +99,15 @@ def test_validate_threshold():
         validate_threshold(-1)
     with pytest.raises(ValueError):
         validate_threshold(41)
+
+
+def test_validate_pos():
+    validate_pos(1)
+    validate_pos(5)
+    validate_pos(100)
+
+    with pytest.raises(ValueError, match=r"pos must be a positive integer, but got 0"):
+        validate_pos(0)
+
+    with pytest.raises(ValueError, match=r"pos must be a positive integer, but got -1"):
+        validate_pos(-1)

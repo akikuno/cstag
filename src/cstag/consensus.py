@@ -4,24 +4,24 @@ import re
 from itertools import chain
 from collections import deque, Counter
 
-from cstag.utils.validator import validate_long_format
+from cstag.utils.validator import validate_cs_tag, validate_long_format
 
 
-def split_cs_tags(cs_tags: list[str]) -> list[deque[str]]:
+def split_cs_tags(cs_tags: list[str]) -> list[list[str]]:
     """
-    Split and process each cs tag in cs_tags.
+    Split and process each CS tag in cs_tags.
 
     Args:
-        cs_tags (list[str]): list of cs tags in the long format.
+        cs_tags (list[str]): list of CS tags in the long format.
 
     Returns:
-        list[deque[str]]: list of processed cs tags as deque objects.
+        list[list[str]]: list of processed CS tags.
     """
     cs_tags_splitted = []
     for cs_tag in cs_tags:
         # Remove the prefix "cs:Z:" if present
         cs_tag = cs_tag.replace("cs:Z:", "")
-        # Split the cs tag using special symbols (-, *, ~, =)
+        # Split the CS tag using special symbols (-, *, ~, =)
         split_tags = re.split(r"([-*~=])", cs_tag)[1:]
         # Combine the symbol with the corresponding sequence
         combined_tags = [symbol + seq for symbol, seq in zip(split_tags[0::2], split_tags[1::2])]
@@ -33,36 +33,47 @@ def split_cs_tags(cs_tags: list[str]) -> list[deque[str]]:
         non_empty_tags = [[elem for elem in tag if elem] for tag in further_split_tags]
         # Flatten the list of lists into a single list
         flat_tags = list(chain.from_iterable(non_empty_tags))
-        cs_tags_splitted.append(deque(flat_tags))
+        cs_tags_splitted.append(flat_tags)
     return cs_tags_splitted
 
 
-def normalize_read_lengths(cs_list: list[deque[str]], starts: list[int]) -> list[deque[str]]:
+def normalize_positions(positions: list[int]) -> list[int]:
     """
-    Normalize the lengths of each read in cs_list based on their starts positions.
+    Normalize the positions in the given list by shifting them so that the minimum position becomes zero.
+    """
+    pos_min = min(positions)
+    return [pos - pos_min for pos in positions]
+
+
+def normalize_read_lengths(cs_tags: list[str], positions: list[int]) -> list[list[str]]:
+    """
+    Normalize the lengths of each read in cs_tags based on their starts positions.
 
     Args:
-        cs_list (list[deque[str]]): list of deques representing the reads.
-        starts (list[int]): Starting positions of each read.
+        cs_tags (list[str]): list of CS tags.
+        positions (list[int]): Starting positions of each read.
 
     Returns:
-        list[deque[str]]: list of deques representing the reads, now normalized to the same length.
+        list[list[str]]: list of lists representing the reads, now normalized to the same length.
     """
-    cs_maxlen = max(len(cs) + start for cs, start in zip(cs_list, starts))
+    cs_tags_split = split_cs_tags(cs_tags)
+    cs_tags_deque = [deque(cs) for cs in cs_tags_split]
+    positions_normalized = normalize_positions(positions)
+    cs_maxlen = max(len(cs) + pos for cs, pos in zip(cs_tags_deque, positions_normalized))
 
-    for i, start in enumerate(starts):
-        if start > 0:
-            cs_list[i].extendleft(["N"] * start)
-        if len(cs_list[i]) < cs_maxlen:
-            cs_list[i].extend(["N"] * (cs_maxlen - len(cs_list[i])))
+    for i, pos in enumerate(positions_normalized):
+        if pos > 0:
+            cs_tags_deque[i].extendleft(["N"] * pos)
+        if len(cs_tags_deque[i]) < cs_maxlen:
+            cs_tags_deque[i].extend(["N"] * (cs_maxlen - len(cs_tags_deque[i])))
+    cs_tags = [list(cs) for cs in cs_tags_deque]
+    return cs_tags
 
-    return cs_list
 
-
-def get_consensus(cs_list: list[deque[str]]) -> str:
+def get_consensus(cs_tags: list[list[str]]) -> str:
     cs_consensus = []
-    for cs in zip(*cs_list):
-        # Get the most common cs tag(s)
+    for cs in zip(*cs_tags):
+        # Get the most common CS tag(s)
         most_common_tags = Counter(cs).most_common()
 
         # If there's a unique most common tag, return it
@@ -86,13 +97,13 @@ def get_consensus(cs_list: list[deque[str]]) -> str:
 
 
 def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -> str:
-    """generate consensus of cs tags
+    """generate consensus of CS tags
     Args:
-        cs_tags (list): cs tags in the **long** format
+        cs_tags (list): CS tags in the **long** format
         positions (list): 1-based leftmost mapping position (4th column in SAM file)
-        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
+        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the CS tag. Defaults to False
     Return:
-        str: a consensus of cs tag in the **long** format
+        str: a consensus of CS tag in the **long** format
     Example:
         >>> import cstag
         >>> cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
@@ -104,13 +115,10 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) ->
         raise ValueError("Element numbers of each argument must be the same")
 
     for cs_tag in cs_tags:
+        validate_cs_tag(cs_tag)
         validate_long_format(cs_tag)
 
-    cs_tag_split = split_cs_tags(cs_tags)
-
-    positions_zero_indexed = [pos - 1 for pos in positions]
-
-    cs_tags_normalized_length = normalize_read_lengths(cs_tag_split, positions_zero_indexed)
+    cs_tags_normalized_length = normalize_read_lengths(cs_tags, positions)
 
     cs_consensus = get_consensus(cs_tags_normalized_length)
 
