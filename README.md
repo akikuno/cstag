@@ -151,7 +151,7 @@ chr1	5	.	C	CTT	.	.	.
 """
 ```
 
-The multiple CS tags allow to report the variant allele frequency (VAF).
+The multiple CS tags enable reporting of the variant allele frequency (VAF).
 
 ```python
 import cstag
