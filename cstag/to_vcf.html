@@ -28,10 +28,45 @@
 </summary>
 <pre><code class="python">from __future__ import annotations
 
-from cstag.split import split
-from collections import deque
+import re
+from itertools import chain
+from typing import NamedTuple
+from collections import deque, defaultdict, Counter
 
-from cstag.utils.validator import validate_long_format
+from cstag.split import split
+from cstag.consensus import normalize_read_lengths
+from cstag.utils.validator import validate_cs_tag, validate_long_format, validate_pos
+
+
+class CsInfo(NamedTuple):
+    cs_tag: str
+    pos_start: int
+    pos_end: int
+    chrom: str | None = None
+
+
+class VcfInfo(NamedTuple):
+    dp: int | None = None
+    rd: int | None = None
+    ad: int | None = None
+    vaf: float | None = None
+
+
+class Vcf(NamedTuple):
+    chrom: str | None = None
+    pos: int | None = None
+    ref: str | None = None
+    alt: str | None = None
+    info: VcfInfo = VcfInfo()
+
+
+def remove_spaces_around_newlines(text: str) -&gt; str:
+    return re.sub(r&#34;\s*\n\s*&#34;, &#34;\n&#34;, text)
+
+
+###########################################################
+# Get variant annotations
+###########################################################
 
 
 def find_ref_for_insertion(cs_tag_split: list[str], idx: int) -&gt; str | None:
@@ -61,7 +96,7 @@ def find_ref_for_deletion(cs_tag_split: list[str], idx: int) -&gt; str:
     return &#34;&#34;.join(ref)
 
 
-def get_variant_annotations(cs_tag_split: list[str], position: int) -&gt; list[tuple[int, str, str]]:
+def get_variant_annotations(cs_tag_split: list[str], position: int) -&gt; list[Vcf]:
     variant_annotations = []
     pos = position
     for idx, cs in enumerate(cs_tag_split):
@@ -69,15 +104,15 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -&gt; list[t
             pos += len(cs) - 1
         elif cs.startswith(&#34;*&#34;):
             ref, alt = cs[1].upper(), cs[2].upper()
-            variant_annotations.append((pos, ref, alt))
+            variant_annotations.append(Vcf(pos=pos, ref=ref, alt=alt))
             pos += 1
         elif cs.startswith(&#34;+&#34;):
             ref = find_ref_for_insertion(cs_tag_split, idx)
             alt = ref + cs[1:].upper()
-            variant_annotations.append((pos - 1, ref, alt))
+            variant_annotations.append(Vcf(pos=pos - 1, ref=ref, alt=alt))
         elif cs.startswith(&#34;-&#34;):
             ref = find_ref_for_deletion(cs_tag_split, idx)
-            variant_annotations.append((pos - 1, ref, ref[0]))
+            variant_annotations.append(Vcf(pos=pos - 1, ref=ref, alt=ref[0]))
         elif cs.startswith(&#34;~&#34;):
             continue
 
@@ -85,18 +120,217 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -&gt; list[t
 
 
 ###########################################################
+# Process CS tag (One)
+###########################################################
+
+
+def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -&gt; str:
+    validate_cs_tag(cs_tag)
+    validate_long_format(cs_tag)
+    validate_pos(pos)
+    chrom = str(chrom)
+
+    cs_tag_split = split(cs_tag)
+
+    # Call POS, REF, ALT
+    variants = get_variant_annotations(cs_tag_split, pos)
+
+    # Write VCF
+    HEADER = &#34;##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n&#34;
+    vcf = remove_spaces_around_newlines(HEADER).strip().split(&#34;\n&#34;)
+    for v in variants:
+        vcf.append(f&#34;{chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\t.&#34;)
+
+    return &#34;\n&#34;.join(vcf)
+
+
+###########################################################
+# Format the CS tags
+###########################################################
+
+
+def get_pos_end(cs_tag: str, pos: int) -&gt; int:
+    &#34;&#34;&#34;Get 1-index end positions&#34;&#34;&#34;
+    pos_end = pos
+    for cs in split(cs_tag):
+        if cs[0] in [&#34;=&#34;, &#34;-&#34;]:
+            pos_end += len(cs) - 1
+        if cs[0] == &#34;*&#34;:
+            pos_end += 1
+        else:
+            continue
+    return pos_end
+
+
+def format_cs_tags(cs_tags: list[str], chroms: list[str] | list[int], positions: list[int]) -&gt; list[CsInfo]:
+    &#34;&#34;&#34;Format and filter cs_tags, and create a list of CsInfo objects.
+
+    This function takes lists of cs_tags, chromosomes, and positions. It filters
+    out any cs_tags containing a tilde (&#34;~&#34;) and creates a list of CsInfo objects.
+
+    Args:
+        cs_tags (list[str]): List of cs_tags as strings.
+        chroms (list[str] | list[int]): List of chromosomes as strings or integers.
+        positions (list[int]): List of starting positions as integers.
+
+    Returns:
+        list[CsInfo]: A list of CsInfo objects, each containing information about
+        a cs_tag, its chromosome, and its start and end positions.
+    &#34;&#34;&#34;
+
+    # Convert all chromosomes to string type
+    chroms = [str(chrom) for chrom in chroms]
+    # Create a list of CsInfo objects, filtering out any with a splicing (&#34;~&#34;) in the cs_tag
+    cs_info_list = [
+        CsInfo(cs_tag=cs, chrom=chrom, pos_start=pos, pos_end=get_pos_end(cs, pos))
+        for cs, chrom, pos in zip(cs_tags, chroms, positions)
+        if &#34;~&#34; not in cs
+    ]
+    return cs_info_list
+
+
+###########################################################
+# Group by chrom and overlapping intervals
+###########################################################
+
+
+def group_by_chrom(cs_tags_formatted: list[tuple]) -&gt; dict[str, tuple]:
+    &#34;&#34;&#34;Group CS tags by chromosomes&#34;&#34;&#34;
+    cs_tags_grouped = defaultdict(list)
+    for cs in cs_tags_formatted:
+        cs_tags_grouped[cs.chrom].append(
+            CsInfo(cs_tag=cs.cs_tag, pos_start=cs.pos_start, pos_end=cs.pos_end, chrom=cs.chrom)
+        )
+    return dict(cs_tags_grouped)
+
+
+def group_by_overlapping_intervals(cs_tags_grouped: NamedTuple) -&gt; list[NamedTuple]:
+    # Sort the list by the starting point
+    sorted_data = sorted(cs_tags_grouped, key=lambda x: x.pos_start)
+    # Initialize the list of grouped intervals
+    grouped_intervals = []
+    # Initialize the first group with the first element
+    current_group = [sorted_data[0]]
+    # Loop through the sorted list starting from the second element
+    for i in range(1, len(sorted_data)):
+        overlaps = False
+        for j in current_group:
+            # Check if the intervals overlap
+            if sorted_data[i].pos_start &lt;= j.pos_end and sorted_data[i].pos_end &gt;= j.pos_start:
+                overlaps = True
+                break
+        if overlaps:
+            # Add the interval to the current group
+            current_group.append(sorted_data[i])
+        else:
+            # Add the current group to the list of grouped intervals
+            grouped_intervals.append(current_group)
+            # Start a new group
+            current_group = [sorted_data[i]]
+    # Add the last group to the list of grouped intervals
+    grouped_intervals.append(current_group)
+
+    return grouped_intervals
+
+
+###########################################################
+# Add VCF info
+###########################################################
+
+
+def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt; dict[int, int]:
+    positions_min = min(positions_list)
+    variant_idx = {v.pos - positions_min for v in variant_annotations}
+    variant_pos = {v.pos for v in variant_annotations}
+    cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
+    # Call ref depth
+    reference_depth = defaultdict(int)
+    ACGT = {&#34;A&#34;, &#34;C&#34;, &#34;G&#34;, &#34;T&#34;}
+    for i, v_pos in zip(variant_idx, variant_pos):
+        for cs in cs_tags_normalized_length:
+            if cs[i][0] in ACGT:
+                reference_depth[v_pos] += 1
+
+    return dict(reference_depth)
+
+
+def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -&gt; list[Vcf]:
+    &#34;&#34;&#34;Add Chrom and VCF info (AD, RD, DP, and VAF) to VCF NamedTuple&#34;&#34;&#34;
+    vcf_appended = [v._replace(chrom=chrom) for v in variant_annotations]
+    vcf_appended = [v._replace(info=v.info._replace(ad=ad)) for v, ad in Counter(vcf_appended).items()]
+    vcf_appended = [v._replace(info=v.info._replace(rd=reference_depth.get(v.pos, 0))) for v in vcf_appended]
+    vcf_appended = [v._replace(info=v.info._replace(dp=v.info.rd + v.info.ad)) for v in vcf_appended]
+    vcf_appended = [v._replace(info=v.info._replace(vaf=round(v.info.ad / v.info.dp, 3))) for v in vcf_appended]
+    return vcf_appended
+
+
+###########################################################
+# Process CS tags (Many)
+###########################################################
+
+
+def chrom_sort_key(chrom: str) -&gt; int:
+    &#34;&#34;&#34;Convert a chromosome string to an integer for sorting.&#34;&#34;&#34;
+    return int(chrom.replace(&#34;chr&#34;, &#34;&#34;))
+
+
+def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int]) -&gt; str:
+    # validate inputs
+    _ = [validate_cs_tag(cs_tag) for cs_tag in cs_tags]
+    _ = [validate_long_format(cs_tag) for cs_tag in cs_tags]
+    _ = [validate_pos(pos) for pos in positions]
+
+    cs_tags_formatted = format_cs_tags(cs_tags, chroms, positions)
+    cs_tags_grouped_by_chrom = group_by_chrom(cs_tags_formatted)
+
+    vcf_info = []
+    for chrom, cs_tags_grouped in cs_tags_grouped_by_chrom.items():
+        for csinfo in group_by_overlapping_intervals(cs_tags_grouped):
+            cs_tags_list = [cs.cs_tag for cs in csinfo]
+            positions_list = [cs.pos_start for cs in csinfo]
+            variant_annotations = [
+                get_variant_annotations(split(cs), pos) for cs, pos in zip(cs_tags_list, positions_list)
+            ]
+            variant_annotations = list(chain.from_iterable(variant_annotations))
+            if not variant_annotations:
+                continue
+            reference_depth = call_reference_depth(variant_annotations, cs_tags_list, positions_list)
+            vcf_info += add_vcf_fields(variant_annotations, chrom, reference_depth)
+
+    # Sort by chrom and pos
+    variants = sorted(vcf_info, key=lambda x: (chrom_sort_key(x.chrom), x.pos))
+
+    # Write VCF
+    HEADER = &#34;&#34;&#34;##fileformat=VCFv4.2
+    ##INFO=&lt;ID=DP,Number=1,Type=Integer,Description=&#34;Total Depth&#34;&gt;
+    ##INFO=&lt;ID=RD,Number=1,Type=Integer,Description=&#34;Depth of Ref allele&#34;&gt;
+    ##INFO=&lt;ID=AD,Number=1,Type=Integer,Description=&#34;Depth of Alt allele&#34;&gt;
+    ##INFO=&lt;ID=VAF,Number=1,Type=Float,Description=&#34;Variant allele fractions (AD/DP)&#34;&gt;
+    #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n
+    &#34;&#34;&#34;
+
+    vcf = remove_spaces_around_newlines(HEADER).strip().split(&#34;\n&#34;)
+    for v in variants:
+        vcf.append(
+            f&#34;{v.chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\tDP={v.info.dp};RD={v.info.rd};AD={v.info.ad};VAF={v.info.vaf}&#34;
+        )
+
+    return &#34;\n&#34;.join(vcf)
+
+
+###########################################################
 # main
 ###########################################################
 
 
-def to_vcf(cs_tag: str, chrom: str, pos: int) -&gt; str:
+def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) -&gt; str:
     &#34;&#34;&#34;
-    Convert a CS tag to VCF (Variant Call Format) string.
+    Convert CS tag(s) to VCF (Variant Call Format) string.
 
     Args:
-        cs_tag (str): The CS tag representing the sequence alignment.
-        chrom (str): The chromosome name.
-        pos (int): The starting position for the sequence.
+        cs_tag (str | list[str]): The CS tag representing the sequence alignment.
+        chrom (str | list[str]): The chromosome name.
+        pos (int | list[int]): The starting position for the sequence.
 
     Returns:
         str: The VCF-formatted string.
@@ -112,22 +346,12 @@ def to_vcf(cs_tag: str, chrom: str, pos: int) -&gt; str:
         chr1    4       .       TGG     T       .       .       .
         chr1    5       .       C       CTT     .       .       .
     &#34;&#34;&#34;
-
-    validate_long_format(cs_tag)
-
-    cs_tag_split = split(cs_tag)
-
-    # Call POS, REF, ALT
-    variants = get_variant_annotations(cs_tag_split, pos)
-
-    # Write VCF
-    HEADER = &#34;##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n&#34;
-
-    vcf = HEADER.strip().split(&#34;\n&#34;)
-    for pos, ref, alt in variants:
-        vcf.append(f&#34;{chrom}\t{pos}\t.\t{ref}\t{alt}\t.\t.\t.&#34;)
-
-    return &#34;\n&#34;.join(vcf)</code></pre>
+    if isinstance(cs_tags, str):
+        return process_cs_tag(cs_tags, chroms, positions)
+    elif isinstance(cs_tags, list):
+        return process_cs_tags(cs_tags, chroms, positions)
+    else:
+        raise TypeError(f&#34;cs_tags must be str or list, not {type(cs_tags)}&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -137,6 +361,64 @@ def to_vcf(cs_tag: str, chrom: str, pos: int) -&gt; str:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="cstag.to_vcf.add_vcf_fields"><code class="name flex">
+<span>def <span class="ident">add_vcf_fields</span></span>(<span>variant_annotations: list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>], chrom: str, reference_depth: dict[int, int]) ‑> list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add Chrom and VCF info (AD, RD, DP, and VAF) to VCF NamedTuple</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -&gt; list[Vcf]:
+    &#34;&#34;&#34;Add Chrom and VCF info (AD, RD, DP, and VAF) to VCF NamedTuple&#34;&#34;&#34;
+    vcf_appended = [v._replace(chrom=chrom) for v in variant_annotations]
+    vcf_appended = [v._replace(info=v.info._replace(ad=ad)) for v, ad in Counter(vcf_appended).items()]
+    vcf_appended = [v._replace(info=v.info._replace(rd=reference_depth.get(v.pos, 0))) for v in vcf_appended]
+    vcf_appended = [v._replace(info=v.info._replace(dp=v.info.rd + v.info.ad)) for v in vcf_appended]
+    vcf_appended = [v._replace(info=v.info._replace(vaf=round(v.info.ad / v.info.dp, 3))) for v in vcf_appended]
+    return vcf_appended</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_vcf.call_reference_depth"><code class="name flex">
+<span>def <span class="ident">call_reference_depth</span></span>(<span>variant_annotations, cs_tags_list, positions_list) ‑> dict[int, int]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt; dict[int, int]:
+    positions_min = min(positions_list)
+    variant_idx = {v.pos - positions_min for v in variant_annotations}
+    variant_pos = {v.pos for v in variant_annotations}
+    cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
+    # Call ref depth
+    reference_depth = defaultdict(int)
+    ACGT = {&#34;A&#34;, &#34;C&#34;, &#34;G&#34;, &#34;T&#34;}
+    for i, v_pos in zip(variant_idx, variant_pos):
+        for cs in cs_tags_normalized_length:
+            if cs[i][0] in ACGT:
+                reference_depth[v_pos] += 1
+
+    return dict(reference_depth)</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_vcf.chrom_sort_key"><code class="name flex">
+<span>def <span class="ident">chrom_sort_key</span></span>(<span>chrom: str) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert a chromosome string to an integer for sorting.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def chrom_sort_key(chrom: str) -&gt; int:
+    &#34;&#34;&#34;Convert a chromosome string to an integer for sorting.&#34;&#34;&#34;
+    return int(chrom.replace(&#34;chr&#34;, &#34;&#34;))</code></pre>
+</details>
+</dd>
 <dt id="cstag.to_vcf.find_ref_for_deletion"><code class="name flex">
 <span>def <span class="ident">find_ref_for_deletion</span></span>(<span>cs_tag_split: list[str], idx: int) ‑> str</span>
 </code></dt>
@@ -182,8 +464,82 @@ def to_vcf(cs_tag: str, chrom: str, pos: int) -&gt; str:
     return None</code></pre>
 </details>
 </dd>
+<dt id="cstag.to_vcf.format_cs_tags"><code class="name flex">
+<span>def <span class="ident">format_cs_tags</span></span>(<span>cs_tags: list[str], chroms: list[str] | list[int], positions: list[int]) ‑> list[<a title="cstag.to_vcf.CsInfo" href="#cstag.to_vcf.CsInfo">CsInfo</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Format and filter cs_tags, and create a list of CsInfo objects.</p>
+<p>This function takes lists of cs_tags, chromosomes, and positions. It filters
+out any cs_tags containing a tilde ("~") and creates a list of CsInfo objects.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>cs_tags</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>List of cs_tags as strings.</dd>
+<dt>chroms (list[str] | list[int]): List of chromosomes as strings or integers.</dt>
+<dt><strong><code>positions</code></strong> :&ensp;<code>list[int]</code></dt>
+<dd>List of starting positions as integers.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[<a title="cstag.to_vcf.CsInfo" href="#cstag.to_vcf.CsInfo">CsInfo</a>]</code></dt>
+<dd>A list of CsInfo objects, each containing information about</dd>
+</dl>
+<p>a cs_tag, its chromosome, and its start and end positions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def format_cs_tags(cs_tags: list[str], chroms: list[str] | list[int], positions: list[int]) -&gt; list[CsInfo]:
+    &#34;&#34;&#34;Format and filter cs_tags, and create a list of CsInfo objects.
+
+    This function takes lists of cs_tags, chromosomes, and positions. It filters
+    out any cs_tags containing a tilde (&#34;~&#34;) and creates a list of CsInfo objects.
+
+    Args:
+        cs_tags (list[str]): List of cs_tags as strings.
+        chroms (list[str] | list[int]): List of chromosomes as strings or integers.
+        positions (list[int]): List of starting positions as integers.
+
+    Returns:
+        list[CsInfo]: A list of CsInfo objects, each containing information about
+        a cs_tag, its chromosome, and its start and end positions.
+    &#34;&#34;&#34;
+
+    # Convert all chromosomes to string type
+    chroms = [str(chrom) for chrom in chroms]
+    # Create a list of CsInfo objects, filtering out any with a splicing (&#34;~&#34;) in the cs_tag
+    cs_info_list = [
+        CsInfo(cs_tag=cs, chrom=chrom, pos_start=pos, pos_end=get_pos_end(cs, pos))
+        for cs, chrom, pos in zip(cs_tags, chroms, positions)
+        if &#34;~&#34; not in cs
+    ]
+    return cs_info_list</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_vcf.get_pos_end"><code class="name flex">
+<span>def <span class="ident">get_pos_end</span></span>(<span>cs_tag: str, pos: int) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get 1-index end positions</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_pos_end(cs_tag: str, pos: int) -&gt; int:
+    &#34;&#34;&#34;Get 1-index end positions&#34;&#34;&#34;
+    pos_end = pos
+    for cs in split(cs_tag):
+        if cs[0] in [&#34;=&#34;, &#34;-&#34;]:
+            pos_end += len(cs) - 1
+        if cs[0] == &#34;*&#34;:
+            pos_end += 1
+        else:
+            continue
+    return pos_end</code></pre>
+</details>
+</dd>
 <dt id="cstag.to_vcf.get_variant_annotations"><code class="name flex">
-<span>def <span class="ident">get_variant_annotations</span></span>(<span>cs_tag_split: list[str], position: int) ‑> list[tuple[int, str, str]]</span>
+<span>def <span class="ident">get_variant_annotations</span></span>(<span>cs_tag_split: list[str], position: int) ‑> list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -191,7 +547,7 @@ def to_vcf(cs_tag: str, chrom: str, pos: int) -&gt; str:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_variant_annotations(cs_tag_split: list[str], position: int) -&gt; list[tuple[int, str, str]]:
+<pre><code class="python">def get_variant_annotations(cs_tag_split: list[str], position: int) -&gt; list[Vcf]:
     variant_annotations = []
     pos = position
     for idx, cs in enumerate(cs_tag_split):
@@ -199,35 +555,182 @@ def to_vcf(cs_tag: str, chrom: str, pos: int) -&gt; str:
             pos += len(cs) - 1
         elif cs.startswith(&#34;*&#34;):
             ref, alt = cs[1].upper(), cs[2].upper()
-            variant_annotations.append((pos, ref, alt))
+            variant_annotations.append(Vcf(pos=pos, ref=ref, alt=alt))
             pos += 1
         elif cs.startswith(&#34;+&#34;):
             ref = find_ref_for_insertion(cs_tag_split, idx)
             alt = ref + cs[1:].upper()
-            variant_annotations.append((pos - 1, ref, alt))
+            variant_annotations.append(Vcf(pos=pos - 1, ref=ref, alt=alt))
         elif cs.startswith(&#34;-&#34;):
             ref = find_ref_for_deletion(cs_tag_split, idx)
-            variant_annotations.append((pos - 1, ref, ref[0]))
+            variant_annotations.append(Vcf(pos=pos - 1, ref=ref, alt=ref[0]))
         elif cs.startswith(&#34;~&#34;):
             continue
 
     return variant_annotations</code></pre>
 </details>
 </dd>
-<dt id="cstag.to_vcf.to_vcf"><code class="name flex">
-<span>def <span class="ident">to_vcf</span></span>(<span>cs_tag: str, chrom: str, pos: int) ‑> str</span>
+<dt id="cstag.to_vcf.group_by_chrom"><code class="name flex">
+<span>def <span class="ident">group_by_chrom</span></span>(<span>cs_tags_formatted: list[tuple]) ‑> dict[str, tuple]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Convert a CS tag to VCF (Variant Call Format) string.</p>
+<div class="desc"><p>Group CS tags by chromosomes</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def group_by_chrom(cs_tags_formatted: list[tuple]) -&gt; dict[str, tuple]:
+    &#34;&#34;&#34;Group CS tags by chromosomes&#34;&#34;&#34;
+    cs_tags_grouped = defaultdict(list)
+    for cs in cs_tags_formatted:
+        cs_tags_grouped[cs.chrom].append(
+            CsInfo(cs_tag=cs.cs_tag, pos_start=cs.pos_start, pos_end=cs.pos_end, chrom=cs.chrom)
+        )
+    return dict(cs_tags_grouped)</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_vcf.group_by_overlapping_intervals"><code class="name flex">
+<span>def <span class="ident">group_by_overlapping_intervals</span></span>(<span>cs_tags_grouped: NamedTuple) ‑> list[typing.NamedTuple]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def group_by_overlapping_intervals(cs_tags_grouped: NamedTuple) -&gt; list[NamedTuple]:
+    # Sort the list by the starting point
+    sorted_data = sorted(cs_tags_grouped, key=lambda x: x.pos_start)
+    # Initialize the list of grouped intervals
+    grouped_intervals = []
+    # Initialize the first group with the first element
+    current_group = [sorted_data[0]]
+    # Loop through the sorted list starting from the second element
+    for i in range(1, len(sorted_data)):
+        overlaps = False
+        for j in current_group:
+            # Check if the intervals overlap
+            if sorted_data[i].pos_start &lt;= j.pos_end and sorted_data[i].pos_end &gt;= j.pos_start:
+                overlaps = True
+                break
+        if overlaps:
+            # Add the interval to the current group
+            current_group.append(sorted_data[i])
+        else:
+            # Add the current group to the list of grouped intervals
+            grouped_intervals.append(current_group)
+            # Start a new group
+            current_group = [sorted_data[i]]
+    # Add the last group to the list of grouped intervals
+    grouped_intervals.append(current_group)
+
+    return grouped_intervals</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_vcf.process_cs_tag"><code class="name flex">
+<span>def <span class="ident">process_cs_tag</span></span>(<span>cs_tag: str, chrom: str | int, pos: int) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -&gt; str:
+    validate_cs_tag(cs_tag)
+    validate_long_format(cs_tag)
+    validate_pos(pos)
+    chrom = str(chrom)
+
+    cs_tag_split = split(cs_tag)
+
+    # Call POS, REF, ALT
+    variants = get_variant_annotations(cs_tag_split, pos)
+
+    # Write VCF
+    HEADER = &#34;##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n&#34;
+    vcf = remove_spaces_around_newlines(HEADER).strip().split(&#34;\n&#34;)
+    for v in variants:
+        vcf.append(f&#34;{chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\t.&#34;)
+
+    return &#34;\n&#34;.join(vcf)</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_vcf.process_cs_tags"><code class="name flex">
+<span>def <span class="ident">process_cs_tags</span></span>(<span>cs_tags: list[str], chroms: list[str], positions: list[int]) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int]) -&gt; str:
+    # validate inputs
+    _ = [validate_cs_tag(cs_tag) for cs_tag in cs_tags]
+    _ = [validate_long_format(cs_tag) for cs_tag in cs_tags]
+    _ = [validate_pos(pos) for pos in positions]
+
+    cs_tags_formatted = format_cs_tags(cs_tags, chroms, positions)
+    cs_tags_grouped_by_chrom = group_by_chrom(cs_tags_formatted)
+
+    vcf_info = []
+    for chrom, cs_tags_grouped in cs_tags_grouped_by_chrom.items():
+        for csinfo in group_by_overlapping_intervals(cs_tags_grouped):
+            cs_tags_list = [cs.cs_tag for cs in csinfo]
+            positions_list = [cs.pos_start for cs in csinfo]
+            variant_annotations = [
+                get_variant_annotations(split(cs), pos) for cs, pos in zip(cs_tags_list, positions_list)
+            ]
+            variant_annotations = list(chain.from_iterable(variant_annotations))
+            if not variant_annotations:
+                continue
+            reference_depth = call_reference_depth(variant_annotations, cs_tags_list, positions_list)
+            vcf_info += add_vcf_fields(variant_annotations, chrom, reference_depth)
+
+    # Sort by chrom and pos
+    variants = sorted(vcf_info, key=lambda x: (chrom_sort_key(x.chrom), x.pos))
+
+    # Write VCF
+    HEADER = &#34;&#34;&#34;##fileformat=VCFv4.2
+    ##INFO=&lt;ID=DP,Number=1,Type=Integer,Description=&#34;Total Depth&#34;&gt;
+    ##INFO=&lt;ID=RD,Number=1,Type=Integer,Description=&#34;Depth of Ref allele&#34;&gt;
+    ##INFO=&lt;ID=AD,Number=1,Type=Integer,Description=&#34;Depth of Alt allele&#34;&gt;
+    ##INFO=&lt;ID=VAF,Number=1,Type=Float,Description=&#34;Variant allele fractions (AD/DP)&#34;&gt;
+    #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n
+    &#34;&#34;&#34;
+
+    vcf = remove_spaces_around_newlines(HEADER).strip().split(&#34;\n&#34;)
+    for v in variants:
+        vcf.append(
+            f&#34;{v.chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\tDP={v.info.dp};RD={v.info.rd};AD={v.info.ad};VAF={v.info.vaf}&#34;
+        )
+
+    return &#34;\n&#34;.join(vcf)</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_vcf.remove_spaces_around_newlines"><code class="name flex">
+<span>def <span class="ident">remove_spaces_around_newlines</span></span>(<span>text: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_spaces_around_newlines(text: str) -&gt; str:
+    return re.sub(r&#34;\s*\n\s*&#34;, &#34;\n&#34;, text)</code></pre>
+</details>
+</dd>
+<dt id="cstag.to_vcf.to_vcf"><code class="name flex">
+<span>def <span class="ident">to_vcf</span></span>(<span>cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert CS tag(s) to VCF (Variant Call Format) string.</p>
 <h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>cs_tag</code></strong> :&ensp;<code>str</code></dt>
-<dd>The CS tag representing the sequence alignment.</dd>
-<dt><strong><code>chrom</code></strong> :&ensp;<code>str</code></dt>
-<dd>The chromosome name.</dd>
-<dt><strong><code>pos</code></strong> :&ensp;<code>int</code></dt>
-<dd>The starting position for the sequence.</dd>
-</dl>
+<p>cs_tag (str | list[str]): The CS tag representing the sequence alignment.
+chrom (str | list[str]): The chromosome name.
+pos (int | list[int]): The starting position for the sequence.</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>str</code></dt>
@@ -249,14 +752,14 @@ chr1    5       .       C       CTT     .       .       .
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def to_vcf(cs_tag: str, chrom: str, pos: int) -&gt; str:
+<pre><code class="python">def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) -&gt; str:
     &#34;&#34;&#34;
-    Convert a CS tag to VCF (Variant Call Format) string.
+    Convert CS tag(s) to VCF (Variant Call Format) string.
 
     Args:
-        cs_tag (str): The CS tag representing the sequence alignment.
-        chrom (str): The chromosome name.
-        pos (int): The starting position for the sequence.
+        cs_tag (str | list[str]): The CS tag representing the sequence alignment.
+        chrom (str | list[str]): The chromosome name.
+        pos (int | list[int]): The starting position for the sequence.
 
     Returns:
         str: The VCF-formatted string.
@@ -272,27 +775,145 @@ chr1    5       .       C       CTT     .       .       .
         chr1    4       .       TGG     T       .       .       .
         chr1    5       .       C       CTT     .       .       .
     &#34;&#34;&#34;
-
-    validate_long_format(cs_tag)
-
-    cs_tag_split = split(cs_tag)
-
-    # Call POS, REF, ALT
-    variants = get_variant_annotations(cs_tag_split, pos)
-
-    # Write VCF
-    HEADER = &#34;##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n&#34;
-
-    vcf = HEADER.strip().split(&#34;\n&#34;)
-    for pos, ref, alt in variants:
-        vcf.append(f&#34;{chrom}\t{pos}\t.\t{ref}\t{alt}\t.\t.\t.&#34;)
-
-    return &#34;\n&#34;.join(vcf)</code></pre>
+    if isinstance(cs_tags, str):
+        return process_cs_tag(cs_tags, chroms, positions)
+    elif isinstance(cs_tags, list):
+        return process_cs_tags(cs_tags, chroms, positions)
+    else:
+        raise TypeError(f&#34;cs_tags must be str or list, not {type(cs_tags)}&#34;)</code></pre>
 </details>
 </dd>
 </dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="cstag.to_vcf.CsInfo"><code class="flex name class">
+<span>class <span class="ident">CsInfo</span></span>
+<span>(</span><span>cs_tag: ForwardRef('str'), pos_start: ForwardRef('int'), pos_end: ForwardRef('int'), chrom: ForwardRef('str | None') = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>CsInfo(cs_tag, pos_start, pos_end, chrom)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CsInfo(NamedTuple):
+    cs_tag: str
+    pos_start: int
+    pos_end: int
+    chrom: str | None = None</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="cstag.to_vcf.CsInfo.chrom"><code class="name">var <span class="ident">chrom</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 3</p></div>
+</dd>
+<dt id="cstag.to_vcf.CsInfo.cs_tag"><code class="name">var <span class="ident">cs_tag</span> : str</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 0</p></div>
+</dd>
+<dt id="cstag.to_vcf.CsInfo.pos_end"><code class="name">var <span class="ident">pos_end</span> : int</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 2</p></div>
+</dd>
+<dt id="cstag.to_vcf.CsInfo.pos_start"><code class="name">var <span class="ident">pos_start</span> : int</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 1</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="cstag.to_vcf.Vcf"><code class="flex name class">
+<span>class <span class="ident">Vcf</span></span>
+<span>(</span><span>chrom: ForwardRef('str | None') = None, pos: ForwardRef('int | None') = None, ref: ForwardRef('str | None') = None, alt: ForwardRef('str | None') = None, info: ForwardRef('<a title="cstag.to_vcf.VcfInfo" href="#cstag.to_vcf.VcfInfo">VcfInfo</a>') = VcfInfo(dp=None, rd=None, ad=None, vaf=None))</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Vcf(chrom, pos, ref, alt, info)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Vcf(NamedTuple):
+    chrom: str | None = None
+    pos: int | None = None
+    ref: str | None = None
+    alt: str | None = None
+    info: VcfInfo = VcfInfo()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="cstag.to_vcf.Vcf.alt"><code class="name">var <span class="ident">alt</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 3</p></div>
+</dd>
+<dt id="cstag.to_vcf.Vcf.chrom"><code class="name">var <span class="ident">chrom</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 0</p></div>
+</dd>
+<dt id="cstag.to_vcf.Vcf.info"><code class="name">var <span class="ident">info</span> : <a title="cstag.to_vcf.VcfInfo" href="#cstag.to_vcf.VcfInfo">VcfInfo</a></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 4</p></div>
+</dd>
+<dt id="cstag.to_vcf.Vcf.pos"><code class="name">var <span class="ident">pos</span> : int | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 1</p></div>
+</dd>
+<dt id="cstag.to_vcf.Vcf.ref"><code class="name">var <span class="ident">ref</span> : str | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 2</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="cstag.to_vcf.VcfInfo"><code class="flex name class">
+<span>class <span class="ident">VcfInfo</span></span>
+<span>(</span><span>dp: ForwardRef('int | None') = None, rd: ForwardRef('int | None') = None, ad: ForwardRef('int | None') = None, vaf: ForwardRef('float | None') = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>VcfInfo(dp, rd, ad, vaf)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VcfInfo(NamedTuple):
+    dp: int | None = None
+    rd: int | None = None
+    ad: int | None = None
+    vaf: float | None = None</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="cstag.to_vcf.VcfInfo.ad"><code class="name">var <span class="ident">ad</span> : int | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 2</p></div>
+</dd>
+<dt id="cstag.to_vcf.VcfInfo.dp"><code class="name">var <span class="ident">dp</span> : int | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 0</p></div>
+</dd>
+<dt id="cstag.to_vcf.VcfInfo.rd"><code class="name">var <span class="ident">rd</span> : int | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 1</p></div>
+</dd>
+<dt id="cstag.to_vcf.VcfInfo.vaf"><code class="name">var <span class="ident">vaf</span> : float | None</code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 3</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -308,10 +929,52 @@ chr1    5       .       C       CTT     .       .       .
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="cstag.to_vcf.add_vcf_fields" href="#cstag.to_vcf.add_vcf_fields">add_vcf_fields</a></code></li>
+<li><code><a title="cstag.to_vcf.call_reference_depth" href="#cstag.to_vcf.call_reference_depth">call_reference_depth</a></code></li>
+<li><code><a title="cstag.to_vcf.chrom_sort_key" href="#cstag.to_vcf.chrom_sort_key">chrom_sort_key</a></code></li>
 <li><code><a title="cstag.to_vcf.find_ref_for_deletion" href="#cstag.to_vcf.find_ref_for_deletion">find_ref_for_deletion</a></code></li>
 <li><code><a title="cstag.to_vcf.find_ref_for_insertion" href="#cstag.to_vcf.find_ref_for_insertion">find_ref_for_insertion</a></code></li>
+<li><code><a title="cstag.to_vcf.format_cs_tags" href="#cstag.to_vcf.format_cs_tags">format_cs_tags</a></code></li>
+<li><code><a title="cstag.to_vcf.get_pos_end" href="#cstag.to_vcf.get_pos_end">get_pos_end</a></code></li>
 <li><code><a title="cstag.to_vcf.get_variant_annotations" href="#cstag.to_vcf.get_variant_annotations">get_variant_annotations</a></code></li>
+<li><code><a title="cstag.to_vcf.group_by_chrom" href="#cstag.to_vcf.group_by_chrom">group_by_chrom</a></code></li>
+<li><code><a title="cstag.to_vcf.group_by_overlapping_intervals" href="#cstag.to_vcf.group_by_overlapping_intervals">group_by_overlapping_intervals</a></code></li>
+<li><code><a title="cstag.to_vcf.process_cs_tag" href="#cstag.to_vcf.process_cs_tag">process_cs_tag</a></code></li>
+<li><code><a title="cstag.to_vcf.process_cs_tags" href="#cstag.to_vcf.process_cs_tags">process_cs_tags</a></code></li>
+<li><code><a title="cstag.to_vcf.remove_spaces_around_newlines" href="#cstag.to_vcf.remove_spaces_around_newlines">remove_spaces_around_newlines</a></code></li>
 <li><code><a title="cstag.to_vcf.to_vcf" href="#cstag.to_vcf.to_vcf">to_vcf</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="cstag.to_vcf.CsInfo" href="#cstag.to_vcf.CsInfo">CsInfo</a></code></h4>
+<ul class="">
+<li><code><a title="cstag.to_vcf.CsInfo.chrom" href="#cstag.to_vcf.CsInfo.chrom">chrom</a></code></li>
+<li><code><a title="cstag.to_vcf.CsInfo.cs_tag" href="#cstag.to_vcf.CsInfo.cs_tag">cs_tag</a></code></li>
+<li><code><a title="cstag.to_vcf.CsInfo.pos_end" href="#cstag.to_vcf.CsInfo.pos_end">pos_end</a></code></li>
+<li><code><a title="cstag.to_vcf.CsInfo.pos_start" href="#cstag.to_vcf.CsInfo.pos_start">pos_start</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a></code></h4>
+<ul class="">
+<li><code><a title="cstag.to_vcf.Vcf.alt" href="#cstag.to_vcf.Vcf.alt">alt</a></code></li>
+<li><code><a title="cstag.to_vcf.Vcf.chrom" href="#cstag.to_vcf.Vcf.chrom">chrom</a></code></li>
+<li><code><a title="cstag.to_vcf.Vcf.info" href="#cstag.to_vcf.Vcf.info">info</a></code></li>
+<li><code><a title="cstag.to_vcf.Vcf.pos" href="#cstag.to_vcf.Vcf.pos">pos</a></code></li>
+<li><code><a title="cstag.to_vcf.Vcf.ref" href="#cstag.to_vcf.Vcf.ref">ref</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="cstag.to_vcf.VcfInfo" href="#cstag.to_vcf.VcfInfo">VcfInfo</a></code></h4>
+<ul class="">
+<li><code><a title="cstag.to_vcf.VcfInfo.ad" href="#cstag.to_vcf.VcfInfo.ad">ad</a></code></li>
+<li><code><a title="cstag.to_vcf.VcfInfo.dp" href="#cstag.to_vcf.VcfInfo.dp">dp</a></code></li>
+<li><code><a title="cstag.to_vcf.VcfInfo.rd" href="#cstag.to_vcf.VcfInfo.rd">rd</a></code></li>
+<li><code><a title="cstag.to_vcf.VcfInfo.vaf" href="#cstag.to_vcf.VcfInfo.vaf">vaf</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

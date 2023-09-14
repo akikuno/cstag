@@ -30,20 +30,23 @@
 <a href="https://anaconda.org/bioconda/cstag"><img alt="Bioconda" src="https://img.shields.io/conda/v/bioconda/cstag?label=Bioconda&amp;color=orange"></a>
 <a href="https://zenodo.org/badge/latestdoi/468937655"><img alt="DOI" src="https://zenodo.org/badge/468937655.svg"></a></p>
 <h1 id="cstag">cstag</h1>
-<p><code><a title="cstag" href="#cstag">cstag</a></code> is a Python library designed for handling and manipulating <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tags</a>.</p>
-<h2 id="features">🌟Features</h2>
+<p><code><a title="cstag" href="#cstag">cstag</a></code> is a Python library tailored for the manipulation and handling of <a href="https://github.com/lh3/minimap2#cs">minimap2's CS tags</a>.</p>
+<h2 id="features">🌟 Features</h2>
 <ul>
 <li><code><a title="cstag.call" href="call.html">cstag.call</a></code>: Generate a CS tag</li>
-<li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code>: Convert a CS tag from long to short format</li>
-<li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code>: Convert a CS tag from short to long format</li>
-<li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code>: Generate a consensus cs tag from multiple cs tags</li>
-<li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code>: Mask low-quality bases in a CS tag</li>
-<li><code><a title="cstag.split" href="split.html">cstag.split</a></code>: Split a CS tag</li>
-<li><code><a title="cstag.revcomp" href="revcomp.html">cstag.revcomp</a></code>: Converts a CS tag into its reverse complement.</li>
-<li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code>: Output VCF</li>
-<li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Output HTML</li>
+<li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code>: Convert a CS tag from its long to short format</li>
+<li><code><a title="cstag.lengthen" href="lengthen.html">cstag.lengthen</a></code>: Convert a CS tag from its short to long format</li>
+<li><code><a title="cstag.consensus" href="consensus.html">cstag.consensus</a></code>: Create a consensus CS tag from multiple CS tags</li>
+<li><code><a title="cstag.mask" href="mask.html">cstag.mask</a></code>: Mask low-quality bases within a CS tag</li>
+<li><code><a title="cstag.split" href="split.html">cstag.split</a></code>: Break down a CS tag into its constituent parts</li>
+<li><code><a title="cstag.revcomp" href="revcomp.html">cstag.revcomp</a></code>: Convert a CS tag to its reverse complement</li>
+<li><code><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code>: Reconstruct a reference subsequence from the alignment</li>
+<li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code>: Generate a VCF file</li>
+<li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Produce an HTML representation</li>
 </ul>
-<p>Visit the <a href="https://akikuno.github.io/cstag/cstag/">documentation</a> for more details.</p>
+<p>For comprehensive documentation, please visit <a href="https://akikuno.github.io/cstag/cstag/">our docs</a>.<br>
+To add CS tags to SAM/BAM files, check out <a href="https://github.com/akikuno/cstag-cli"><code>cstag-cli</code></a>.
+</p>
 <h2 id="installation">🛠 Installation</h2>
 <p>Using <a href="https://pypi.org/project/cstag/">PyPI</a>:</p>
 <pre><code class="language-bash">pip install cstag
@@ -51,8 +54,8 @@
 <p>Using <a href="https://anaconda.org/bioconda/cstag">Bioconda</a>:</p>
 <pre><code class="language-bash">conda install -c bioconda cstag
 </code></pre>
-<h2 id="usage">💡Usage</h2>
-<h3 id="generate-cs-tags">Generate CS Tags</h3>
+<h2 id="usage">💡 Usage</h2>
+<h3 id="generating-cs-tags">Generating CS Tags</h3>
 <pre><code class="language-python">import cstag
 
 cigar = &quot;8M2D4M2I3N1M&quot;
@@ -65,25 +68,25 @@ print(cstag.call(cigar, md, seq))
 cstag.call(cigar, md, seq, long=True)
 # =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 </code></pre>
-<h3 id="shorten-or-lengthen-cs-tags">Shorten or Lengthen CS Tags</h3>
+<h3 id="shortening-or-lengthening-cs-tags">Shortening or Lengthening CS Tags</h3>
 <pre><code class="language-python">import cstag
 
 # Convert a CS tag from long to short
-cs = &quot;=ACGT*ag=CGT&quot;
+cs_tag = &quot;=ACGT*ag=CGT&quot;
 
-cstag.shorten(cs)
+cstag.shorten(cs_tag)
 # :4*ag:3
 
 
 # Convert a CS tag from short to long
-cs = &quot;:4*ag:3&quot;
+cs_tag = &quot;:4*ag:3&quot;
 cigar = &quot;8M&quot;
 seq = &quot;ACGTACGT&quot;
 
-cstag.lengthen(cs, cigar, seq)
+cstag.lengthen(cs_tag, cigar, seq)
 # =ACGT*ag=CGT
 </code></pre>
-<h3 id="generate-a-consensus">Generate a Consensus</h3>
+<h3 id="creating-a-consensus">Creating a Consensus</h3>
 <pre><code class="language-python">import cstag
 
 cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
@@ -92,36 +95,42 @@ positions = [1, 1, 2, 2, 1]
 cstag.consensus(cs_tags, positions)
 # =AC*gt*T
 </code></pre>
-<h3 id="mask-low-quality-bases">Mask Low-Quality Bases</h3>
+<h3 id="masking-low-quality-bases">Masking Low-Quality Bases</h3>
 <pre><code class="language-python">import cstag
 
-cs = &quot;=ACGT*ac+gg-cc=T&quot;
+cs_tag = &quot;=ACGT*ac+gg-cc=T&quot;
 cigar = &quot;5M2I2D1M&quot;
 qual = &quot;AA!!!!AA&quot;
 phred_threshold = 10
-cstag.mask(cs, cigar, qual, phred_threshold)
+cstag.mask(cs_tag, cigar, qual, phred_threshold)
 # =ACNN*an+ng-cc=T
 </code></pre>
-<h3 id="split-a-cs-tag">Split a CS Tag</h3>
+<h3 id="splitting-a-cs-tag">Splitting a CS Tag</h3>
 <pre><code class="language-python">import cstag
 
-cs = &quot;=ACGT*ac+gg-cc=T&quot;
-cstag.split(cs)
+cs_tag = &quot;=ACGT*ac+gg-cc=T&quot;
+cstag.split(cs_tag)
 # ['=ACGT', '*ac', '+gg', '-cc', '=T']
 </code></pre>
 <h3 id="reverse-complement-of-a-cs-tag">Reverse Complement of a CS Tag</h3>
 <pre><code class="language-python">import cstag
 
-cs = &quot;=ACGT*ac+gg-cc=T&quot;
-cstag.revcomp(cs)
+cs_tag = &quot;=ACGT*ac+gg-cc=T&quot;
+cstag.revcomp(cs_tag)
 # =A-gg+cc*tg=ACGT
 </code></pre>
-<h3 id="generate-vcf-report">Generate VCF Report</h3>
+<h3 id="reconstructing-the-reference-subsequence">Reconstructing the Reference Subsequence</h3>
+<pre><code class="language-python">import cstag
+cs_tag = &quot;=AC*gt=T-gg=C+tt=A&quot;
+cstag.to_sequence(cs_tag)
+# ACTTCTTA
+</code></pre>
+<h3 id="generating-a-vcf-report">Generating a VCF Report</h3>
 <pre><code class="language-python">import cstag
 cs_tag = &quot;=AC*gt=T-gg=C+tt=A&quot;
 chrom = &quot;chr1&quot;
 pos = 1
-print(cstag.to_vcf(cstag, chrom, pos))
+print(cstag.to_vcf(cs_tag, chrom, pos))
 &quot;&quot;&quot;
 ##fileformat=VCFv4.2
 #CHROM  POS ID  REF ALT QUAL    FILTER  INFO
@@ -130,22 +139,39 @@ chr1    4   .   TGG T   .   .   .
 chr1    5   .   C   CTT .   .   .
 &quot;&quot;&quot;
 </code></pre>
-<h3 id="generate-html-report">Generate HTML Report</h3>
+<p>The multiple CS tags enable reporting of the variant allele frequency (VAF).</p>
+<pre><code class="language-python">import cstag
+cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACGT&quot;, &quot;=AC*gt=T&quot;]
+chroms = [&quot;chr1&quot;, &quot;chr1&quot;, &quot;chr1&quot;, &quot;chr2&quot;, &quot;chr2&quot;]
+positions = [2, 2, 3, 10, 100]
+print(cstag.to_vcf(cs_tags, chroms, positions))
+&quot;&quot;&quot;
+##fileformat=VCFv4.2
+##INFO=&lt;ID=DP,Number=1,Type=Integer,Description=&quot;Total Depth&quot;&gt;
+##INFO=&lt;ID=RD,Number=1,Type=Integer,Description=&quot;Depth of Ref allele&quot;&gt;
+##INFO=&lt;ID=AD,Number=1,Type=Integer,Description=&quot;Depth of Alt allele&quot;&gt;
+##INFO=&lt;ID=VAF,Number=1,Type=Float,Description=&quot;Variant allele frequency (AD/DP)&quot;&gt;
+#CHROM  POS ID  REF ALT QUAL    FILTER  INFO
+chr1    4   .   G   T   .   .   DP=3;RD=1;AD=2;VAF=0.667
+chr2    102 .   G   T   .   .   DP=1;RD=0;AD=1;VAF=1.0
+&quot;&quot;&quot;
+</code></pre>
+<h3 id="generating-an-html-report">Generating an HTML Report</h3>
 <pre><code class="language-python">import cstag
 from pathlib import Path
 
-cs_tag = &quot;=AC+GGG=T-ACGT*at~gt10cg=GNNN&quot;
+cs_tag = &quot;=AC+ggg=T-acgt*at~gt10ag=GNNN&quot;
 description = &quot;Example&quot;
 
 cs_tag_html = cstag.to_html(cs_tag, description)
 Path(&quot;report.html&quot;).write_text(cs_tag_html)
 # Output &quot;report.html&quot;
 </code></pre>
-<p>The resulting <code>report.html</code> looks like this :point_down:</p>
-<p><img width="414" alt="example_report" src="https://user-images.githubusercontent.com/15861316/158910398-67f480d2-8742-412a-b528-40e545c46513.png"></p>
-<h2 id="feedback">📣Feedback</h2>
-<p>For questions, bug reports, or any other inquiries, feel free to reach out!<br>
-Please use <a href="https://github.com/akikuno/cstag/issues">GitHub Issues</a> for reporting.</p>
+<p>You can visualize mutations indicated by the CS tag using the generated <code>report.html</code> file as shown below:</p>
+<p><img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png"></p>
+<h2 id="feedback-and-support">📣 Feedback and Support</h2>
+<p>For questions, bug reports, or other forms of feedback, we'd love to hear from you!<br>
+Please use <a href="https://github.com/akikuno/cstag/issues">GitHub Issues</a> for all reporting purposes.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -162,7 +188,8 @@ from cstag.mask import mask
 from cstag.split import split
 from cstag.revcomp import revcomp
 from cstag.to_html import to_html
-from cstag.to_vcf import to_vcf</code></pre>
+from cstag.to_vcf import to_vcf
+from cstag.to_sequence import to_sequence</code></pre>
 </details>
 </section>
 <section>
@@ -200,6 +227,10 @@ from cstag.to_vcf import to_vcf</code></pre>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -222,20 +253,21 @@ from cstag.to_vcf import to_vcf</code></pre>
 <div class="toc">
 <ul>
 <li><a href="#cstag">cstag</a><ul>
-<li><a href="#features">🌟Features</a></li>
+<li><a href="#features">🌟 Features</a></li>
 <li><a href="#installation">🛠 Installation</a></li>
-<li><a href="#usage">💡Usage</a><ul>
-<li><a href="#generate-cs-tags">Generate CS Tags</a></li>
-<li><a href="#shorten-or-lengthen-cs-tags">Shorten or Lengthen CS Tags</a></li>
-<li><a href="#generate-a-consensus">Generate a Consensus</a></li>
-<li><a href="#mask-low-quality-bases">Mask Low-Quality Bases</a></li>
-<li><a href="#split-a-cs-tag">Split a CS Tag</a></li>
+<li><a href="#usage">💡 Usage</a><ul>
+<li><a href="#generating-cs-tags">Generating CS Tags</a></li>
+<li><a href="#shortening-or-lengthening-cs-tags">Shortening or Lengthening CS Tags</a></li>
+<li><a href="#creating-a-consensus">Creating a Consensus</a></li>
+<li><a href="#masking-low-quality-bases">Masking Low-Quality Bases</a></li>
+<li><a href="#splitting-a-cs-tag">Splitting a CS Tag</a></li>
 <li><a href="#reverse-complement-of-a-cs-tag">Reverse Complement of a CS Tag</a></li>
-<li><a href="#generate-vcf-report">Generate VCF Report</a></li>
-<li><a href="#generate-html-report">Generate HTML Report</a></li>
+<li><a href="#reconstructing-the-reference-subsequence">Reconstructing the Reference Subsequence</a></li>
+<li><a href="#generating-a-vcf-report">Generating a VCF Report</a></li>
+<li><a href="#generating-an-html-report">Generating an HTML Report</a></li>
 </ul>
 </li>
-<li><a href="#feedback">📣Feedback</a></li>
+<li><a href="#feedback-and-support">📣 Feedback and Support</a></li>
 </ul>
 </li>
 </ul>
@@ -251,6 +283,7 @@ from cstag.to_vcf import to_vcf</code></pre>
 <li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code></li>
 <li><code><a title="cstag.split" href="split.html">cstag.split</a></code></li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></li>
+<li><code><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code></li>
 <li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code></li>
 <li><code><a title="cstag.utils" href="utils/index.html">cstag.utils</a></code></li>
 </ul>

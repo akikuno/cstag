@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>cstag.mask API documentation</title>
+<title>cstag.to_sequence API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -19,7 +19,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>cstag.mask</code></h1>
+<h1 class="title">Module <code>cstag.to_sequence</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -28,61 +28,39 @@
 </summary>
 <pre><code class="python">from __future__ import annotations
 
-import re
+from cstag.split import split
+from cstag.utils.validator import validate_cs_tag, validate_long_format
 
-from cstag.utils.validator import validate_cs_tag, validate_long_format, validate_threshold
 
+def to_sequence(cs_tag: str) -&gt; str:
+    &#34;&#34;&#34;Reconstruct the reference subsequence in the alignment
 
-def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False) -&gt; str:
-    &#34;&#34;&#34;Mask low-quality bases to &#39;N&#39;
     Args:
-        cs_tag (str): cs tag in the **long** format
-        cigar (str): cigar strings (6th column in SAM file)
-        qual (str): ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)
-        threshold (int, optional): Phred Quality Score (defalt = 10). The low-quality bases are defined as &#39;less than or equal to the threshold&#39;
-        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
-    Return:
-        str: Masked cs tag
+        cs_tag (str): CS tag in the **long** format
+
+    Returns:
+        str: The sequence string derived from the CS tag.
+
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; cs_tag = &#34;=ACGT*ac+gg-cc=T&#34;
-        &gt;&gt;&gt; cigar = &#34;5M2I2D1M&#34;
-        &gt;&gt;&gt; qual = &#34;AA!!!!AA&#34;
-        &gt;&gt;&gt; cstag.mask(cs_tag, qual)
-        =ACNN*an+ng-cc=T
+        &gt;&gt;&gt; cs_tag = &#34;=AC*gt=T-gg=C+tt=A&#34;
+        &gt;&gt;&gt; cstag.to_sequence(cs_tag)
+        &#34;ACTTCTTA&#34;
     &#34;&#34;&#34;
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
-    validate_threshold(threshold)
 
-    mask_symbols = [chr(th + 33) for th in range(threshold + 1)]
-    mask_symbols = set(mask_symbols)
+    cs_tag = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    sequence = []
+    for cs in split(cs_tag):
+        if cs.startswith(&#34;=&#34;):
+            sequence.append(cs[1:].upper())
+        elif cs.startswith(&#34;+&#34;):
+            sequence.append(cs[1:].upper())
+        elif cs.startswith(&#34;*&#34;):
+            sequence.append(cs[-1].upper())
 
-    cs = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
-    list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
-    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
-
-    if cigar.split(&#34;S&#34;)[0].isdigit():
-        softclip = int(cigar.split(&#34;S&#34;)[0])
-        qual = qual[softclip:]
-
-    cs_masked = []
-    idx = 0
-    for cs in list_cs:
-        cs = list(cs)
-        if cs[0] == &#34;*&#34;:
-            if qual[idx] in mask_symbols:
-                cs[-1] = &#34;n&#34;
-            idx += 1
-        elif cs[0] == &#34;=&#34; or cs[0] == &#34;+&#34;:
-            for i in range(len(cs) - 1):
-                if qual[idx + i] in mask_symbols:
-                    cs[i + 1] = &#34;N&#34; if cs[0] == &#34;=&#34; else &#34;n&#34;
-            idx += i + 1
-        cs_masked.append(&#34;&#34;.join(cs))
-    cs_masked = &#34;&#34;.join(cs_masked)
-
-    return f&#34;cs:Z:{cs_masked}&#34; if prefix else cs_masked</code></pre>
+    return &#34;&#34;.join(sequence)</code></pre>
 </details>
 </section>
 <section>
@@ -92,88 +70,60 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="cstag.mask.mask"><code class="name flex">
-<span>def <span class="ident">mask</span></span>(<span>cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False) ‑> str</span>
+<dt id="cstag.to_sequence.to_sequence"><code class="name flex">
+<span>def <span class="ident">to_sequence</span></span>(<span>cs_tag: str) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Mask low-quality bases to 'N'</p>
+<div class="desc"><p>Reconstruct the reference subsequence in the alignment</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>cs_tag</code></strong> :&ensp;<code>str</code></dt>
-<dd>cs tag in the <strong>long</strong> format</dd>
-<dt><strong><code>cigar</code></strong> :&ensp;<code>str</code></dt>
-<dd>cigar strings (6th column in SAM file)</dd>
-<dt><strong><code>qual</code></strong> :&ensp;<code>str</code></dt>
-<dd>ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)</dd>
-<dt><strong><code>threshold</code></strong> :&ensp;<code>int</code>, optional</dt>
-<dd>Phred Quality Score (defalt = 10). The low-quality bases are defined as 'less than or equal to the threshold'</dd>
-<dt><strong><code>prefix</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False</dd>
+<dd>CS tag in the <strong>long</strong> format</dd>
 </dl>
-<h2 id="return">Return</h2>
-<p>str: Masked cs tag</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The sequence string derived from the CS tag.</dd>
+</dl>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
-&gt;&gt;&gt; cs_tag = &quot;=ACGT*ac+gg-cc=T&quot;
-&gt;&gt;&gt; cigar = &quot;5M2I2D1M&quot;
-&gt;&gt;&gt; qual = &quot;AA!!!!AA&quot;
-&gt;&gt;&gt; cstag.mask(cs_tag, qual)
-=ACNN*an+ng-cc=T
+&gt;&gt;&gt; cs_tag = &quot;=AC*gt=T-gg=C+tt=A&quot;
+&gt;&gt;&gt; cstag.to_sequence(cs_tag)
+&quot;ACTTCTTA&quot;
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False) -&gt; str:
-    &#34;&#34;&#34;Mask low-quality bases to &#39;N&#39;
+<pre><code class="python">def to_sequence(cs_tag: str) -&gt; str:
+    &#34;&#34;&#34;Reconstruct the reference subsequence in the alignment
+
     Args:
-        cs_tag (str): cs tag in the **long** format
-        cigar (str): cigar strings (6th column in SAM file)
-        qual (str): ASCII of Phred-scaled base quaiity+33 (11th column in SAM file)
-        threshold (int, optional): Phred Quality Score (defalt = 10). The low-quality bases are defined as &#39;less than or equal to the threshold&#39;
-        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
-    Return:
-        str: Masked cs tag
+        cs_tag (str): CS tag in the **long** format
+
+    Returns:
+        str: The sequence string derived from the CS tag.
+
     Example:
         &gt;&gt;&gt; import cstag
-        &gt;&gt;&gt; cs_tag = &#34;=ACGT*ac+gg-cc=T&#34;
-        &gt;&gt;&gt; cigar = &#34;5M2I2D1M&#34;
-        &gt;&gt;&gt; qual = &#34;AA!!!!AA&#34;
-        &gt;&gt;&gt; cstag.mask(cs_tag, qual)
-        =ACNN*an+ng-cc=T
+        &gt;&gt;&gt; cs_tag = &#34;=AC*gt=T-gg=C+tt=A&#34;
+        &gt;&gt;&gt; cstag.to_sequence(cs_tag)
+        &#34;ACTTCTTA&#34;
     &#34;&#34;&#34;
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
-    validate_threshold(threshold)
 
-    mask_symbols = [chr(th + 33) for th in range(threshold + 1)]
-    mask_symbols = set(mask_symbols)
+    cs_tag = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+    sequence = []
+    for cs in split(cs_tag):
+        if cs.startswith(&#34;=&#34;):
+            sequence.append(cs[1:].upper())
+        elif cs.startswith(&#34;+&#34;):
+            sequence.append(cs[1:].upper())
+        elif cs.startswith(&#34;*&#34;):
+            sequence.append(cs[-1].upper())
 
-    cs = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
-    list_cs = re.split(r&#34;([-+*~=])&#34;, cs)[1:]
-    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
-
-    if cigar.split(&#34;S&#34;)[0].isdigit():
-        softclip = int(cigar.split(&#34;S&#34;)[0])
-        qual = qual[softclip:]
-
-    cs_masked = []
-    idx = 0
-    for cs in list_cs:
-        cs = list(cs)
-        if cs[0] == &#34;*&#34;:
-            if qual[idx] in mask_symbols:
-                cs[-1] = &#34;n&#34;
-            idx += 1
-        elif cs[0] == &#34;=&#34; or cs[0] == &#34;+&#34;:
-            for i in range(len(cs) - 1):
-                if qual[idx + i] in mask_symbols:
-                    cs[i + 1] = &#34;N&#34; if cs[0] == &#34;=&#34; else &#34;n&#34;
-            idx += i + 1
-        cs_masked.append(&#34;&#34;.join(cs))
-    cs_masked = &#34;&#34;.join(cs_masked)
-
-    return f&#34;cs:Z:{cs_masked}&#34; if prefix else cs_masked</code></pre>
+    return &#34;&#34;.join(sequence)</code></pre>
 </details>
 </dd>
 </dl>
@@ -194,7 +144,7 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="cstag.mask.mask" href="#cstag.mask.mask">mask</a></code></li>
+<li><code><a title="cstag.to_sequence.to_sequence" href="#cstag.to_sequence.to_sequence">to_sequence</a></code></li>
 </ul>
 </li>
 </ul>
