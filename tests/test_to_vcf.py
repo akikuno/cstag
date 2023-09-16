@@ -25,7 +25,6 @@ class Vcf(NamedTuple):
     info: VcfInfo = VcfInfo()
 
 
-# find_ref_for_insertionのテスト
 def test_find_ref_for_insertion():
     assert find_ref_for_insertion(["=ACGT", "*ga", "+a"], 0) is None
     assert find_ref_for_insertion(["=ACGT", "*ga", "+a"], 1) == "T"
@@ -33,7 +32,6 @@ def test_find_ref_for_insertion():
     assert find_ref_for_insertion(["=AC", "=GT", "-g", "+a"], 3) == "G"
 
 
-# find_ref_for_deletionのテスト
 def test_find_ref_for_deletion():
     assert find_ref_for_deletion(["=AC", "-g"], 1) == "CG"
     assert find_ref_for_deletion(["=ACGT", "*ga", "-a"], 2) == "GA"
@@ -41,7 +39,6 @@ def test_find_ref_for_deletion():
     assert find_ref_for_deletion(["=AC", "=GT", "+a", "-a"], 3) == "TA"
 
 
-# get_variant_annotationsのテスト
 def test_get_variant_annotations():
     default_info = VcfInfo()
     # single mutation
@@ -83,7 +80,6 @@ def test_get_variant_annotations():
     ]
 
 
-# process_cs_tag関数のテスト
 def test_process_cs_tag():
     cs_tag1 = "=AC*gt=T-gg=C+tt=A"
     chrom1 = "chr1"

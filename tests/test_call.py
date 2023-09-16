@@ -12,7 +12,6 @@ from src.cstag.call import (
 ###########################################################
 
 
-# split_cigarのテスト
 @pytest.mark.parametrize(
     "cigar, expected",
     [
@@ -45,7 +44,6 @@ def testparse_md(md_input, expected_output):
     assert parse_md(md_input) == expected_output
 
 
-# join_cigarのテスト
 @pytest.mark.parametrize(
     "cigar_tuples, expected",
     [
@@ -63,7 +61,6 @@ def testjoin_cigar(cigar_tuples, expected):
     assert join_cigar(cigar_tuples) == expected
 
 
-# trim_clipsのテスト
 @pytest.mark.parametrize(
     "cigar, seq, expected_cigar, expected_seq",
     [
