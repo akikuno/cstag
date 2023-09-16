@@ -55,7 +55,7 @@ seq = "ACGTACGTACGTACG"
 print(cstag.call(cigar, md, seq))
 # :2*ag:5-ag:4+ac~nn3nn:1
 
-cstag.call(cigar, md, seq, long=True)
+print(cstag.call(cigar, md, seq, long=True))
 # =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
@@ -67,7 +67,7 @@ import cstag
 # Convert a CS tag from long to short
 cs_tag = "=ACGT*ag=CGT"
 
-cstag.shorten(cs_tag)
+print(cstag.shorten(cs_tag))
 # :4*ag:3
 
 
@@ -76,7 +76,7 @@ cs_tag = ":4*ag:3"
 cigar = "8M"
 seq = "ACGTACGT"
 
-cstag.lengthen(cs_tag, cigar, seq)
+print(cstag.lengthen(cs_tag, cigar, seq))
 # =ACGT*ag=CGT
 ```
 
@@ -88,7 +88,7 @@ import cstag
 cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
 positions = [1, 1, 2, 2, 1]
 
-cstag.consensus(cs_tags, positions)
+print(cstag.consensus(cs_tags, positions))
 # =AC*gt*T
 ```
 
@@ -101,7 +101,7 @@ cs_tag = "=ACGT*ac+gg-cc=T"
 cigar = "5M2I2D1M"
 qual = "AA!!!!AA"
 phred_threshold = 10
-cstag.mask(cs_tag, cigar, qual, phred_threshold)
+print(cstag.mask(cs_tag, cigar, qual, phred_threshold))
 # =ACNN*an+ng-cc=T
 ```
 
@@ -111,7 +111,7 @@ cstag.mask(cs_tag, cigar, qual, phred_threshold)
 import cstag
 
 cs_tag = "=ACGT*ac+gg-cc=T"
-cstag.split(cs_tag)
+print(cstag.split(cs_tag))
 # ['=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
@@ -121,7 +121,7 @@ cstag.split(cs_tag)
 import cstag
 
 cs_tag = "=ACGT*ac+gg-cc=T"
-cstag.revcomp(cs_tag)
+print(cstag.revcomp(cs_tag))
 # =A-gg+cc*tg=ACGT
 ```
 
@@ -130,7 +130,7 @@ cstag.revcomp(cs_tag)
 ```python
 import cstag
 cs_tag = "=AC*gt=T-gg=C+tt=A"
-cstag.to_sequence(cs_tag)
+print(cstag.to_sequence(cs_tag))
 # ACTTCTTA
 ```
 
