@@ -194,3 +194,8 @@ You can visualize mutations indicated by the CS tag using the generated `report.
 
 For questions, bug reports, or other forms of feedback, we'd love to hear from you!  
 Please use [GitHub Issues](https://github.com/akikuno/cstag/issues) for all reporting purposes.  
+
+## 🤝 Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/akikuno/cstag/blob/main/CODE_OF_CONDUCT.md).  
+By participating in this project you agree to abide by its terms.  
