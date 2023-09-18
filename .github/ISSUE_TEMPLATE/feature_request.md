@@ -13,7 +13,5 @@ A clear and concise description of what the problem is. Ex. I'm always frustrate
 
 **Describe alternatives you've considered**
 
-**Can you submit a pull request? (Yes/No)**
-
 **Additional context**
 Add any other context or screenshots about the feature request here.
