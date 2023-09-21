@@ -1,28 +1,21 @@
 from __future__ import annotations
 
-from typing import NamedTuple
 from src.cstag.to_vcf import (
+    Vcf,
+    VcfInfo,
+    chrom_sort_key,
     find_ref_for_insertion,
     find_ref_for_deletion,
     get_variant_annotations,
+    get_pos_end,
+    add_vcf_fields,
     process_cs_tag,
     process_cs_tags,
 )
 
-
-class VcfInfo(NamedTuple):
-    dp: int | None = None
-    rd: int | None = None
-    ad: int | None = None
-    vaf: float | None = None
-
-
-class Vcf(NamedTuple):
-    chrom: str | None = None
-    pos: int | None = None
-    ref: str | None = None
-    alt: str | None = None
-    info: VcfInfo = VcfInfo()
+###########################################################
+# Get variant annotations
+###########################################################
 
 
 def test_find_ref_for_insertion():
@@ -80,6 +73,57 @@ def test_get_variant_annotations():
     ]
 
 
+###########################################################
+# Format the CS tags
+###########################################################
+
+
+def test_get_pos_end():
+    assert get_pos_end("=ACGT", 1) == 4
+    assert get_pos_end("=ACGT", 5) == 8
+    assert get_pos_end("=ACGT*ag=ACGT", 1) == 9
+    assert get_pos_end("=ACGT-aa=ACGT", 1) == 10
+    assert get_pos_end("=ACGT+aa=ACGT", 1) == 8
+    assert get_pos_end("=ACGTNNACGT", 1) == 10
+
+
+###########################################################
+# Group by chrom and overlapping intervals
+###########################################################
+
+
+###########################################################
+# Add VCF info
+###########################################################
+
+
+def test_add_vcf_fields():
+    sample_variant_annotations = [
+        Vcf(chrom=None, pos=1, ref="A", alt="T", info=VcfInfo(dp=None, rd=None, ad=None, vaf=None)),
+        Vcf(chrom=None, pos=1, ref="A", alt="T", info=VcfInfo(dp=None, rd=None, ad=None, vaf=None)),
+        Vcf(chrom=None, pos=2, ref="G", alt="C", info=VcfInfo(dp=None, rd=None, ad=None, vaf=None)),
+    ]
+    sample_chrom = "chr1"
+    sample_reference_depth = {1: 10, 2: 5}
+    result = add_vcf_fields(sample_variant_annotations, sample_chrom, sample_reference_depth)
+    result = sorted(result, key=lambda x: (chrom_sort_key(x.chrom), x.pos))
+    assert result[0].chrom == "chr1"
+    assert result[0].info.ad == 2
+    assert result[0].info.rd == 10
+    assert result[0].info.dp == 12
+    assert result[0].info.vaf == 0.167
+    assert result[1].chrom == "chr1"
+    assert result[1].info.ad == 1
+    assert result[1].info.rd == 5
+    assert result[1].info.dp == 6
+    assert result[1].info.vaf == 0.167
+
+
+###########################################################
+# process_cs_tag: Single CS tag
+###########################################################
+
+
 def test_process_cs_tag():
     cs_tag1 = "=AC*gt=T-gg=C+tt=A"
     chrom1 = "chr1"
@@ -101,7 +145,7 @@ chr1	5	.	C	CTT	.	.	."""
 
 
 ###########################################################
-# Multuple CS tags
+# process_cs_tags: Multuple CS tags
 ###########################################################
 
 
