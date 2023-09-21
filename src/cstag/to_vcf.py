@@ -205,24 +205,9 @@ def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -> d
     return dict(reference_depth)
 
 
-def remove_duplicates(variant_annotations: list[Vcf]) -> list[Vcf]:
-    seen = set()
-    unique_vcf = []
-
-    for v in variant_annotations:
-        # Create a unique key based on pos, ref, and alt
-        key = (v.pos, v.ref, v.alt)
-        if key not in seen:
-            seen.add(key)
-            unique_vcf.append(v)
-
-    return unique_vcf
-
-
 def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -> list[Vcf]:
     """Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass"""
     variant_counter = Counter((v.pos, v.ref, v.alt) for v in variant_annotations)
-    # unique_variant_annotations = remove_duplicates(variant_annotations)
 
     updated_annotations = []
     for v in set(variant_annotations):
