@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from src.cstag.to_vcf import (
+    CsInfo,
     Vcf,
     VcfInfo,
     chrom_sort_key,
@@ -8,6 +9,7 @@ from src.cstag.to_vcf import (
     find_ref_for_deletion,
     get_variant_annotations,
     get_pos_end,
+    format_cs_tags,
     add_vcf_fields,
     process_cs_tag,
     process_cs_tags,
@@ -85,6 +87,23 @@ def test_get_pos_end():
     assert get_pos_end("=ACGT-aa=ACGT", 1) == 10
     assert get_pos_end("=ACGT+aa=ACGT", 1) == 8
     assert get_pos_end("=ACGTNNACGT", 1) == 10
+
+
+def test_format_cs_tags():
+    # Sample input data
+    cs_tags = ["=ACGT", "=ACGT", "=AC*gc=T", ":4~ct:3"]
+    chroms = ["chr1", "chr2", "chr3", "chr6"]
+    positions = [1, 2, 3, 4]
+
+    result = format_cs_tags(cs_tags, chroms, positions)
+
+    # Expected output
+    expected_output = [
+        CsInfo(cs_tag="=ACGT", chrom="chr1", pos_start=1, pos_end=4),
+        CsInfo(cs_tag="=ACGT", chrom="chr2", pos_start=2, pos_end=5),
+        CsInfo(cs_tag="=AC*gc=T", chrom="chr3", pos_start=3, pos_end=6),
+    ]
+    assert result == expected_output
 
 
 ###########################################################
