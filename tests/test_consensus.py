@@ -76,15 +76,15 @@ def test_substitution():
 
 
 def test_insertion():
-    CSTAG = ["=ACGT", "=AC+ggggg=GT", "=C+ggggg=GT", "=C+ggggg=GT"]
+    CSTAG = ["=ACGT", "=AC+acgt=GT", "=C+acgt=GT", "=C+acgt=GT"]
     POS = [1, 1, 2, 2]
-    assert consensus(CSTAG, POS) == "=AC+ggggg=GT"
+    assert consensus(CSTAG, POS) == "=AC+acgt=GT"
 
 
 def test_deletion():
-    CSTAG = ["=ACGT", "=AC-ggggg=GT", "=C-ggggg=GT", "=C-ggggg=GT"]
+    CSTAG = ["=ACGT", "=AC-acgt=GT", "=C-acgt=GT", "=C-acgt=GT"]
     POS = [1, 1, 2, 2]
-    assert consensus(CSTAG, POS) == "=AC-ggggg=GT"
+    assert consensus(CSTAG, POS) == "=AC-acgt=GT"
 
 
 def test_splicing():

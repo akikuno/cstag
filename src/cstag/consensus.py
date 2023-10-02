@@ -89,8 +89,8 @@ def normalize_read_lengths(cs_tags: list[str], positions: list[int]) -> list[lis
 
 
 def condense_deletions(s: str) -> str:
-    # Pattern for detecting continuous same nucleotide deletions
-    pattern = r"(-[acgtn])\1+"
+    # Pattern for detecting continuous nucleotide deletions
+    pattern = r"(-[acgtn])+"
 
     # Function to replace the matched pattern
     def replacement(match) -> str:
