@@ -30,9 +30,9 @@ def test_normalize_read_lengths():
     cs_tags = ["=ACGT", "=AC", "=GT"]
     starts = [0, 2, 4]
     expected_output = [
-        (["A", "C", "G", "T", "N", "N"]),
-        (["N", "N", "A", "C", "N", "N"]),
-        (["N", "N", "N", "N", "G", "T"]),
+        (["A", "C", "G", "T", None, None]),
+        ([None, None, "A", "C", None, None]),
+        ([None, None, None, None, "G", "T"]),
     ]
 
     assert normalize_read_lengths(cs_tags, starts) == expected_output
@@ -78,13 +78,13 @@ def test_substitution():
 def test_insertion():
     CSTAG = ["=ACGT", "=AC+ggggg=GT", "=C+ggggg=GT", "=C+ggggg=GT"]
     POS = [1, 1, 2, 2]
-    assert consensus(CSTAG, POS) == "=NC+ggggg=GT"
+    assert consensus(CSTAG, POS) == "=AC+ggggg=GT"
 
 
 def test_deletion():
     CSTAG = ["=ACGT", "=AC-ggggg=GT", "=C-ggggg=GT", "=C-ggggg=GT"]
     POS = [1, 1, 2, 2]
-    assert consensus(CSTAG, POS) == "=NC-ggggg=GT"
+    assert consensus(CSTAG, POS) == "=AC-ggggg=GT"
 
 
 def test_splicing():
@@ -95,13 +95,13 @@ def test_splicing():
         "=C~gc100ag=T",
     ]
     POS = [1, 1, 2, 2]
-    assert consensus(CSTAG, POS) == "=NC~gc100ag=T"
+    assert consensus(CSTAG, POS) == "=AC~gc100ag=T"
 
 
 def test_positions():
     CSTAG = ["=ACGT", "=CGT", "=GT"]
     POS = [1, 2, 3]
-    assert consensus(CSTAG, POS) == "=NCGT"
+    assert consensus(CSTAG, POS) == "=ACGT"
 
 
 def test_positions_more_than_one():
