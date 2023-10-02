@@ -20,8 +20,9 @@
 - `cstag.split()`: Break down a CS tag into its constituent parts
 - `cstag.revcomp()`: Convert a CS tag to its reverse complement
 - `cstag.to_sequence()`: Reconstruct a reference subsequence from the alignment
-- `cstag.to_vcf()`: Generate a VCF file
-- `cstag.to_html()`: Produce an HTML representation
+- `cstag.to_vcf()`: Generate a VCF representation
+- `cstag.to_html()`: Generate an HTML representation
+- `cstag.to_pdf()`: Produce a PDF file
 
 For comprehensive documentation, please visit [our docs](https://akikuno.github.io/cstag/cstag/).  
 To add CS tags to SAM/BAM files, check out [`cstag-cli`](https://github.com/akikuno/cstag-cli).  
@@ -55,7 +56,7 @@ seq = "ACGTACGTACGTACG"
 print(cstag.call(cigar, md, seq))
 # :2*ag:5-ag:4+ac~nn3nn:1
 
-cstag.call(cigar, md, seq, long=True)
+print(cstag.call(cigar, md, seq, long=True))
 # =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
@@ -67,7 +68,7 @@ import cstag
 # Convert a CS tag from long to short
 cs_tag = "=ACGT*ag=CGT"
 
-cstag.shorten(cs_tag)
+print(cstag.shorten(cs_tag))
 # :4*ag:3
 
 
@@ -76,7 +77,7 @@ cs_tag = ":4*ag:3"
 cigar = "8M"
 seq = "ACGTACGT"
 
-cstag.lengthen(cs_tag, cigar, seq)
+print(cstag.lengthen(cs_tag, cigar, seq))
 # =ACGT*ag=CGT
 ```
 
@@ -88,7 +89,7 @@ import cstag
 cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
 positions = [1, 1, 2, 2, 1]
 
-cstag.consensus(cs_tags, positions)
+print(cstag.consensus(cs_tags, positions))
 # =AC*gt*T
 ```
 
@@ -101,7 +102,7 @@ cs_tag = "=ACGT*ac+gg-cc=T"
 cigar = "5M2I2D1M"
 qual = "AA!!!!AA"
 phred_threshold = 10
-cstag.mask(cs_tag, cigar, qual, phred_threshold)
+print(cstag.mask(cs_tag, cigar, qual, phred_threshold))
 # =ACNN*an+ng-cc=T
 ```
 
@@ -111,7 +112,7 @@ cstag.mask(cs_tag, cigar, qual, phred_threshold)
 import cstag
 
 cs_tag = "=ACGT*ac+gg-cc=T"
-cstag.split(cs_tag)
+print(cstag.split(cs_tag))
 # ['=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
@@ -121,7 +122,7 @@ cstag.split(cs_tag)
 import cstag
 
 cs_tag = "=ACGT*ac+gg-cc=T"
-cstag.revcomp(cs_tag)
+print(cstag.revcomp(cs_tag))
 # =A-gg+cc*tg=ACGT
 ```
 
@@ -130,7 +131,7 @@ cstag.revcomp(cs_tag)
 ```python
 import cstag
 cs_tag = "=AC*gt=T-gg=C+tt=A"
-cstag.to_sequence(cs_tag)
+print(cstag.to_sequence(cs_tag))
 # ACTTCTTA
 ```
 
@@ -190,7 +191,28 @@ You can visualize mutations indicated by the CS tag using the generated `report.
 <img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png">
 
 
+### Generating a PDF Report
+
+```python
+import cstag
+
+cs_tag = "=AC+ggg=T-acgt*at~gt10ag=GNNN"
+description = "Example"
+path_out = "report.pdf"
+
+cstag.to_pdf(cs_tag, description, path_out)
+# Output "report.pdf"
+```
+
+You can obtain the same images of `cstag.to_html` as a PDF file.
+
+
 ## 📣 Feedback and Support
 
 For questions, bug reports, or other forms of feedback, we'd love to hear from you!  
 Please use [GitHub Issues](https://github.com/akikuno/cstag/issues) for all reporting purposes.  
+
+## 🤝 Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/akikuno/cstag/blob/main/CODE_OF_CONDUCT.md).  
+By participating in this project you agree to abide by its terms.  

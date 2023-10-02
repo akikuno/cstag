@@ -2,29 +2,33 @@ from __future__ import annotations
 
 import re
 from itertools import chain
-from typing import NamedTuple
 from collections import deque, defaultdict, Counter
+
+from dataclasses import dataclass
 
 from cstag.split import split
 from cstag.consensus import normalize_read_lengths
 from cstag.utils.validator import validate_cs_tag, validate_long_format, validate_pos
 
 
-class CsInfo(NamedTuple):
+@dataclass(frozen=True)
+class CsInfo:
     cs_tag: str
     pos_start: int
     pos_end: int
     chrom: str | None = None
 
 
-class VcfInfo(NamedTuple):
+@dataclass(frozen=True)
+class VcfInfo:
     dp: int | None = None
     rd: int | None = None
     ad: int | None = None
     vaf: float | None = None
 
 
-class Vcf(NamedTuple):
+@dataclass(frozen=True)
+class Vcf:
     chrom: str | None = None
     pos: int | None = None
     ref: str | None = None
@@ -92,38 +96,13 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[Vcf]
 
 
 ###########################################################
-# Process CS tag (One)
-###########################################################
-
-
-def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -> str:
-    validate_cs_tag(cs_tag)
-    validate_long_format(cs_tag)
-    validate_pos(pos)
-    chrom = str(chrom)
-
-    cs_tag_split = split(cs_tag)
-
-    # Call POS, REF, ALT
-    variants = get_variant_annotations(cs_tag_split, pos)
-
-    # Write VCF
-    HEADER = "##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n"
-    vcf = remove_spaces_around_newlines(HEADER).strip().split("\n")
-    for v in variants:
-        vcf.append(f"{chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\t.")
-
-    return "\n".join(vcf)
-
-
-###########################################################
 # Format the CS tags
 ###########################################################
 
 
 def get_pos_end(cs_tag: str, pos: int) -> int:
     """Get 1-index end positions"""
-    pos_end = pos
+    pos_end = pos - 1
     for cs in split(cs_tag):
         if cs[0] in ["=", "-"]:
             pos_end += len(cs) - 1
@@ -176,7 +155,7 @@ def group_by_chrom(cs_tags_formatted: list[tuple]) -> dict[str, tuple]:
     return dict(cs_tags_grouped)
 
 
-def group_by_overlapping_intervals(cs_tags_grouped: NamedTuple) -> list[NamedTuple]:
+def group_by_overlapping_intervals(cs_tags_grouped: CsInfo) -> list[CsInfo]:
     # Sort the list by the starting point
     sorted_data = sorted(cs_tags_grouped, key=lambda x: x.pos_start)
     # Initialize the list of grouped intervals
@@ -227,13 +206,50 @@ def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -> d
 
 
 def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -> list[Vcf]:
-    """Add Chrom and VCF info (AD, RD, DP, and VAF) to VCF NamedTuple"""
-    vcf_appended = [v._replace(chrom=chrom) for v in variant_annotations]
-    vcf_appended = [v._replace(info=v.info._replace(ad=ad)) for v, ad in Counter(vcf_appended).items()]
-    vcf_appended = [v._replace(info=v.info._replace(rd=reference_depth.get(v.pos, 0))) for v in vcf_appended]
-    vcf_appended = [v._replace(info=v.info._replace(dp=v.info.rd + v.info.ad)) for v in vcf_appended]
-    vcf_appended = [v._replace(info=v.info._replace(vaf=round(v.info.ad / v.info.dp, 3))) for v in vcf_appended]
-    return vcf_appended
+    """Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass"""
+    variant_counter = Counter((v.pos, v.ref, v.alt) for v in variant_annotations)
+
+    updated_annotations = []
+    for v in set(variant_annotations):
+        ad = variant_counter[(v.pos, v.ref, v.alt)]
+        rd = reference_depth.get(v.pos, 0)
+        dp = rd + ad
+        vaf = round(ad / dp, 3) if dp else 0
+
+        # Creating a new VcfInfo object
+        updated_info = VcfInfo(dp=dp, rd=rd, ad=ad, vaf=vaf)
+
+        # Creating a new Vcf object
+        updated_variant = Vcf(chrom=chrom, pos=v.pos, ref=v.ref, alt=v.alt, info=updated_info)
+
+        updated_annotations.append(updated_variant)
+
+    return updated_annotations
+
+
+###########################################################
+# Process CS tag (One)
+###########################################################
+
+
+def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -> str:
+    validate_cs_tag(cs_tag)
+    validate_long_format(cs_tag)
+    validate_pos(pos)
+    chrom = str(chrom)
+
+    cs_tag_split = split(cs_tag)
+
+    # Call POS, REF, ALT
+    variants = get_variant_annotations(cs_tag_split, pos)
+
+    # Write VCF
+    HEADER = "##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n"
+    vcf = remove_spaces_around_newlines(HEADER).strip().split("\n")
+    for v in variants:
+        vcf.append(f"{chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\t.")
+
+    return "\n".join(vcf)
 
 
 ###########################################################
