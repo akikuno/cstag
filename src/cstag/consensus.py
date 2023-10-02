@@ -37,7 +37,9 @@ def split_cs_tags(cs_tags: list[str]) -> list[list[str]]:
     for cs_tag in cs_tags:
         # Remove the prefix "cs:Z:" if present
         cs_tag = cs_tag.replace("cs:Z:", "")
+
         # Split the CS tag using special symbols (-, *, ~, =)
+        # insertion symbol (+) is ignored because it is not observed in reference sequence
         tags_splitted = re.split(r"([-*~=])", cs_tag)[1:]
         # Combine the symbol with the corresponding sequence
         tags_combined = [symbol + seq for symbol, seq in zip(tags_splitted[0::2], tags_splitted[1::2])]
