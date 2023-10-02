@@ -33,21 +33,18 @@ HTML_HEADER = """<!DOCTYPE html>
     border: 0.1em solid;
     background-color: #ee827c;
     font-weight: bold;
-    # border-radius: 5px;
     }
     .Del {
     color: #333;
     border: 0.1em solid;
     background-color: #a0d8ef;
     font-weight: bold;
-    # border-radius: 5px;
     }
     .Sub {
     color: #333;
     border: 0.1em solid;
     background-color: #98d98e;
     font-weight: bold;
-    # border-radius: 5px;
     }
     .Splice {
     color: #333;
@@ -60,7 +57,6 @@ HTML_HEADER = """<!DOCTYPE html>
     border: 0.1em solid;
     background-color: #c0c6c9;
     font-weight: bold;
-    # border-radius: 5px;
     }
 
     </style>
