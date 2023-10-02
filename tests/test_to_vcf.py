@@ -10,6 +10,8 @@ from src.cstag.to_vcf import (
     get_variant_annotations,
     get_pos_end,
     format_cs_tags,
+    group_by_chrom,
+    group_by_overlapping_intervals,
     add_vcf_fields,
     process_cs_tag,
     process_cs_tags,
@@ -109,6 +111,50 @@ def test_format_cs_tags():
 ###########################################################
 # Group by chrom and overlapping intervals
 ###########################################################
+
+
+def test_group_by_chrom():
+    cs_tags_input = [
+        CsInfo(cs_tag="=A", pos_start=10, pos_end=20, chrom="chr1"),
+        CsInfo(cs_tag="=A", pos_start=30, pos_end=40, chrom="chr1"),
+        CsInfo(cs_tag="=A", pos_start=50, pos_end=60, chrom="chr2"),
+    ]
+
+    expected_output = {
+        "chr1": [
+            CsInfo(cs_tag="=A", pos_start=10, pos_end=20, chrom="chr1"),
+            CsInfo(cs_tag="=A", pos_start=30, pos_end=40, chrom="chr1"),
+        ],
+        "chr2": [
+            CsInfo(cs_tag="=A", pos_start=50, pos_end=60, chrom="chr2"),
+        ],
+    }
+
+    assert group_by_chrom(cs_tags_input) == expected_output
+
+
+def test_group_by_overlapping_intervals():
+    cs_tags_input = [
+        CsInfo(cs_tag="=A", pos_start=5, pos_end=15, chrom="chr1"),
+        CsInfo(cs_tag="=A", pos_start=10, pos_end=20, chrom="chr1"),
+        CsInfo(cs_tag="=A", pos_start=30, pos_end=40, chrom="chr1"),
+        CsInfo(cs_tag="=A", pos_start=50, pos_end=60, chrom="chr2"),
+    ]
+
+    expected_output = [
+        [
+            CsInfo(cs_tag="=A", pos_start=5, pos_end=15, chrom="chr1"),
+            CsInfo(cs_tag="=A", pos_start=10, pos_end=20, chrom="chr1"),
+        ],
+        [
+            CsInfo(cs_tag="=A", pos_start=30, pos_end=40, chrom="chr1"),
+        ],
+        [
+            CsInfo(cs_tag="=A", pos_start=50, pos_end=60, chrom="chr2"),
+        ],
+    ]
+
+    assert group_by_overlapping_intervals(cs_tags_input) == expected_output
 
 
 ###########################################################
