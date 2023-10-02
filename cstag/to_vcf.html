@@ -30,29 +30,33 @@
 
 import re
 from itertools import chain
-from typing import NamedTuple
 from collections import deque, defaultdict, Counter
+
+from dataclasses import dataclass
 
 from cstag.split import split
 from cstag.consensus import normalize_read_lengths
 from cstag.utils.validator import validate_cs_tag, validate_long_format, validate_pos
 
 
-class CsInfo(NamedTuple):
+@dataclass(frozen=True)
+class CsInfo:
     cs_tag: str
     pos_start: int
     pos_end: int
     chrom: str | None = None
 
 
-class VcfInfo(NamedTuple):
+@dataclass(frozen=True)
+class VcfInfo:
     dp: int | None = None
     rd: int | None = None
     ad: int | None = None
     vaf: float | None = None
 
 
-class Vcf(NamedTuple):
+@dataclass(frozen=True)
+class Vcf:
     chrom: str | None = None
     pos: int | None = None
     ref: str | None = None
@@ -120,38 +124,13 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -&gt; list[V
 
 
 ###########################################################
-# Process CS tag (One)
-###########################################################
-
-
-def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -&gt; str:
-    validate_cs_tag(cs_tag)
-    validate_long_format(cs_tag)
-    validate_pos(pos)
-    chrom = str(chrom)
-
-    cs_tag_split = split(cs_tag)
-
-    # Call POS, REF, ALT
-    variants = get_variant_annotations(cs_tag_split, pos)
-
-    # Write VCF
-    HEADER = &#34;##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n&#34;
-    vcf = remove_spaces_around_newlines(HEADER).strip().split(&#34;\n&#34;)
-    for v in variants:
-        vcf.append(f&#34;{chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\t.&#34;)
-
-    return &#34;\n&#34;.join(vcf)
-
-
-###########################################################
 # Format the CS tags
 ###########################################################
 
 
 def get_pos_end(cs_tag: str, pos: int) -&gt; int:
     &#34;&#34;&#34;Get 1-index end positions&#34;&#34;&#34;
-    pos_end = pos
+    pos_end = pos - 1
     for cs in split(cs_tag):
         if cs[0] in [&#34;=&#34;, &#34;-&#34;]:
             pos_end += len(cs) - 1
@@ -204,7 +183,7 @@ def group_by_chrom(cs_tags_formatted: list[tuple]) -&gt; dict[str, tuple]:
     return dict(cs_tags_grouped)
 
 
-def group_by_overlapping_intervals(cs_tags_grouped: NamedTuple) -&gt; list[NamedTuple]:
+def group_by_overlapping_intervals(cs_tags_grouped: CsInfo) -&gt; list[CsInfo]:
     # Sort the list by the starting point
     sorted_data = sorted(cs_tags_grouped, key=lambda x: x.pos_start)
     # Initialize the list of grouped intervals
@@ -255,13 +234,50 @@ def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt
 
 
 def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -&gt; list[Vcf]:
-    &#34;&#34;&#34;Add Chrom and VCF info (AD, RD, DP, and VAF) to VCF NamedTuple&#34;&#34;&#34;
-    vcf_appended = [v._replace(chrom=chrom) for v in variant_annotations]
-    vcf_appended = [v._replace(info=v.info._replace(ad=ad)) for v, ad in Counter(vcf_appended).items()]
-    vcf_appended = [v._replace(info=v.info._replace(rd=reference_depth.get(v.pos, 0))) for v in vcf_appended]
-    vcf_appended = [v._replace(info=v.info._replace(dp=v.info.rd + v.info.ad)) for v in vcf_appended]
-    vcf_appended = [v._replace(info=v.info._replace(vaf=round(v.info.ad / v.info.dp, 3))) for v in vcf_appended]
-    return vcf_appended
+    &#34;&#34;&#34;Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass&#34;&#34;&#34;
+    variant_counter = Counter((v.pos, v.ref, v.alt) for v in variant_annotations)
+
+    updated_annotations = []
+    for v in set(variant_annotations):
+        ad = variant_counter[(v.pos, v.ref, v.alt)]
+        rd = reference_depth.get(v.pos, 0)
+        dp = rd + ad
+        vaf = round(ad / dp, 3) if dp else 0
+
+        # Creating a new VcfInfo object
+        updated_info = VcfInfo(dp=dp, rd=rd, ad=ad, vaf=vaf)
+
+        # Creating a new Vcf object
+        updated_variant = Vcf(chrom=chrom, pos=v.pos, ref=v.ref, alt=v.alt, info=updated_info)
+
+        updated_annotations.append(updated_variant)
+
+    return updated_annotations
+
+
+###########################################################
+# Process CS tag (One)
+###########################################################
+
+
+def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -&gt; str:
+    validate_cs_tag(cs_tag)
+    validate_long_format(cs_tag)
+    validate_pos(pos)
+    chrom = str(chrom)
+
+    cs_tag_split = split(cs_tag)
+
+    # Call POS, REF, ALT
+    variants = get_variant_annotations(cs_tag_split, pos)
+
+    # Write VCF
+    HEADER = &#34;##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n&#34;
+    vcf = remove_spaces_around_newlines(HEADER).strip().split(&#34;\n&#34;)
+    for v in variants:
+        vcf.append(f&#34;{chrom}\t{v.pos}\t.\t{v.ref}\t{v.alt}\t.\t.\t.&#34;)
+
+    return &#34;\n&#34;.join(vcf)
 
 
 ###########################################################
@@ -365,19 +381,31 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
 <span>def <span class="ident">add_vcf_fields</span></span>(<span>variant_annotations: list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>], chrom: str, reference_depth: dict[int, int]) ‑> list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Add Chrom and VCF info (AD, RD, DP, and VAF) to VCF NamedTuple</p></div>
+<div class="desc"><p>Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -&gt; list[Vcf]:
-    &#34;&#34;&#34;Add Chrom and VCF info (AD, RD, DP, and VAF) to VCF NamedTuple&#34;&#34;&#34;
-    vcf_appended = [v._replace(chrom=chrom) for v in variant_annotations]
-    vcf_appended = [v._replace(info=v.info._replace(ad=ad)) for v, ad in Counter(vcf_appended).items()]
-    vcf_appended = [v._replace(info=v.info._replace(rd=reference_depth.get(v.pos, 0))) for v in vcf_appended]
-    vcf_appended = [v._replace(info=v.info._replace(dp=v.info.rd + v.info.ad)) for v in vcf_appended]
-    vcf_appended = [v._replace(info=v.info._replace(vaf=round(v.info.ad / v.info.dp, 3))) for v in vcf_appended]
-    return vcf_appended</code></pre>
+    &#34;&#34;&#34;Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass&#34;&#34;&#34;
+    variant_counter = Counter((v.pos, v.ref, v.alt) for v in variant_annotations)
+
+    updated_annotations = []
+    for v in set(variant_annotations):
+        ad = variant_counter[(v.pos, v.ref, v.alt)]
+        rd = reference_depth.get(v.pos, 0)
+        dp = rd + ad
+        vaf = round(ad / dp, 3) if dp else 0
+
+        # Creating a new VcfInfo object
+        updated_info = VcfInfo(dp=dp, rd=rd, ad=ad, vaf=vaf)
+
+        # Creating a new Vcf object
+        updated_variant = Vcf(chrom=chrom, pos=v.pos, ref=v.ref, alt=v.alt, info=updated_info)
+
+        updated_annotations.append(updated_variant)
+
+    return updated_annotations</code></pre>
 </details>
 </dd>
 <dt id="cstag.to_vcf.call_reference_depth"><code class="name flex">
@@ -527,7 +555,7 @@ out any cs_tags containing a tilde ("~") and creates a list of CsInfo objects.</
 </summary>
 <pre><code class="python">def get_pos_end(cs_tag: str, pos: int) -&gt; int:
     &#34;&#34;&#34;Get 1-index end positions&#34;&#34;&#34;
-    pos_end = pos
+    pos_end = pos - 1
     for cs in split(cs_tag):
         if cs[0] in [&#34;=&#34;, &#34;-&#34;]:
             pos_end += len(cs) - 1
@@ -590,7 +618,7 @@ out any cs_tags containing a tilde ("~") and creates a list of CsInfo objects.</
 </details>
 </dd>
 <dt id="cstag.to_vcf.group_by_overlapping_intervals"><code class="name flex">
-<span>def <span class="ident">group_by_overlapping_intervals</span></span>(<span>cs_tags_grouped: NamedTuple) ‑> list[typing.NamedTuple]</span>
+<span>def <span class="ident">group_by_overlapping_intervals</span></span>(<span>cs_tags_grouped: <a title="cstag.to_vcf.CsInfo" href="#cstag.to_vcf.CsInfo">CsInfo</a>) ‑> list[<a title="cstag.to_vcf.CsInfo" href="#cstag.to_vcf.CsInfo">CsInfo</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -598,7 +626,7 @@ out any cs_tags containing a tilde ("~") and creates a list of CsInfo objects.</
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def group_by_overlapping_intervals(cs_tags_grouped: NamedTuple) -&gt; list[NamedTuple]:
+<pre><code class="python">def group_by_overlapping_intervals(cs_tags_grouped: CsInfo) -&gt; list[CsInfo]:
     # Sort the list by the starting point
     sorted_data = sorted(cs_tags_grouped, key=lambda x: x.pos_start)
     # Initialize the list of grouped intervals
@@ -790,126 +818,117 @@ chr1    5       .       C       CTT     .       .       .
 <dl>
 <dt id="cstag.to_vcf.CsInfo"><code class="flex name class">
 <span>class <span class="ident">CsInfo</span></span>
-<span>(</span><span>cs_tag: ForwardRef('str'), pos_start: ForwardRef('int'), pos_end: ForwardRef('int'), chrom: ForwardRef('str | None') = None)</span>
+<span>(</span><span>cs_tag: str, pos_start: int, pos_end: int, chrom: str | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>CsInfo(cs_tag, pos_start, pos_end, chrom)</p></div>
+<div class="desc"><p>CsInfo(cs_tag: 'str', pos_start: 'int', pos_end: 'int', chrom: 'str | None' = None)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class CsInfo(NamedTuple):
+<pre><code class="python">@dataclass(frozen=True)
+class CsInfo:
     cs_tag: str
     pos_start: int
     pos_end: int
     chrom: str | None = None</code></pre>
 </details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.tuple</li>
-</ul>
-<h3>Instance variables</h3>
+<h3>Class variables</h3>
 <dl>
 <dt id="cstag.to_vcf.CsInfo.chrom"><code class="name">var <span class="ident">chrom</span> : str | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 3</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.CsInfo.cs_tag"><code class="name">var <span class="ident">cs_tag</span> : str</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 0</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.CsInfo.pos_end"><code class="name">var <span class="ident">pos_end</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 2</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.CsInfo.pos_start"><code class="name">var <span class="ident">pos_start</span> : int</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 1</p></div>
+<div class="desc"></div>
 </dd>
 </dl>
 </dd>
 <dt id="cstag.to_vcf.Vcf"><code class="flex name class">
 <span>class <span class="ident">Vcf</span></span>
-<span>(</span><span>chrom: ForwardRef('str | None') = None, pos: ForwardRef('int | None') = None, ref: ForwardRef('str | None') = None, alt: ForwardRef('str | None') = None, info: ForwardRef('<a title="cstag.to_vcf.VcfInfo" href="#cstag.to_vcf.VcfInfo">VcfInfo</a>') = VcfInfo(dp=None, rd=None, ad=None, vaf=None))</span>
+<span>(</span><span>chrom: str | None = None, pos: int | None = None, ref: str | None = None, alt: str | None = None, info: <a title="cstag.to_vcf.VcfInfo" href="#cstag.to_vcf.VcfInfo">VcfInfo</a> = VcfInfo(dp=None, rd=None, ad=None, vaf=None))</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Vcf(chrom, pos, ref, alt, info)</p></div>
+<div class="desc"><p>Vcf(chrom: 'str | None' = None, pos: 'int | None' = None, ref: 'str | None' = None, alt: 'str | None' = None, info: 'VcfInfo' = VcfInfo(dp=None, rd=None, ad=None, vaf=None))</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Vcf(NamedTuple):
+<pre><code class="python">@dataclass(frozen=True)
+class Vcf:
     chrom: str | None = None
     pos: int | None = None
     ref: str | None = None
     alt: str | None = None
     info: VcfInfo = VcfInfo()</code></pre>
 </details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.tuple</li>
-</ul>
-<h3>Instance variables</h3>
+<h3>Class variables</h3>
 <dl>
 <dt id="cstag.to_vcf.Vcf.alt"><code class="name">var <span class="ident">alt</span> : str | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 3</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.Vcf.chrom"><code class="name">var <span class="ident">chrom</span> : str | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 0</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.Vcf.info"><code class="name">var <span class="ident">info</span> : <a title="cstag.to_vcf.VcfInfo" href="#cstag.to_vcf.VcfInfo">VcfInfo</a></code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 4</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.Vcf.pos"><code class="name">var <span class="ident">pos</span> : int | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 1</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.Vcf.ref"><code class="name">var <span class="ident">ref</span> : str | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 2</p></div>
+<div class="desc"></div>
 </dd>
 </dl>
 </dd>
 <dt id="cstag.to_vcf.VcfInfo"><code class="flex name class">
 <span>class <span class="ident">VcfInfo</span></span>
-<span>(</span><span>dp: ForwardRef('int | None') = None, rd: ForwardRef('int | None') = None, ad: ForwardRef('int | None') = None, vaf: ForwardRef('float | None') = None)</span>
+<span>(</span><span>dp: int | None = None, rd: int | None = None, ad: int | None = None, vaf: float | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>VcfInfo(dp, rd, ad, vaf)</p></div>
+<div class="desc"><p>VcfInfo(dp: 'int | None' = None, rd: 'int | None' = None, ad: 'int | None' = None, vaf: 'float | None' = None)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class VcfInfo(NamedTuple):
+<pre><code class="python">@dataclass(frozen=True)
+class VcfInfo:
     dp: int | None = None
     rd: int | None = None
     ad: int | None = None
     vaf: float | None = None</code></pre>
 </details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.tuple</li>
-</ul>
-<h3>Instance variables</h3>
+<h3>Class variables</h3>
 <dl>
 <dt id="cstag.to_vcf.VcfInfo.ad"><code class="name">var <span class="ident">ad</span> : int | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 2</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.VcfInfo.dp"><code class="name">var <span class="ident">dp</span> : int | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 0</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.VcfInfo.rd"><code class="name">var <span class="ident">rd</span> : int | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 1</p></div>
+<div class="desc"></div>
 </dd>
 <dt id="cstag.to_vcf.VcfInfo.vaf"><code class="name">var <span class="ident">vaf</span> : float | None</code></dt>
 <dd>
-<div class="desc"><p>Alias for field number 3</p></div>
+<div class="desc"></div>
 </dd>
 </dl>
 </dd>

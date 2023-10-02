@@ -41,8 +41,9 @@
 <li><code><a title="cstag.split" href="split.html">cstag.split</a></code>: Break down a CS tag into its constituent parts</li>
 <li><code><a title="cstag.revcomp" href="revcomp.html">cstag.revcomp</a></code>: Convert a CS tag to its reverse complement</li>
 <li><code><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code>: Reconstruct a reference subsequence from the alignment</li>
-<li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code>: Generate a VCF file</li>
-<li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Produce an HTML representation</li>
+<li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code>: Generate a VCF representation</li>
+<li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Generate an HTML representation</li>
+<li><code><a title="cstag.to_pdf" href="to_pdf.html">cstag.to_pdf</a></code>: Produce a PDF file</li>
 </ul>
 <p>For comprehensive documentation, please visit <a href="https://akikuno.github.io/cstag/cstag/">our docs</a>.<br>
 To add CS tags to SAM/BAM files, check out <a href="https://github.com/akikuno/cstag-cli"><code>cstag-cli</code></a>.
@@ -65,7 +66,7 @@ seq = &quot;ACGTACGTACGTACG&quot;
 print(cstag.call(cigar, md, seq))
 # :2*ag:5-ag:4+ac~nn3nn:1
 
-cstag.call(cigar, md, seq, long=True)
+print(cstag.call(cigar, md, seq, long=True))
 # =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 </code></pre>
 <h3 id="shortening-or-lengthening-cs-tags">Shortening or Lengthening CS Tags</h3>
@@ -74,7 +75,7 @@ cstag.call(cigar, md, seq, long=True)
 # Convert a CS tag from long to short
 cs_tag = &quot;=ACGT*ag=CGT&quot;
 
-cstag.shorten(cs_tag)
+print(cstag.shorten(cs_tag))
 # :4*ag:3
 
 
@@ -83,7 +84,7 @@ cs_tag = &quot;:4*ag:3&quot;
 cigar = &quot;8M&quot;
 seq = &quot;ACGTACGT&quot;
 
-cstag.lengthen(cs_tag, cigar, seq)
+print(cstag.lengthen(cs_tag, cigar, seq))
 # =ACGT*ag=CGT
 </code></pre>
 <h3 id="creating-a-consensus">Creating a Consensus</h3>
@@ -92,7 +93,7 @@ cstag.lengthen(cs_tag, cigar, seq)
 cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
 positions = [1, 1, 2, 2, 1]
 
-cstag.consensus(cs_tags, positions)
+print(cstag.consensus(cs_tags, positions))
 # =AC*gt*T
 </code></pre>
 <h3 id="masking-low-quality-bases">Masking Low-Quality Bases</h3>
@@ -102,27 +103,27 @@ cs_tag = &quot;=ACGT*ac+gg-cc=T&quot;
 cigar = &quot;5M2I2D1M&quot;
 qual = &quot;AA!!!!AA&quot;
 phred_threshold = 10
-cstag.mask(cs_tag, cigar, qual, phred_threshold)
+print(cstag.mask(cs_tag, cigar, qual, phred_threshold))
 # =ACNN*an+ng-cc=T
 </code></pre>
 <h3 id="splitting-a-cs-tag">Splitting a CS Tag</h3>
 <pre><code class="language-python">import cstag
 
 cs_tag = &quot;=ACGT*ac+gg-cc=T&quot;
-cstag.split(cs_tag)
+print(cstag.split(cs_tag))
 # ['=ACGT', '*ac', '+gg', '-cc', '=T']
 </code></pre>
 <h3 id="reverse-complement-of-a-cs-tag">Reverse Complement of a CS Tag</h3>
 <pre><code class="language-python">import cstag
 
 cs_tag = &quot;=ACGT*ac+gg-cc=T&quot;
-cstag.revcomp(cs_tag)
+print(cstag.revcomp(cs_tag))
 # =A-gg+cc*tg=ACGT
 </code></pre>
 <h3 id="reconstructing-the-reference-subsequence">Reconstructing the Reference Subsequence</h3>
 <pre><code class="language-python">import cstag
 cs_tag = &quot;=AC*gt=T-gg=C+tt=A&quot;
-cstag.to_sequence(cs_tag)
+print(cstag.to_sequence(cs_tag))
 # ACTTCTTA
 </code></pre>
 <h3 id="generating-a-vcf-report">Generating a VCF Report</h3>
@@ -169,9 +170,24 @@ Path(&quot;report.html&quot;).write_text(cs_tag_html)
 </code></pre>
 <p>You can visualize mutations indicated by the CS tag using the generated <code>report.html</code> file as shown below:</p>
 <p><img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png"></p>
+<h3 id="generating-a-pdf-report">Generating a PDF Report</h3>
+<pre><code class="language-python">import cstag
+
+cs_tag = &quot;=AC+ggg=T-acgt*at~gt10ag=GNNN&quot;
+description = &quot;Example&quot;
+path_out = &quot;report.pdf&quot;
+
+cstag.to_pdf(cs_tag, description, path_out)
+# Output &quot;report.pdf&quot;
+</code></pre>
+<p>You can obtain the same images of <code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code> as a PDF file.</p>
 <h2 id="feedback-and-support">📣 Feedback and Support</h2>
 <p>For questions, bug reports, or other forms of feedback, we'd love to hear from you!<br>
-Please use <a href="https://github.com/akikuno/cstag/issues">GitHub Issues</a> for all reporting purposes.</p>
+Please use <a href="https://github.com/akikuno/cstag/issues">GitHub Issues</a> for all reporting purposes.
+</p>
+<h2 id="code-of-conduct">🤝 Code of Conduct</h2>
+<p>Please note that this project is released with a <a href="https://github.com/akikuno/cstag/blob/main/CODE_OF_CONDUCT.md">Contributor Code of Conduct</a>.<br>
+By participating in this project you agree to abide by its terms.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -188,6 +204,7 @@ from cstag.mask import mask
 from cstag.split import split
 from cstag.revcomp import revcomp
 from cstag.to_html import to_html
+from cstag.to_pdf import to_pdf
 from cstag.to_vcf import to_vcf
 from cstag.to_sequence import to_sequence</code></pre>
 </details>
@@ -224,6 +241,10 @@ from cstag.to_sequence import to_sequence</code></pre>
 <div class="desc"></div>
 </dd>
 <dt><code class="name"><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="cstag.to_pdf" href="to_pdf.html">cstag.to_pdf</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -265,9 +286,11 @@ from cstag.to_sequence import to_sequence</code></pre>
 <li><a href="#reconstructing-the-reference-subsequence">Reconstructing the Reference Subsequence</a></li>
 <li><a href="#generating-a-vcf-report">Generating a VCF Report</a></li>
 <li><a href="#generating-an-html-report">Generating an HTML Report</a></li>
+<li><a href="#generating-a-pdf-report">Generating a PDF Report</a></li>
 </ul>
 </li>
 <li><a href="#feedback-and-support">📣 Feedback and Support</a></li>
+<li><a href="#code-of-conduct">🤝 Code of Conduct</a></li>
 </ul>
 </li>
 </ul>
@@ -283,6 +306,7 @@ from cstag.to_sequence import to_sequence</code></pre>
 <li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code></li>
 <li><code><a title="cstag.split" href="split.html">cstag.split</a></code></li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></li>
+<li><code><a title="cstag.to_pdf" href="to_pdf.html">cstag.to_pdf</a></code></li>
 <li><code><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code></li>
 <li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code></li>
 <li><code><a title="cstag.utils" href="utils/index.html">cstag.utils</a></code></li>
