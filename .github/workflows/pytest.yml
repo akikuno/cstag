@@ -21,7 +21,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip pytest
           python -m pip install -e .
-          python -m pip install weasyprint==59
+          python -m pip install cffi==1.15.1
 
       - name: Run pytest on Linux🐧, macOS🍎 and Windows🪟
         env:
