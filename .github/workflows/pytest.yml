@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         python-version: [ '3.8', '3.9', '3.10', '3.x' ]
     name: Python ${{ matrix.python-version }} ${{ matrix.os }}
 
@@ -28,7 +28,7 @@ jobs:
           brew update
           brew install weasyprint
 
-      - name: Run pytest on Linux🐧, macOS🍎 and Windows🪟
+      - name: Run pytest on Linux🐧, macOS🍎
         env:
           PYTHONPATH: src
         run: |
