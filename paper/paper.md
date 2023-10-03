@@ -1,5 +1,5 @@
 ---
-title: 'cstag: a Python package for manipulating and visualizing CS tags'
+title: '`cstag` and `cstag-cli`: tools for manipulating and visualizing CS tags'
 tags:
   - python
   - genomics
