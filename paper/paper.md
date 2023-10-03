@@ -1,10 +1,5 @@
 ---
 title: 'Pingouin: statistics in Python'
-tags:
-  - python
-  - genomics
-  - sequencing
-  - bioinformatics
 authors:
   - name: Akihiro Kuno
     orcid: 0000-0002-4674-6882
