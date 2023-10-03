@@ -13,8 +13,8 @@ authors:
 affiliations:
  - name: Department of Anatomy and Embryology, University of Tsukuba, Tsukuba, Ibaraki, Japan
    index: 1
-date: 2023-10-31
-bibliography: paper.bib
+date: 30 October 2023
+bibliography: paper/paper.bib
 ---
 
 # Summary
