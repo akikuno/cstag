@@ -1,5 +1,5 @@
 ---
-title: 'cstag: A Python Package for manipulating and visualizing CS tags'
+title: 'Pingouin: statistics in Python'
 tags:
   - python
   - genomics
@@ -16,9 +16,26 @@ affiliations:
 date: 30 October 2023
 bibliography: paper.bib
 ---
+<!-- ---
+title: 'Pingouin: statistics in Python'
+tags:
+  - statistics
+  - python
+  - data analysis
+  - pandas
+authors:
+ - name: Raphael Vallat
+   orcid: 0000-0003-1779-7653
+   affiliation: "1"
+affiliations:
+ - name: Department of Psychology, University of California, Berkeley.
+   index: 1
+date: 05 October 2018
+bibliography: paper.bib
+--- -->
 
 <!-- ---
-title: cstag: A Python Package for manipulating and visualizing CS tags
+title: 'cstag: A Python Package for manipulating and visualizing CS tags'
 tags:
   - python
   - genomics
@@ -28,14 +45,13 @@ authors:
   - name: Akihiro Kuno
     orcid: 0000-0002-4674-6882
     corresponding: true
-    affiliation: 1
+   affiliation: "1"
 affiliations:
  - name: Department of Anatomy and Embryology, University of Tsukuba, Tsukuba, Ibaraki, Japan
    index: 1
 date: 30 October 2023
-bibliography: paper/paper.bib
+bibliography: paper.bib
 --- -->
-
 # Summary
 With the widespread commoditization of DNA sequencers, the scientific community is generating an unprecedented volume of sequence alignments on a daily basis. Conventionally, the task of identifying specific mutations or reconstructing reference subsequences from alignment data has been cumbersome and resource-intensive. This often involved intricate processes requiring the cross-referencing of multiple elements like query sequences, CIGAR strings, and MD tags. However, in recent years, a new tag called the CS tag has been developed [@minimap2], which encapsulates the information contained in both CIGAR strings and MD tags. The CS tags enable researchers to represent mutations within alignments in a far more intuitive and streamlined manner.
 
