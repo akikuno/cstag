@@ -1,4 +1,43 @@
 ---
+title: 'Gala: A Python package for galactic dynamics'
+tags:
+  - Python
+  - astronomy
+  - dynamics
+  - galactic dynamics
+  - milky way
+authors:
+  - name: Adrian M. Price-Whelan
+    orcid: 0000-0000-0000-0000
+    equal-contrib: true
+    affiliation: "1, 2" # (Multiple affiliations must be quoted)
+  - name: Author Without ORCID
+    equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
+    affiliation: 2
+  - name: Author with no affiliation
+    corresponding: true # (This is how to denote the corresponding author)
+    affiliation: 3
+  - given-names: Ludwig
+    dropping-particle: van
+    surname: Beethoven
+    affiliation: 3
+affiliations:
+ - name: Lyman Spitzer, Jr. Fellow, Princeton University, USA
+   index: 1
+ - name: Institution Name, Country
+   index: 2
+ - name: Independent Researcher, Country
+   index: 3
+date: 13 August 2017
+bibliography: paper.bib
+
+# Optional fields if submitting to a AAS journal too, see this blog post:
+# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
+aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
+aas-journal: Astrophysical Journal <- The name of the AAS journal.
+---
+
+<!-- ---
 title: cstag: A Python Package for manipulating and visualizing CS tags
 tags:
   - python
@@ -15,7 +54,7 @@ affiliations:
    index: 1
 date: 30 October 2023
 bibliography: paper/paper.bib
----
+--- -->
 
 # Summary
 With the widespread commoditization of DNA sequencers, the scientific community is generating an unprecedented volume of sequence alignments on a daily basis. Conventionally, the task of identifying specific mutations or reconstructing reference subsequences from alignment data has been cumbersome and resource-intensive. This often involved intricate processes requiring the cross-referencing of multiple elements like query sequences, CIGAR strings, and MD tags. However, in recent years, a new tag called the CS tag has been developed [@minimap2], which encapsulates the information contained in both CIGAR strings and MD tags. The CS tags enable researchers to represent mutations within alignments in a far more intuitive and streamlined manner.
