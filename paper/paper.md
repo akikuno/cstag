@@ -9,10 +9,12 @@ authors:
   - name: Akihiro Kuno
     orcid: 0000-0002-4674-6882
     corresponding: true
-    affiliation: "1"
+    affiliation: "1, 2"
 affiliations:
   - name: Department of Anatomy and Embryology, University of Tsukuba, Tsukuba, Ibaraki, Japan
     index: 1
+  - name: Laboratory Animal Resource Center, Trans-border Medical Research Center, University of Tsukuba, Tsukuba, Ibaraki, Japan.
+    index: 2
 date: 30 October 2023
 bibliography: paper.bib
 ---
@@ -25,18 +27,18 @@ This paper introduces two tools aimed at harnessing CS tags: a Python library na
 
 # Statement of Need
 
-The CS tag serves as a relatively novel format for encoding information pertinent to sequence alignment[@Heng2018]. Compared to traditional formats such as CIGAR and MD tags, the CS tag offers the unique capability to encode multiple types of sequence variations—namely mismatches, insertions, deletions, and splice sites—within a single tag. In contrast, extracting comprehensive variant information from CIGAR and MD tags necessitates intricate cross-referencing and interpretation between them, which can be computationally challenging. Additionally, the CS tag in long form encapsulates which bases in the query sequence map directly to specific bases in the reference sequence, thereby enhancing interpretability. As a result of this consolidated approach to encoding sequence alignment information, the CS tag simplifies tasks that traditionally required the mutual referencing of CIGAR, MD tags, and query sequences. This advantage has led to the incorporation of the CS tag in several bioinformatics tools, effectively streamlining the process of variant identification and analysis[@Kuno2022; @Parker2021].
+The CS tag introduces a relatively new format for encoding information related to sequence alignment[@Heng2018]. While traditional formats, like CIGAR and MD tags, play crucial roles, the CS tag stands out by encoding a variety of sequence variations—including mismatches, insertions, deletions, and splice sites—all within one unified tag. To extract comprehensive variant data from CIGAR and MD tags, users often face the complexity of cross-referencing and interpreting between these tags, a task that can be intensive. On the other hand, the long form of the CS tag clearly indicates which bases from the query sequence align to specific bases in the reference sequence, improving its interpretability. As a result, the CS tag has simplified tasks that previously relied on mutual referencing between CIGAR, MD tags, and query sequences. This efficiency has led to the widespread adoption of the CS tag in various bioinformatics tools, enhancing the process of variant identification and analysis [@Kuno2022; @Parker2021].
 
-The cstag and cstag-cli to further use the expression of the CS tag. The cstag is a Python toolkit for performing various operations and visualizations on CS tags, while cstag-cli is a command-line tool for adding CS tags to existing SAM/BAM files.
+Here, the author has developed the `cstag` and `cstag-cli` to further use the expression of the CS tag. `cstag` is a Python toolkit designed for a range of operations and visualizations related to CS tags. In contrast, `cstag-cli` serves as a command-line utility focused on appending CS tags to pre-existing SAM/BAM files.
 
-The cstag performs to split and process sequence variation information, generate its reverse complement, and create consensus sequences. Additionally, cstag can convert the variation information represented by the CS tag (mismatches, insertions, deletions, splice sites, unknown) into Variant Call Format (VCF) files, or output it as HTML or PDF. Converting to VCF allows for visualization in genome browsers like IGV[@Robinson2011], and using HTML/PDF enables the creation of publication-ready figures (Figure 1). As an actual use case, the authors have clarified the variation information in samples by obtaining a consensus of multiple CS tags generated through Target sequencing and subsequently visualizing them[@Kuno2022].
-
+`cstag` performs to split and process sequence variation information, generate its reverse complement, and create consensus sequences. Additionally, `cstag` can convert the variation information represented by the CS tag into Variant Call Format (VCF) files. In addition, it can produce outputs in HTML/PDF formats. The VCF conversion facillitates visualization in genome browsers, such as IGV [@Robinson2011], while the HTML/PDF formats cater to the generation of publication-ready visuals. To illustrate its practical application, the authors have demonstrated how variation information in samples can be elucidated by deriving a consensus from multiple CS tags produced via Nanopore target sequencing, and subsequently visualizing the results [@Kuno2022].
 <!-- ![Visualization of CS tags by VCF and HTML outputs.](cstag_visualization.png) -->
 
-Furthermore, cstag-cli was developed as a command-line tool for adding CS tags. While paftools [@Heng2018] calls the CS tags from SAM/BAM files, it changes the file format to PAF. Although the PAF is a lightweight and convenient format, SAM/BAM format is more  commonly used as input for various tools. Therefore, cstag-cli was created to add CS tags without changing the file format. cstag-cli is a command-line tool that takes SAM/BAM files as input and outputs SAM with CS tags to standard output. Since SAM/BAM can be received from standard input, it is easy to integrate cstag-cli into existing scripts. This allows the user to obtain CS tags without altering the format of the existing SAM/BAM files.
+Additionally, the `cstag-cli` has been developed as a command-line tool specifically for appending CS tags to SAM/BAM files. While paftools [@Heng2018] can extract CS tags from these files, it converts them to the PAF format. Even though PAF is a lightweight and user-friendly format, the SAM/BAM format remains the predominant choice for many bioinformatics tools. Recognizing this preference, `cstag-cli` was designed to add CS tags directly to the original files without necessitating any format change. Accepting SAM/BAM files as input, `cstag-cli` outputs them with appended CS tags to the standard output. Given the tool's ability to directly process SAM/BAM files from standard input, it seamlessly integrates into existing scripts, enabling users to access CS tags without modifying their existing SAM/BAM file structures.
+
 
 # Availability
-cstag and cstag-cli are distributed on PyPI under the MIT License. Conda packages are also available in the Bioconda channel [@Grüning2018]. The source code is available in a git repository on GitHub at https://github.com/akikuno/cstag and https://github.com/akikuno/cstag-cli, and features a Continuous Integration workflow to run integration tests on changes. Documentation of cstag is hosted on [pdoc3](https://akikuno.github.io/cstag/cstag/) and built for each new release.
+cstag and `cstag-cli` are distributed on PyPI under the MIT License. Conda packages are also available in the Bioconda channel [@Grüning2018]. The source code is available in a git repository on GitHub at https://github.com/akikuno/cstag and https://github.com/akikuno/cstag-cli, and features a Continuous Integration workflow to run integration tests on changes. Documentation of `cstag` is hosted on [pdoc3](https://akikuno.github.io/cstag/cstag/) and built for each new release.
 
 # Acknowledgements
 
