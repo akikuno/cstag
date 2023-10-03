@@ -1,18 +1,19 @@
 ---
-title: 'Pingouin: statistics in Python'
+title: 'cstag: A Python Package for manipulating and visualizing CS tags'
 tags:
-  - statistics
   - python
-  - data analysis
-  - pandas
+  - genomics
+  - sequencing
+  - bioinformatics
 authors:
- - name: Raphael Vallat
-   orcid: 0000-0003-1779-7653
+  - name: Akihiro Kuno
+    orcid: 0000-0002-4674-6882
+    corresponding: true
    affiliation: "1"
 affiliations:
- - name: Department of Psychology, University of California, Berkeley.
+ - name: Department of Anatomy and Embryology, University of Tsukuba, Tsukuba, Ibaraki, Japan
    index: 1
-date: 05 October 2018
+date: 30 October 2023
 bibliography: paper.bib
 ---
 
