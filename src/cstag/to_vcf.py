@@ -189,17 +189,22 @@ def group_by_overlapping_intervals(cs_tags_grouped: CsInfo) -> list[CsInfo]:
 ###########################################################
 
 
+def replace_mutation_to_atmark(cs_tags: str) -> str:
+    """Replaces mutations with '@'."""
+    return "".join(cs if cs in {"A", "C", "G", "T"} else "@" for cs in cs_tags)
+
+
 def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -> dict[int, int]:
-    positions_min = min(positions_list)
-    variant_idx = {v.pos - positions_min for v in variant_annotations}
-    variant_pos = {v.pos for v in variant_annotations}
     cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
-    # Call ref depth
+    cs_replaced = [replace_mutation_to_atmark(cs_tags) for cs_tags in cs_tags_normalized_length]
+
     reference_depth = defaultdict(int)
-    for i, v_pos in zip(variant_idx, variant_pos):
-        for cs in cs_tags_normalized_length:
-            if cs[i][0] and cs[i][0] in "ACGT":
-                reference_depth[v_pos] += 1
+    unique_variants = set(variant_annotations)
+    for v in unique_variants:
+        v_idx = v.pos - min(positions_list)
+        for cs in cs_replaced:
+            if v.ref == cs[v_idx : v_idx + len(v.ref)]:
+                reference_depth[v.pos] += 1
 
     return dict(reference_depth)
 

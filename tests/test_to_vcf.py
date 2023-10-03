@@ -12,6 +12,7 @@ from src.cstag.to_vcf import (
     format_cs_tags,
     group_by_chrom,
     group_by_overlapping_intervals,
+    call_reference_depth,
     add_vcf_fields,
     process_cs_tag,
     process_cs_tags,
@@ -160,6 +161,22 @@ def test_group_by_overlapping_intervals():
 ###########################################################
 # Add VCF info
 ###########################################################
+
+
+def test_call_reference_depth():
+    variant_annotations = [
+        Vcf(pos=11, ref="C", alt="G"),
+        Vcf(pos=12, ref="G", alt="GAA"),
+        Vcf(pos=13, ref="TAC", alt="T"),
+        Vcf(pos=11, ref="C", alt="G"),
+        Vcf(pos=12, ref="G", alt="GAA"),
+    ]
+    cs_tags_list = ["=A*cg=G+aa=T-ac=G", "*cg=G+aa=T-ac=G", "=G-t=ACG"]
+    positions_list = [10, 11, 12]
+    expected_output = {12: 1}
+
+    result = call_reference_depth(variant_annotations, cs_tags_list, positions_list)
+    assert result == expected_output, f"Expected {expected_output}, but got {result}"
 
 
 def test_add_vcf_fields():
