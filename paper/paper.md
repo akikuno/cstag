@@ -1,5 +1,10 @@
 ---
-title: 'Pingouin: statistics in Python'
+title: 'cstag: A Python Package for manipulating and visualizing CS tags'
+tags:
+  - python
+  - genomics
+  - sequencing
+  - bioinformatics
 authors:
   - name: Akihiro Kuno
     orcid: 0000-0002-4674-6882
