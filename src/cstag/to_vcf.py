@@ -196,10 +196,9 @@ def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -> d
     cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
     # Call ref depth
     reference_depth = defaultdict(int)
-    ACGT = {"A", "C", "G", "T"}
     for i, v_pos in zip(variant_idx, variant_pos):
         for cs in cs_tags_normalized_length:
-            if cs[i][0] in ACGT:
+            if cs[i][0] and cs[i][0] in "ACGT":
                 reference_depth[v_pos] += 1
 
     return dict(reference_depth)
