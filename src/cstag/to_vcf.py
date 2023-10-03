@@ -194,7 +194,7 @@ def replace_mutation_to_atmark(cs_tags: str) -> str:
     return "".join(cs if cs in {"A", "C", "G", "T"} else "@" for cs in cs_tags)
 
 
-def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -> dict[int, int]:
+def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -> dict[tuple(str, int), int]:
     cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
     cs_replaced = [replace_mutation_to_atmark(cs_tags) for cs_tags in cs_tags_normalized_length]
 
@@ -204,19 +204,21 @@ def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -> d
         v_idx = v.pos - min(positions_list)
         for cs in cs_replaced:
             if v.ref == cs[v_idx : v_idx + len(v.ref)]:
-                reference_depth[v.pos] += 1
+                reference_depth[(v.ref, v.pos)] += 1
 
     return dict(reference_depth)
 
 
-def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -> list[Vcf]:
+def add_vcf_fields(
+    variant_annotations: list[Vcf], chrom: str, reference_depth: dict[tuple(str, int), int]
+) -> list[Vcf]:
     """Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass"""
     variant_counter = Counter((v.pos, v.ref, v.alt) for v in variant_annotations)
 
     updated_annotations = []
     for v in set(variant_annotations):
         ad = variant_counter[(v.pos, v.ref, v.alt)]
-        rd = reference_depth.get(v.pos, 0)
+        rd = reference_depth.get((v.ref, v.pos), 0)
         dp = rd + ad
         vaf = round(ad / dp, 3) if dp else 0
 
