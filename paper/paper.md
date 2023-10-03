@@ -4,10 +4,10 @@ authors:
   - name: Akihiro Kuno
     orcid: 0000-0002-4674-6882
     corresponding: true
-   affiliation: "1"
+    affiliation: "1"
 affiliations:
- - name: Department of Anatomy and Embryology, University of Tsukuba, Tsukuba, Ibaraki, Japan
-   index: 1
+  - name: Department of Anatomy and Embryology, University of Tsukuba, Tsukuba, Ibaraki, Japan
+    index: 1
 date: 30 October 2023
 bibliography: paper.bib
 ---
