@@ -222,7 +222,7 @@ def replace_mutation_to_atmark(cs_tags: str) -&gt; str:
     return &#34;&#34;.join(cs if cs in {&#34;A&#34;, &#34;C&#34;, &#34;G&#34;, &#34;T&#34;} else &#34;@&#34; for cs in cs_tags)
 
 
-def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt; dict[int, int]:
+def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt; dict[tuple(str, int), int]:
     cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
     cs_replaced = [replace_mutation_to_atmark(cs_tags) for cs_tags in cs_tags_normalized_length]
 
@@ -232,19 +232,21 @@ def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt
         v_idx = v.pos - min(positions_list)
         for cs in cs_replaced:
             if v.ref == cs[v_idx : v_idx + len(v.ref)]:
-                reference_depth[v.pos] += 1
+                reference_depth[(v.ref, v.pos)] += 1
 
     return dict(reference_depth)
 
 
-def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -&gt; list[Vcf]:
+def add_vcf_fields(
+    variant_annotations: list[Vcf], chrom: str, reference_depth: dict[tuple(str, int), int]
+) -&gt; list[Vcf]:
     &#34;&#34;&#34;Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass&#34;&#34;&#34;
     variant_counter = Counter((v.pos, v.ref, v.alt) for v in variant_annotations)
 
     updated_annotations = []
     for v in set(variant_annotations):
         ad = variant_counter[(v.pos, v.ref, v.alt)]
-        rd = reference_depth.get(v.pos, 0)
+        rd = reference_depth.get((v.ref, v.pos), 0)
         dp = rd + ad
         vaf = round(ad / dp, 3) if dp else 0
 
@@ -382,7 +384,7 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="cstag.to_vcf.add_vcf_fields"><code class="name flex">
-<span>def <span class="ident">add_vcf_fields</span></span>(<span>variant_annotations: list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>], chrom: str, reference_depth: dict[int, int]) ‑> list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>]</span>
+<span>def <span class="ident">add_vcf_fields</span></span>(<span>variant_annotations: list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>], chrom: str, reference_depth: dict[tuple(str, int), int]) ‑> list[<a title="cstag.to_vcf.Vcf" href="#cstag.to_vcf.Vcf">Vcf</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass</p></div>
@@ -390,14 +392,16 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_vcf_fields(variant_annotations: list[Vcf], chrom: str, reference_depth: dict[int, int]) -&gt; list[Vcf]:
+<pre><code class="python">def add_vcf_fields(
+    variant_annotations: list[Vcf], chrom: str, reference_depth: dict[tuple(str, int), int]
+) -&gt; list[Vcf]:
     &#34;&#34;&#34;Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass&#34;&#34;&#34;
     variant_counter = Counter((v.pos, v.ref, v.alt) for v in variant_annotations)
 
     updated_annotations = []
     for v in set(variant_annotations):
         ad = variant_counter[(v.pos, v.ref, v.alt)]
-        rd = reference_depth.get(v.pos, 0)
+        rd = reference_depth.get((v.ref, v.pos), 0)
         dp = rd + ad
         vaf = round(ad / dp, 3) if dp else 0
 
@@ -413,7 +417,7 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
 </details>
 </dd>
 <dt id="cstag.to_vcf.call_reference_depth"><code class="name flex">
-<span>def <span class="ident">call_reference_depth</span></span>(<span>variant_annotations, cs_tags_list, positions_list) ‑> dict[int, int]</span>
+<span>def <span class="ident">call_reference_depth</span></span>(<span>variant_annotations, cs_tags_list, positions_list) ‑> dict[tuple(str, int), int]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -421,7 +425,7 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt; dict[int, int]:
+<pre><code class="python">def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt; dict[tuple(str, int), int]:
     cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
     cs_replaced = [replace_mutation_to_atmark(cs_tags) for cs_tags in cs_tags_normalized_length]
 
@@ -431,7 +435,7 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
         v_idx = v.pos - min(positions_list)
         for cs in cs_replaced:
             if v.ref == cs[v_idx : v_idx + len(v.ref)]:
-                reference_depth[v.pos] += 1
+                reference_depth[(v.ref, v.pos)] += 1
 
     return dict(reference_depth)</code></pre>
 </details>
