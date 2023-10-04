@@ -217,18 +217,22 @@ def group_by_overlapping_intervals(cs_tags_grouped: CsInfo) -&gt; list[CsInfo]:
 ###########################################################
 
 
+def replace_mutation_to_atmark(cs_tags: str) -&gt; str:
+    &#34;&#34;&#34;Replaces mutations with &#39;@&#39;.&#34;&#34;&#34;
+    return &#34;&#34;.join(cs if cs in {&#34;A&#34;, &#34;C&#34;, &#34;G&#34;, &#34;T&#34;} else &#34;@&#34; for cs in cs_tags)
+
+
 def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt; dict[int, int]:
-    positions_min = min(positions_list)
-    variant_idx = {v.pos - positions_min for v in variant_annotations}
-    variant_pos = {v.pos for v in variant_annotations}
     cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
-    # Call ref depth
+    cs_replaced = [replace_mutation_to_atmark(cs_tags) for cs_tags in cs_tags_normalized_length]
+
     reference_depth = defaultdict(int)
-    ACGT = {&#34;A&#34;, &#34;C&#34;, &#34;G&#34;, &#34;T&#34;}
-    for i, v_pos in zip(variant_idx, variant_pos):
-        for cs in cs_tags_normalized_length:
-            if cs[i][0] in ACGT:
-                reference_depth[v_pos] += 1
+    unique_variants = set(variant_annotations)
+    for v in unique_variants:
+        v_idx = v.pos - min(positions_list)
+        for cs in cs_replaced:
+            if v.ref == cs[v_idx : v_idx + len(v.ref)]:
+                reference_depth[v.pos] += 1
 
     return dict(reference_depth)
 
@@ -418,17 +422,16 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -&gt; dict[int, int]:
-    positions_min = min(positions_list)
-    variant_idx = {v.pos - positions_min for v in variant_annotations}
-    variant_pos = {v.pos for v in variant_annotations}
     cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
-    # Call ref depth
+    cs_replaced = [replace_mutation_to_atmark(cs_tags) for cs_tags in cs_tags_normalized_length]
+
     reference_depth = defaultdict(int)
-    ACGT = {&#34;A&#34;, &#34;C&#34;, &#34;G&#34;, &#34;T&#34;}
-    for i, v_pos in zip(variant_idx, variant_pos):
-        for cs in cs_tags_normalized_length:
-            if cs[i][0] in ACGT:
-                reference_depth[v_pos] += 1
+    unique_variants = set(variant_annotations)
+    for v in unique_variants:
+        v_idx = v.pos - min(positions_list)
+        for cs in cs_replaced:
+            if v.ref == cs[v_idx : v_idx + len(v.ref)]:
+                reference_depth[v.pos] += 1
 
     return dict(reference_depth)</code></pre>
 </details>
@@ -750,6 +753,20 @@ out any cs_tags containing a tilde ("~") and creates a list of CsInfo objects.</
     return re.sub(r&#34;\s*\n\s*&#34;, &#34;\n&#34;, text)</code></pre>
 </details>
 </dd>
+<dt id="cstag.to_vcf.replace_mutation_to_atmark"><code class="name flex">
+<span>def <span class="ident">replace_mutation_to_atmark</span></span>(<span>cs_tags: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Replaces mutations with '@'.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def replace_mutation_to_atmark(cs_tags: str) -&gt; str:
+    &#34;&#34;&#34;Replaces mutations with &#39;@&#39;.&#34;&#34;&#34;
+    return &#34;&#34;.join(cs if cs in {&#34;A&#34;, &#34;C&#34;, &#34;G&#34;, &#34;T&#34;} else &#34;@&#34; for cs in cs_tags)</code></pre>
+</details>
+</dd>
 <dt id="cstag.to_vcf.to_vcf"><code class="name flex">
 <span>def <span class="ident">to_vcf</span></span>(<span>cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) ‑> str</span>
 </code></dt>
@@ -961,6 +978,7 @@ class VcfInfo:
 <li><code><a title="cstag.to_vcf.process_cs_tag" href="#cstag.to_vcf.process_cs_tag">process_cs_tag</a></code></li>
 <li><code><a title="cstag.to_vcf.process_cs_tags" href="#cstag.to_vcf.process_cs_tags">process_cs_tags</a></code></li>
 <li><code><a title="cstag.to_vcf.remove_spaces_around_newlines" href="#cstag.to_vcf.remove_spaces_around_newlines">remove_spaces_around_newlines</a></code></li>
+<li><code><a title="cstag.to_vcf.replace_mutation_to_atmark" href="#cstag.to_vcf.replace_mutation_to_atmark">replace_mutation_to_atmark</a></code></li>
 <li><code><a title="cstag.to_vcf.to_vcf" href="#cstag.to_vcf.to_vcf">to_vcf</a></code></li>
 </ul>
 </li>
