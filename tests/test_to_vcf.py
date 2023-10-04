@@ -173,7 +173,7 @@ def test_call_reference_depth():
     ]
     cs_tags_list = ["=A*cg=G+aa=T-ac=G", "*cg=G+aa=T-ac=G", "=G-t=ACG"]
     positions_list = [10, 11, 12]
-    expected_output = {12: 1}
+    expected_output = {("G", 12): 1}
 
     result = call_reference_depth(variant_annotations, cs_tags_list, positions_list)
     assert result == expected_output, f"Expected {expected_output}, but got {result}"
@@ -186,7 +186,7 @@ def test_add_vcf_fields():
         Vcf(chrom=None, pos=2, ref="G", alt="C", info=VcfInfo(dp=None, rd=None, ad=None, vaf=None)),
     ]
     sample_chrom = "chr1"
-    sample_reference_depth = {1: 10, 2: 5}
+    sample_reference_depth = {("A", 1): 10, ("G", 2): 5}
     result = add_vcf_fields(sample_variant_annotations, sample_chrom, sample_reference_depth)
     result = sorted(result, key=lambda x: (chrom_sort_key(x.chrom), x.pos))
     assert result[0].chrom == "chr1"
