@@ -9,6 +9,7 @@ def test_revcomp_normal():
     assert revcomp("=ACTG+ac=AAAA") == "=TTTT+gt=CAGT"
     assert revcomp("=ACTG-ac=AAAA") == "=TTTT-gt=CAGT"
     assert revcomp("~ag10tc") == "~ga10ct"
+    assert revcomp("=ACGT*ac+gg-cc=T") == "=A-gg+cc*tg=ACGT"
     # short format
     assert revcomp(":4*ag:3") == ":3*tc:4"
     assert revcomp(":4+ac") == "+gt:4"

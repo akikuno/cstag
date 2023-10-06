@@ -7,6 +7,7 @@ def test_to_sequence_normal_cases():
     assert to_sequence("cs:Z:=A+cgt") == "ACGT"
     assert to_sequence("cs:Z:=AC-tt=GT") == "ACGT"
     assert to_sequence("cs:Z:=AC~gt10ag=GT") == "ACGT"
+    assert to_sequence("=AC*gt=T-gg=C+tt=A") == "ACTTCTTA"
 
 
 def test_to_sequence_edge_cases():
