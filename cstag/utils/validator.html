@@ -33,7 +33,7 @@ import re
 
 def validate_cs_tag(cs_tag: str) -&gt; None:
     pattern = re.compile(
-        r&#34;^(=|[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn][acgtn][0-9]+[acgtn][acgtn])*$&#34;
+        r&#34;^(=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn][acgtn][0-9]+[acgtn][acgtn])*$&#34;
     )
 
     if not pattern.fullmatch(cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)):
@@ -81,7 +81,7 @@ def validate_pos(pos: int) -&gt; None:
 </summary>
 <pre><code class="python">def validate_cs_tag(cs_tag: str) -&gt; None:
     pattern = re.compile(
-        r&#34;^(=|[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn][acgtn][0-9]+[acgtn][acgtn])*$&#34;
+        r&#34;^(=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn][acgtn][0-9]+[acgtn][acgtn])*$&#34;
     )
 
     if not pattern.fullmatch(cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)):
