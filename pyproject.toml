@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "cstag"
-version = "1.0.3"
+version = "1.0.4"
 description = "Python module to manipulate the minimap2's CS tag"
 authors = ["Akihiro Kuno <akuno@md.tsukuba.ac.jp>"]
 homepage = "https://github.com/akikuno/cstag"
