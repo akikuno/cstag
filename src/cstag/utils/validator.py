@@ -5,7 +5,7 @@ import re
 
 def validate_cs_tag(cs_tag: str) -> None:
     pattern = re.compile(
-        r"^(=|[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn][acgtn][0-9]+[acgtn][acgtn])*$"
+        r"^(=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn][acgtn][0-9]+[acgtn][acgtn])*$"
     )
 
     if not pattern.fullmatch(cs_tag.replace("cs:Z:", "")):
