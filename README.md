@@ -90,7 +90,7 @@ cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
 positions = [1, 1, 2, 2, 1]
 
 print(cstag.consensus(cs_tags, positions))
-# =AC*gt*T
+# =AC*gt=T
 ```
 
 ### Masking Low-Quality Bases
