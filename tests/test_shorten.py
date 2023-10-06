@@ -1,6 +1,11 @@
 import re
 from src.cstag import shorten
 
+def test_mutation():
+    CSTAG = "=ACGT*ag=CGT"
+    csshort = ":4*ag:3"
+    assert shorten(CSTAG) == csshort
+
 
 def test_softclip():
     CSTAG = "=ATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"

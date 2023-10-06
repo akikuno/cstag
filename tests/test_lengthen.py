@@ -1,6 +1,13 @@
 import re
 from src.cstag import lengthen
 
+def test_mutation():
+    CSTAG = ":4*ag:3"
+    CIGAR = "8M"
+    SEQ = "ACGTACGT"
+
+    assert lengthen(CSTAG, CIGAR, SEQ) == "=ACGT*ag=CGT"
+
 
 def test_softclip():
     SEQ = "ATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"

@@ -299,7 +299,7 @@ def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int])
     ##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
     ##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">
     ##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">
-    ##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele fractions (AD/DP)">
+    ##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele frequency (AD/DP)">
     #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n
     """
 

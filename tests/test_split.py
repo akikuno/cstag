@@ -26,6 +26,7 @@ from src.cstag.split import split
         ("=ACGT+ag=CGT", False, ["=ACGT", "+ag", "=CGT"]),
         ("=ACGT-ag=CGT", False, ["=ACGT", "-ag", "=CGT"]),
         ("=ACGT~gt1ac=CGT", False, ["=ACGT", "~gt1ac", "=CGT"]),
+        ("=ACGT*ac+gg-cc=T", False, ['=ACGT', '*ac', '+gg', '-cc', '=T']),
         ("=AC*ag+t-ccc~gt1ac=AC", False, ["=AC", "*ag", "+t", "-ccc", "~gt1ac", "=AC"]),
     ],
 )

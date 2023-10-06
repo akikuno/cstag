@@ -231,17 +231,25 @@ chr1	5	.	C	CTT	.	.	."""
 ###########################################################
 
 
-def test_process_cs_tags_base():
+def test_process_cs_tags_simple_case():
+    cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T"]
+    chroms = ["chr1", "chr1", "chr1", "chr2", "chr2"]
+    positions = [2, 2, 3, 10, 100]
+
+    expected_output="""##fileformat=VCFv4.2
+    ##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+    ##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">
+    ##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">
+    ##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele frequency (AD/DP)">
+    #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO
+    chr1\t4\t.\tG\tT\t.\t.\tDP=3;RD=1;AD=2;VAF=0.667
+    chr2\t102\t.\tG\tT\t.\t.\tDP=1;RD=0;AD=1;VAF=1.0
+    """.replace("    ", "").strip()
+    assert process_cs_tags(cs_tags, chroms, positions) == expected_output
+
+def test_process_cs_tags_with_splice():
     cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T", "=AC~nn10nn=GT"]
     chroms = ["chr1", "chr1", "chr1", "chr2", "chr2", "chr3"]
     positions = [2, 2, 3, 10, 100, 5]
-    expected_output = """##fileformat=VCFv4.2\n##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">\n##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">\n##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">\n##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele fractions (AD/DP)">\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t4\t.\tG\tT\t.\t.\tDP=3;RD=1;AD=2;VAF=0.667\nchr2\t102\t.\tG\tT\t.\t.\tDP=1;RD=0;AD=1;VAF=1.0"""
+    expected_output = """##fileformat=VCFv4.2\n##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">\n##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">\n##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">\n##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele frequency (AD/DP)">\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t4\t.\tG\tT\t.\t.\tDP=3;RD=1;AD=2;VAF=0.667\nchr2\t102\t.\tG\tT\t.\t.\tDP=1;RD=0;AD=1;VAF=1.0"""
     assert process_cs_tags(cs_tags, chroms, positions) == expected_output
-
-
-# def test_process_cs_tags_crhoms_sort():
-#     cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T", "=AC*gt=T"]
-#     chroms = ["chr1", "chr1", "chr1", "chr2", "chr10", "chr2"]
-#     positions = [2, 2, 3, 10, 100, 5]
-#     expected_output = """##fileformat=VCFv4.2\n##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">\n##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">\n##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">\n##INFO=<ID=VAF,Number=1,Type=Float,Description="Variant allele fractions (AD/DP)">\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t4\t.\tG\tT\t.\t.\tDP=3;RD=1;AD=2;VAF=0.667\nchr2\t102\t.\tG\tT\t.\t.\tDP=1;RD=0;AD=1;VAF=1.0"""
-#     assert process_cs_tags(cs_tags, chroms, positions) == expected_output
