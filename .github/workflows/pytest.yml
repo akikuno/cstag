@@ -29,7 +29,7 @@ jobs:
       - name: Install weasyprint on macos-latest
         if: runner.os == 'macOS'
         run: |
-          brew link --overwrite python@${{ matrix.python-version }}
+          brew link --overwrite python@3.11
           brew update
           brew install weasyprint
 
