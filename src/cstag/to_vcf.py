@@ -96,7 +96,7 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[Vcf]
 
 
 ###########################################################
-# Format the CS tags
+# Format the cs tags
 ###########################################################
 
 
@@ -146,7 +146,7 @@ def format_cs_tags(cs_tags: list[str], chroms: list[str] | list[int], positions:
 
 
 def group_by_chrom(cs_tags_formatted: list[tuple]) -> dict[str, tuple]:
-    """Group CS tags by chromosomes"""
+    """Group cs tags by chromosomes"""
     cs_tags_grouped = defaultdict(list)
     for cs in cs_tags_formatted:
         cs_tags_grouped[cs.chrom].append(
@@ -234,7 +234,7 @@ def add_vcf_fields(
 
 
 ###########################################################
-# Process CS tag (One)
+# Process cs tag (One)
 ###########################################################
 
 
@@ -259,7 +259,7 @@ def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -> str:
 
 
 ###########################################################
-# Process CS tags (Many)
+# Process cs tags (Many)
 ###########################################################
 
 
@@ -319,10 +319,10 @@ def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int])
 
 def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) -> str:
     """
-    Convert CS tag(s) to VCF (Variant Call Format) string.
+    Convert cs tag(s) to VCF (Variant Call Format) string.
 
     Args:
-        cs_tag (str | list[str]): The CS tag representing the sequence alignment.
+        cs_tag (str | list[str]): The cs tag representing the sequence alignment.
         chrom (str | list[str]): The chromosome name.
         pos (int | list[int]): The starting position for the sequence.
 

@@ -9,17 +9,17 @@ def validate_cs_tag(cs_tag: str) -> None:
     )
 
     if not pattern.fullmatch(cs_tag.replace("cs:Z:", "")):
-        raise ValueError(f"Invalid CS tag: {cs_tag}")
+        raise ValueError(f"Invalid cs tag: {cs_tag}")
 
 
 def validate_short_format(cs_tag: str) -> None:
     if re.search(r"=[ACGTN]+", cs_tag):
-        raise ValueError("CS tag must be in short format")
+        raise ValueError("cs tag must be in short format")
 
 
 def validate_long_format(cs_tag: str) -> None:
     if re.search(r":[0-9]+", cs_tag):
-        raise ValueError("CS tag must be in long format")
+        raise ValueError("cs tag must be in long format")
 
 
 def validate_threshold(threshold: int) -> None:

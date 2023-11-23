@@ -8,10 +8,10 @@ def to_sequence(cs_tag: str) -> str:
     """Reconstruct the reference subsequence in the alignment
 
     Args:
-        cs_tag (str): CS tag in the **long** format
+        cs_tag (str): cs tag in the **long** format
 
     Returns:
-        str: The sequence string derived from the CS tag.
+        str: The sequence string derived from the cs tag.
 
     Example:
         >>> import cstag

@@ -74,8 +74,10 @@ def trim_clips(cigar: str, seq: str) -> tuple[str, str]:
 
 
 ###########################################################
-# Generate CS long
+# Generate cs tag in long format
 ###########################################################
+
+
 def expand_cigar_operations(cigar: str) -> list[str]:
     parsed_cigar = parse_cigar(cigar)
     expanded_list = []

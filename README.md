@@ -7,25 +7,25 @@
 
 # cstag
 
-`cstag` is a Python library tailored for the manipulation and handling of [minimap2's CS tags](https://github.com/lh3/minimap2#cs).
+`cstag` is a Python library tailored for for manipulating and visualizing [minimap2's cs tags](https://github.com/lh3/minimap2#cs).
 
 
 ## 🌟 Features
 
-- `cstag.call()`: Generate a CS tag
-- `cstag.shorten()`: Convert a CS tag from its long to short format
-- `cstag.lengthen()`: Convert a CS tag from its short to long format
-- `cstag.consensus()`: Create a consensus CS tag from multiple CS tags
-- `cstag.mask()`: Mask low-quality bases within a CS tag
-- `cstag.split()`: Break down a CS tag into its constituent parts
-- `cstag.revcomp()`: Convert a CS tag to its reverse complement
+- `cstag.call()`: Generate a cs tag
+- `cstag.shorten()`: Convert a cs tag from its long to short format
+- `cstag.lengthen()`: Convert a cs tag from its short to long format
+- `cstag.consensus()`: Create a consensus cs tag from multiple cs tags
+- `cstag.mask()`: Mask low-quality bases within a cs tag
+- `cstag.split()`: Break down a cs tag into its constituent parts
+- `cstag.revcomp()`: Convert a cs tag to its reverse complement
 - `cstag.to_sequence()`: Reconstruct a reference subsequence from the alignment
 - `cstag.to_vcf()`: Generate a VCF representation
 - `cstag.to_html()`: Generate an HTML representation
 - `cstag.to_pdf()`: Produce a PDF file
 
 For comprehensive documentation, please visit [our docs](https://akikuno.github.io/cstag/cstag/).  
-To add CS tags to SAM/BAM files, check out [`cstag-cli`](https://github.com/akikuno/cstag-cli).  
+To add cs tags to SAM/BAM files, check out [`cstag-cli`](https://github.com/akikuno/cstag-cli).  
 
 
 ## 🛠 Installation
@@ -44,7 +44,7 @@ conda install -c bioconda cstag
 
 ## 💡 Usage
 
-### Generating CS Tags
+### Generating cs Tags
 
 ```python
 import cstag
@@ -60,19 +60,19 @@ print(cstag.call(cigar, md, seq, long=True))
 # =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
-### Shortening or Lengthening CS Tags
+### Shortening or Lengthening cs Tags
 
 ```python
 import cstag
 
-# Convert a CS tag from long to short
+# Convert a cs tag from long to short
 cs_tag = "=ACGT*ag=CGT"
 
 print(cstag.shorten(cs_tag))
 # :4*ag:3
 
 
-# Convert a CS tag from short to long
+# Convert a cs tag from short to long
 cs_tag = ":4*ag:3"
 cigar = "8M"
 seq = "ACGTACGT"
@@ -106,7 +106,7 @@ print(cstag.mask(cs_tag, cigar, qual, phred_threshold))
 # =ACNN*an+ng-cc=T
 ```
 
-### Splitting a CS Tag
+### Splitting a cs Tag
 
 ```python
 import cstag
@@ -116,7 +116,7 @@ print(cstag.split(cs_tag))
 # ['=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
-### Reverse Complement of a CS Tag
+### Reverse Complement of a cs Tag
 
 ```python
 import cstag
@@ -152,7 +152,7 @@ chr1	5	.	C	CTT	.	.	.
 """
 ```
 
-The multiple CS tags enable reporting of the variant allele frequency (VAF).
+The multiple cs tags enable reporting of the variant allele frequency (VAF).
 
 ```python
 import cstag
@@ -186,7 +186,7 @@ Path("report.html").write_text(cs_tag_html)
 # Output "report.html"
 ```
 
-You can visualize mutations indicated by the CS tag using the generated `report.html` file as shown below:
+You can visualize mutations indicated by the cs tag using the generated `report.html` file as shown below:
 
 <img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png">
 

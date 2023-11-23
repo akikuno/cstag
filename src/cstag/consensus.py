@@ -25,20 +25,20 @@ def expand_deletion_tags(tags_combined: list[str]) -> list[str]:
 
 def split_cs_tags(cs_tags: list[str]) -> list[list[str]]:
     """
-    Split and process each CS tag in cs_tags.
+    Split and process each cs tag in cs_tags.
 
     Args:
-        cs_tags (list[str]): list of CS tags in the long format.
+        cs_tags (list[str]): list of cs tags in the long format.
 
     Returns:
-        list[list[str]]: list of processed CS tags.
+        list[list[str]]: list of processed cs tags.
     """
     cs_tags_splitted = []
     for cs_tag in cs_tags:
         # Remove the prefix "cs:Z:" if present
         cs_tag = cs_tag.replace("cs:Z:", "")
 
-        # Split the CS tag using special symbols (-, *, ~, =)
+        # Split the cs tag using special symbols (-, *, ~, =)
         # insertion symbol (+) is ignored because it is not observed in reference sequence
         tags_splitted = re.split(r"([-*~=])", cs_tag)[1:]
         # Combine the symbol with the corresponding sequence
@@ -70,7 +70,7 @@ def normalize_read_lengths(cs_tags: list[str], positions: list[int]) -> list[lis
     Normalize the lengths of each read in cs_tags based on their starts positions. If the length is insufficient, fill in with `None`.
 
     Args:
-        cs_tags (list[str]): list of CS tags.
+        cs_tags (list[str]): list of cs tags.
         positions (list[int]): Starting positions of each read.
 
     Returns:
@@ -109,7 +109,7 @@ def get_consensus(cs_tags: list[list[str]]) -> str:
     for cs in zip(*cs_tags):
         # Remove the None that is compensating for the insufficient lead length.
         cs = [c for c in cs if c]
-        # Get the most common CS tag(s)
+        # Get the most common cs tag(s)
         most_common_tags = Counter(cs).most_common()
 
         # If there's a unique most common tag, return it
@@ -134,13 +134,13 @@ def get_consensus(cs_tags: list[list[str]]) -> str:
 
 
 def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -> str:
-    """generate consensus of CS tags
+    """generate consensus of cs tags
     Args:
-        cs_tags (list): CS tags in the **long** format
+        cs_tags (list): cs tags in the **long** format
         positions (list): 1-based leftmost mapping position (4th column in SAM file)
-        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the CS tag. Defaults to False
+        prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
     Return:
-        str: a consensus of CS tag in the **long** format
+        str: a consensus of cs tag in the **long** format
     Example:
         >>> import cstag
         >>> cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]

@@ -7,15 +7,15 @@ from cstag.to_html import to_html
 
 def to_pdf(cs_tag: str, description: str, path_out: str | Path) -> None:
     """
-    Convert a CS tag and its description to a PDF file.
+    Convert a cs tag and its description to a PDF file.
 
-    This function takes a CS (custom string) tag and its description, converts
+    This function takes a cs (custom string) tag and its description, converts
     it to HTML using the `to_html` function, and then writes it to a PDF file
     using WeasyPrint.
 
     Args:
-        cs_tag (str): The CS tag to be converted.
-        description (str): The description associated with the CS tag.
+        cs_tag (str): The cs tag to be converted.
+        description (str): The description associated with the cs tag.
         path_out (str | Path): The path where the output PDF file will be saved.
 
     Returns:

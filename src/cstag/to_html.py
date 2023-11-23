@@ -83,7 +83,7 @@ HTML_FOOTER = """
 
 
 def append_mark_to_n(cs_tag: str) -> str:
-    """Process each CS tag by adding specific markers `@` to `N`."""
+    """Process each cs tag by adding specific markers `@` to `N`."""
 
     def append_mark(cs: str) -> str:
         if cs.startswith("N"):
@@ -138,7 +138,7 @@ def process_cs_tag(cs_tag: str) -> str:
 def to_html(cs_tag: str, description: str = "") -> str:
     """Output HTML string showing a sequence with mutations colored
     Args:
-        cs_tag (str): CS tag in the **long** format
+        cs_tag (str): cs tag in the **long** format
         description (str): (optional) header information in the output string
     Return:
         HTML string
