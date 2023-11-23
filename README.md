@@ -44,7 +44,7 @@ conda install -c bioconda cstag
 
 ## 💡 Usage
 
-### Generating cs Tags
+### Generating cs tags
 
 ```python
 import cstag
@@ -60,7 +60,7 @@ print(cstag.call(cigar, md, seq, long=True))
 # =AC*ag=TACGT-ag=ACGT+ac~nn3nn=G
 ```
 
-### Shortening or Lengthening cs Tags
+### Shortening or Lengthening cs tags
 
 ```python
 import cstag
@@ -106,7 +106,7 @@ print(cstag.mask(cs_tag, cigar, qual, phred_threshold))
 # =ACNN*an+ng-cc=T
 ```
 
-### Splitting a cs Tag
+### Splitting a cs tag
 
 ```python
 import cstag
@@ -116,7 +116,7 @@ print(cstag.split(cs_tag))
 # ['=ACGT', '*ac', '+gg', '-cc', '=T']
 ```
 
-### Reverse Complement of a cs Tag
+### Reverse Complement of a cs tag
 
 ```python
 import cstag
