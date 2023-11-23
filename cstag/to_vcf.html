@@ -124,7 +124,7 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -&gt; list[V
 
 
 ###########################################################
-# Format the CS tags
+# Format the cs tags
 ###########################################################
 
 
@@ -174,7 +174,7 @@ def format_cs_tags(cs_tags: list[str], chroms: list[str] | list[int], positions:
 
 
 def group_by_chrom(cs_tags_formatted: list[tuple]) -&gt; dict[str, tuple]:
-    &#34;&#34;&#34;Group CS tags by chromosomes&#34;&#34;&#34;
+    &#34;&#34;&#34;Group cs tags by chromosomes&#34;&#34;&#34;
     cs_tags_grouped = defaultdict(list)
     for cs in cs_tags_formatted:
         cs_tags_grouped[cs.chrom].append(
@@ -262,7 +262,7 @@ def add_vcf_fields(
 
 
 ###########################################################
-# Process CS tag (One)
+# Process cs tag (One)
 ###########################################################
 
 
@@ -287,7 +287,7 @@ def process_cs_tag(cs_tag: str, chrom: str | int, pos: int) -&gt; str:
 
 
 ###########################################################
-# Process CS tags (Many)
+# Process cs tags (Many)
 ###########################################################
 
 
@@ -347,10 +347,10 @@ def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int])
 
 def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) -&gt; str:
     &#34;&#34;&#34;
-    Convert CS tag(s) to VCF (Variant Call Format) string.
+    Convert cs tag(s) to VCF (Variant Call Format) string.
 
     Args:
-        cs_tag (str | list[str]): The CS tag representing the sequence alignment.
+        cs_tag (str | list[str]): The cs tag representing the sequence alignment.
         chrom (str | list[str]): The chromosome name.
         pos (int | list[int]): The starting position for the sequence.
 
@@ -609,13 +609,13 @@ out any cs_tags containing a tilde ("~") and creates a list of CsInfo objects.</
 <span>def <span class="ident">group_by_chrom</span></span>(<span>cs_tags_formatted: list[tuple]) ‑> dict[str, tuple]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Group CS tags by chromosomes</p></div>
+<div class="desc"><p>Group cs tags by chromosomes</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def group_by_chrom(cs_tags_formatted: list[tuple]) -&gt; dict[str, tuple]:
-    &#34;&#34;&#34;Group CS tags by chromosomes&#34;&#34;&#34;
+    &#34;&#34;&#34;Group cs tags by chromosomes&#34;&#34;&#34;
     cs_tags_grouped = defaultdict(list)
     for cs in cs_tags_formatted:
         cs_tags_grouped[cs.chrom].append(
@@ -775,9 +775,9 @@ out any cs_tags containing a tilde ("~") and creates a list of CsInfo objects.</
 <span>def <span class="ident">to_vcf</span></span>(<span>cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Convert CS tag(s) to VCF (Variant Call Format) string.</p>
+<div class="desc"><p>Convert cs tag(s) to VCF (Variant Call Format) string.</p>
 <h2 id="args">Args</h2>
-<p>cs_tag (str | list[str]): The CS tag representing the sequence alignment.
+<p>cs_tag (str | list[str]): The cs tag representing the sequence alignment.
 chrom (str | list[str]): The chromosome name.
 pos (int | list[int]): The starting position for the sequence.</p>
 <h2 id="returns">Returns</h2>
@@ -803,10 +803,10 @@ chr1    5       .       C       CTT     .       .       .
 </summary>
 <pre><code class="python">def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) -&gt; str:
     &#34;&#34;&#34;
-    Convert CS tag(s) to VCF (Variant Call Format) string.
+    Convert cs tag(s) to VCF (Variant Call Format) string.
 
     Args:
-        cs_tag (str | list[str]): The CS tag representing the sequence alignment.
+        cs_tag (str | list[str]): The cs tag representing the sequence alignment.
         chrom (str | list[str]): The chromosome name.
         pos (int | list[int]): The starting position for the sequence.
 

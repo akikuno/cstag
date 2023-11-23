@@ -111,7 +111,7 @@ HTML_FOOTER = &#34;&#34;&#34;
 
 
 def append_mark_to_n(cs_tag: str) -&gt; str:
-    &#34;&#34;&#34;Process each CS tag by adding specific markers `@` to `N`.&#34;&#34;&#34;
+    &#34;&#34;&#34;Process each cs tag by adding specific markers `@` to `N`.&#34;&#34;&#34;
 
     def append_mark(cs: str) -&gt; str:
         if cs.startswith(&#34;N&#34;):
@@ -166,7 +166,7 @@ def process_cs_tag(cs_tag: str) -&gt; str:
 def to_html(cs_tag: str, description: str = &#34;&#34;) -&gt; str:
     &#34;&#34;&#34;Output HTML string showing a sequence with mutations colored
     Args:
-        cs_tag (str): CS tag in the **long** format
+        cs_tag (str): cs tag in the **long** format
         description (str): (optional) header information in the output string
     Return:
         HTML string
@@ -203,13 +203,13 @@ def to_html(cs_tag: str, description: str = &#34;&#34;) -&gt; str:
 <span>def <span class="ident">append_mark_to_n</span></span>(<span>cs_tag: str) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Process each CS tag by adding specific markers <code>@</code> to <code>N</code>.</p></div>
+<div class="desc"><p>Process each cs tag by adding specific markers <code>@</code> to <code>N</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def append_mark_to_n(cs_tag: str) -&gt; str:
-    &#34;&#34;&#34;Process each CS tag by adding specific markers `@` to `N`.&#34;&#34;&#34;
+    &#34;&#34;&#34;Process each cs tag by adding specific markers `@` to `N`.&#34;&#34;&#34;
 
     def append_mark(cs: str) -&gt; str:
         if cs.startswith(&#34;N&#34;):
@@ -287,7 +287,7 @@ def to_html(cs_tag: str, description: str = &#34;&#34;) -&gt; str:
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>cs_tag</code></strong> :&ensp;<code>str</code></dt>
-<dd>CS tag in the <strong>long</strong> format</dd>
+<dd>cs tag in the <strong>long</strong> format</dd>
 <dt><strong><code>description</code></strong> :&ensp;<code>str</code></dt>
 <dd>(optional) header information in the output string</dd>
 </dl>
@@ -306,7 +306,7 @@ def to_html(cs_tag: str, description: str = &#34;&#34;) -&gt; str:
 <pre><code class="python">def to_html(cs_tag: str, description: str = &#34;&#34;) -&gt; str:
     &#34;&#34;&#34;Output HTML string showing a sequence with mutations colored
     Args:
-        cs_tag (str): CS tag in the **long** format
+        cs_tag (str): cs tag in the **long** format
         description (str): (optional) header information in the output string
     Return:
         HTML string

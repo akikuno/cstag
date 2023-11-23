@@ -53,20 +53,20 @@ def expand_deletion_tags(tags_combined: list[str]) -&gt; list[str]:
 
 def split_cs_tags(cs_tags: list[str]) -&gt; list[list[str]]:
     &#34;&#34;&#34;
-    Split and process each CS tag in cs_tags.
+    Split and process each cs tag in cs_tags.
 
     Args:
-        cs_tags (list[str]): list of CS tags in the long format.
+        cs_tags (list[str]): list of cs tags in the long format.
 
     Returns:
-        list[list[str]]: list of processed CS tags.
+        list[list[str]]: list of processed cs tags.
     &#34;&#34;&#34;
     cs_tags_splitted = []
     for cs_tag in cs_tags:
         # Remove the prefix &#34;cs:Z:&#34; if present
         cs_tag = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
 
-        # Split the CS tag using special symbols (-, *, ~, =)
+        # Split the cs tag using special symbols (-, *, ~, =)
         # insertion symbol (+) is ignored because it is not observed in reference sequence
         tags_splitted = re.split(r&#34;([-*~=])&#34;, cs_tag)[1:]
         # Combine the symbol with the corresponding sequence
@@ -98,7 +98,7 @@ def normalize_read_lengths(cs_tags: list[str], positions: list[int]) -&gt; list[
     Normalize the lengths of each read in cs_tags based on their starts positions. If the length is insufficient, fill in with `None`.
 
     Args:
-        cs_tags (list[str]): list of CS tags.
+        cs_tags (list[str]): list of cs tags.
         positions (list[int]): Starting positions of each read.
 
     Returns:
@@ -137,7 +137,7 @@ def get_consensus(cs_tags: list[list[str]]) -&gt; str:
     for cs in zip(*cs_tags):
         # Remove the None that is compensating for the insufficient lead length.
         cs = [c for c in cs if c]
-        # Get the most common CS tag(s)
+        # Get the most common cs tag(s)
         most_common_tags = Counter(cs).most_common()
 
         # If there&#39;s a unique most common tag, return it
@@ -162,13 +162,13 @@ def get_consensus(cs_tags: list[list[str]]) -&gt; str:
 
 
 def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&gt; str:
-    &#34;&#34;&#34;generate consensus of CS tags
+    &#34;&#34;&#34;generate consensus of cs tags
     Args:
-        cs_tags (list): CS tags in the **long** format
+        cs_tags (list): cs tags in the **long** format
         positions (list): 1-based leftmost mapping position (4th column in SAM file)
-        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the CS tag. Defaults to False
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
     Return:
-        str: a consensus of CS tag in the **long** format
+        str: a consensus of cs tag in the **long** format
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs_tags = [&#34;=ACGT&#34;, &#34;=AC*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=ACT+ccc=T&#34;]
@@ -224,18 +224,18 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
 <span>def <span class="ident">consensus</span></span>(<span>cs_tags: list[str], positions: list[int], prefix: bool = False) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>generate consensus of CS tags</p>
+<div class="desc"><p>generate consensus of cs tags</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>cs_tags</code></strong> :&ensp;<code>list</code></dt>
-<dd>CS tags in the <strong>long</strong> format</dd>
+<dd>cs tags in the <strong>long</strong> format</dd>
 <dt><strong><code>positions</code></strong> :&ensp;<code>list</code></dt>
 <dd>1-based leftmost mapping position (4th column in SAM file)</dd>
 <dt><strong><code>prefix</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>Whether to add the prefix 'cs:Z:' to the CS tag. Defaults to False</dd>
+<dd>Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False</dd>
 </dl>
 <h2 id="return">Return</h2>
-<p>str: a consensus of CS tag in the <strong>long</strong> format</p>
+<p>str: a consensus of cs tag in the <strong>long</strong> format</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
@@ -248,13 +248,13 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&gt; str:
-    &#34;&#34;&#34;generate consensus of CS tags
+    &#34;&#34;&#34;generate consensus of cs tags
     Args:
-        cs_tags (list): CS tags in the **long** format
+        cs_tags (list): cs tags in the **long** format
         positions (list): 1-based leftmost mapping position (4th column in SAM file)
-        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the CS tag. Defaults to False
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
     Return:
-        str: a consensus of CS tag in the **long** format
+        str: a consensus of cs tag in the **long** format
     Example:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs_tags = [&#34;=ACGT&#34;, &#34;=AC*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=ACT+ccc=T&#34;]
@@ -307,7 +307,7 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
     for cs in zip(*cs_tags):
         # Remove the None that is compensating for the insufficient lead length.
         cs = [c for c in cs if c]
-        # Get the most common CS tag(s)
+        # Get the most common cs tag(s)
         most_common_tags = Counter(cs).most_common()
 
         # If there&#39;s a unique most common tag, return it
@@ -351,7 +351,7 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>cs_tags</code></strong> :&ensp;<code>list[str]</code></dt>
-<dd>list of CS tags.</dd>
+<dd>list of cs tags.</dd>
 <dt><strong><code>positions</code></strong> :&ensp;<code>list[int]</code></dt>
 <dd>Starting positions of each read.</dd>
 </dl>
@@ -369,7 +369,7 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
     Normalize the lengths of each read in cs_tags based on their starts positions. If the length is insufficient, fill in with `None`.
 
     Args:
-        cs_tags (list[str]): list of CS tags.
+        cs_tags (list[str]): list of cs tags.
         positions (list[int]): Starting positions of each read.
 
     Returns:
@@ -393,16 +393,16 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
 <span>def <span class="ident">split_cs_tags</span></span>(<span>cs_tags: list[str]) ‑> list[list[str]]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Split and process each CS tag in cs_tags.</p>
+<div class="desc"><p>Split and process each cs tag in cs_tags.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>cs_tags</code></strong> :&ensp;<code>list[str]</code></dt>
-<dd>list of CS tags in the long format.</dd>
+<dd>list of cs tags in the long format.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>list[list[str]]</code></dt>
-<dd>list of processed CS tags.</dd>
+<dd>list of processed cs tags.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -410,20 +410,20 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
 </summary>
 <pre><code class="python">def split_cs_tags(cs_tags: list[str]) -&gt; list[list[str]]:
     &#34;&#34;&#34;
-    Split and process each CS tag in cs_tags.
+    Split and process each cs tag in cs_tags.
 
     Args:
-        cs_tags (list[str]): list of CS tags in the long format.
+        cs_tags (list[str]): list of cs tags in the long format.
 
     Returns:
-        list[list[str]]: list of processed CS tags.
+        list[list[str]]: list of processed cs tags.
     &#34;&#34;&#34;
     cs_tags_splitted = []
     for cs_tag in cs_tags:
         # Remove the prefix &#34;cs:Z:&#34; if present
         cs_tag = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
 
-        # Split the CS tag using special symbols (-, *, ~, =)
+        # Split the cs tag using special symbols (-, *, ~, =)
         # insertion symbol (+) is ignored because it is not observed in reference sequence
         tags_splitted = re.split(r&#34;([-*~=])&#34;, cs_tag)[1:]
         # Combine the symbol with the corresponding sequence

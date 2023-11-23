@@ -37,17 +37,17 @@ def validate_cs_tag(cs_tag: str) -&gt; None:
     )
 
     if not pattern.fullmatch(cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)):
-        raise ValueError(f&#34;Invalid CS tag: {cs_tag}&#34;)
+        raise ValueError(f&#34;Invalid cs tag: {cs_tag}&#34;)
 
 
 def validate_short_format(cs_tag: str) -&gt; None:
     if re.search(r&#34;=[ACGTN]+&#34;, cs_tag):
-        raise ValueError(&#34;CS tag must be in short format&#34;)
+        raise ValueError(&#34;cs tag must be in short format&#34;)
 
 
 def validate_long_format(cs_tag: str) -&gt; None:
     if re.search(r&#34;:[0-9]+&#34;, cs_tag):
-        raise ValueError(&#34;CS tag must be in long format&#34;)
+        raise ValueError(&#34;cs tag must be in long format&#34;)
 
 
 def validate_threshold(threshold: int) -&gt; None:
@@ -85,7 +85,7 @@ def validate_pos(pos: int) -&gt; None:
     )
 
     if not pattern.fullmatch(cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)):
-        raise ValueError(f&#34;Invalid CS tag: {cs_tag}&#34;)</code></pre>
+        raise ValueError(f&#34;Invalid cs tag: {cs_tag}&#34;)</code></pre>
 </details>
 </dd>
 <dt id="cstag.utils.validator.validate_long_format"><code class="name flex">
@@ -99,7 +99,7 @@ def validate_pos(pos: int) -&gt; None:
 </summary>
 <pre><code class="python">def validate_long_format(cs_tag: str) -&gt; None:
     if re.search(r&#34;:[0-9]+&#34;, cs_tag):
-        raise ValueError(&#34;CS tag must be in long format&#34;)</code></pre>
+        raise ValueError(&#34;cs tag must be in long format&#34;)</code></pre>
 </details>
 </dd>
 <dt id="cstag.utils.validator.validate_pos"><code class="name flex">
@@ -127,7 +127,7 @@ def validate_pos(pos: int) -&gt; None:
 </summary>
 <pre><code class="python">def validate_short_format(cs_tag: str) -&gt; None:
     if re.search(r&#34;=[ACGTN]+&#34;, cs_tag):
-        raise ValueError(&#34;CS tag must be in short format&#34;)</code></pre>
+        raise ValueError(&#34;cs tag must be in short format&#34;)</code></pre>
 </details>
 </dd>
 <dt id="cstag.utils.validator.validate_threshold"><code class="name flex">
