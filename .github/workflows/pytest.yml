@@ -29,7 +29,7 @@ jobs:
       - name: Install weasyprint on macos-latest
         if: runner.os == 'macOS'
         run: |
-          rm -rf /usr/local/bin/2to3 # https://github.com/actions/runner-images/issues/2322#issuecomment-749211076
+          rm -rf /usr/local/bin/2to3* # https://github.com/actions/runner-images/issues/2322#issuecomment-749211076
           brew update
           brew install weasyprint
 
