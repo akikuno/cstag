@@ -28,8 +28,56 @@
   pages    = "3094--3100",
   month    =  sep,
   year     =  2018,
-  language = "en"
+  language = "en",
+  doi = "10.1093/bioinformatics/bty191"
 }
+
+
+
+@ARTICLE{Crawford2019,
+  title    = "alignparse: A Python package for parsing complex features from
+              high-throughput long-read sequencing",
+  author   = "Crawford, Katharine H D and Bloom, Jesse D",
+  abstract = "Advances in sequencing technology have made it possible to
+              generate large numbers of long, high-accuracy sequencing reads.
+              For instance, the new PacBio Sequel platform can generate
+              hundreds of thousands of high-quality circular consensus
+              sequences in a single run (Hebert et al., 2018; Rhoads \& Au,
+              2015). Good programs exist for aligning these reads for genome
+              assembly (Chaisson \& Tesler, 2012; Li, 2018). However, these
+              long reads can also be used for other purposes, such as
+              sequencing PCR amplicons that contain various features of
+              interest. For instance, PacBio circular consensus sequences have
+              been used to identify the mutations in influenza viruses in
+              single cells (Russell et al, 2019), or to link barcodes to gene
+              mutants in deep mutational scanning (Matreyek et al., 2018). For
+              such applications, the alignment of the sequences to the targets
+              may be fairly trivial, but it is not trivial to then parse
+              specific features of interest (such as mutations, unique
+              molecular identifiers, cell barcodes, and flanking sequences)
+              from these alignments. Here we describe alignparse, a Python
+              package for parsing complex sets of features from long sequences
+              that map to known targets. Specifically, it allows the user to
+              provide complex target sequences in Genbank Flat File format that
+              contain an arbitrary number of user-defined sub-sequence features
+              (Sayers et al., 2019). It then aligns the sequencing reads to
+              these targets and filters alignments based on whether the
+              user-specified features are present with the desired identities
+              (which can be set to different thresholds for different
+              features). Finally, it parses out the sequences, mutations,
+              and/or accuracy (sequence quality) of these features as specified
+              by the user. The flexibility of this package therefore fulfills
+              the need for a tool to extract and analyze complex sets of
+              features in large numbers of long sequencing reads.",
+  journal  = "J Open Source Softw",
+  volume   =  4,
+  number   =  44,
+  month    =  dec,
+  year     =  2019,
+  language = "en",
+  doi = "10.21105/joss.01915"
+}
+
 
 @ARTICLE{Parker2021,
   title    = "2passtools: two-pass alignment using machine-learning-filtered
@@ -59,7 +107,8 @@
   keywords = "Gene expression; Long-read sequencing; Machine learning; Nanopore
               sequencing; RNA-seq; Spliced alignment; Splicing; Transcriptome
               assembly",
-  language = "en"
+  language = "en",
+  doi = "10.1186/s13059-021-02296-0"
 }
 
 
@@ -99,7 +148,8 @@
   pages    = "e3001507",
   month    =  jan,
   year     =  2022,
-  language = "en"
+  language = "en",
+  doi = "10.1371/journal.pbio.3001507"
 }
 
 
@@ -117,22 +167,23 @@
   pages    = "475--476",
   month    =  jul,
   year     =  2018,
-  language = "en"
+  language = "en",
+  doi = "10.1038/s41592-018-0046-7"
 }
 
- @ARTICLE{Robinson2011,
-   title    = "Integrative genomics viewer",
-   author   = "Robinson, James T and Thorvaldsd{\'o}ttir, Helga and Winckler,
-               Wendy and Guttman, Mitchell and Lander, Eric S and Getz, Gad and
-               Mesirov, Jill P",
-   journal  = "Nat. Biotechnol.",
-   volume   =  29,
-   number   =  1,
-   pages    = "24--26",
-   month    =  jan,
-   year     =  2011,
-   language = "en"
- }
- 
+@ARTICLE{Robinson2011,
+  title    = "Integrative genomics viewer",
+  author   = "Robinson, James T and Thorvaldsd{\'o}ttir, Helga and Winckler,
+              Wendy and Guttman, Mitchell and Lander, Eric S and Getz, Gad and
+              Mesirov, Jill P",
+  journal  = "Nat. Biotechnol.",
+  volume   =  29,
+  number   =  1,
+  pages    = "24--26",
+  month    =  jan,
+  year     =  2011,
+  language = "en",
+  doi = "10.1038/nbt.1754"
+}
 
 
