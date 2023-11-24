@@ -48,8 +48,8 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
         &gt;&gt;&gt; cs_tag = &#34;=ACGT*ac+gg-cc=T&#34;
         &gt;&gt;&gt; cigar = &#34;5M2I2D1M&#34;
         &gt;&gt;&gt; qual = &#34;AA!!!!AA&#34;
-        &gt;&gt;&gt; cstag.mask(cs_tag, qual)
-        =ACNN*an+ng-cc=T
+        &gt;&gt;&gt; cstag.mask(cs_tag, cigar, qual)
+        &#39;=ACNN*an+ng-cc=T&#39;
     &#34;&#34;&#34;
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)
@@ -117,8 +117,8 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
 &gt;&gt;&gt; cs_tag = &quot;=ACGT*ac+gg-cc=T&quot;
 &gt;&gt;&gt; cigar = &quot;5M2I2D1M&quot;
 &gt;&gt;&gt; qual = &quot;AA!!!!AA&quot;
-&gt;&gt;&gt; cstag.mask(cs_tag, qual)
-=ACNN*an+ng-cc=T
+&gt;&gt;&gt; cstag.mask(cs_tag, cigar, qual)
+'=ACNN*an+ng-cc=T'
 </code></pre></div>
 <details class="source">
 <summary>
@@ -139,8 +139,8 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
         &gt;&gt;&gt; cs_tag = &#34;=ACGT*ac+gg-cc=T&#34;
         &gt;&gt;&gt; cigar = &#34;5M2I2D1M&#34;
         &gt;&gt;&gt; qual = &#34;AA!!!!AA&#34;
-        &gt;&gt;&gt; cstag.mask(cs_tag, qual)
-        =ACNN*an+ng-cc=T
+        &gt;&gt;&gt; cstag.mask(cs_tag, cigar, qual)
+        &#39;=ACNN*an+ng-cc=T&#39;
     &#34;&#34;&#34;
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)

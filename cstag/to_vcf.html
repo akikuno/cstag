@@ -361,7 +361,7 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
         &gt;&gt;&gt; cs_tag = &#34;=AC*gt=T-gg=C+tt=A&#34;
         &gt;&gt;&gt; chrom = &#34;chr1&#34;
         &gt;&gt;&gt; pos = 1
-        &gt;&gt;&gt; print(cstag.to_vcf(cstag, chrom, pos))
+        &gt;&gt;&gt; print(cstag.to_vcf(cs_tag, chrom, pos))
         ##fileformat=VCFv4.2
         #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO
         chr1    3       .       G       T       .       .       .
@@ -790,7 +790,7 @@ pos (int | list[int]): The starting position for the sequence.</p>
 &gt;&gt;&gt; cs_tag = &quot;=AC*gt=T-gg=C+tt=A&quot;
 &gt;&gt;&gt; chrom = &quot;chr1&quot;
 &gt;&gt;&gt; pos = 1
-&gt;&gt;&gt; print(cstag.to_vcf(cstag, chrom, pos))
+&gt;&gt;&gt; print(cstag.to_vcf(cs_tag, chrom, pos))
 ##fileformat=VCFv4.2
 #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO
 chr1    3       .       G       T       .       .       .
@@ -817,7 +817,7 @@ chr1    5       .       C       CTT     .       .       .
         &gt;&gt;&gt; cs_tag = &#34;=AC*gt=T-gg=C+tt=A&#34;
         &gt;&gt;&gt; chrom = &#34;chr1&#34;
         &gt;&gt;&gt; pos = 1
-        &gt;&gt;&gt; print(cstag.to_vcf(cstag, chrom, pos))
+        &gt;&gt;&gt; print(cstag.to_vcf(cs_tag, chrom, pos))
         ##fileformat=VCFv4.2
         #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO
         chr1    3       .       G       T       .       .       .

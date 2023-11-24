@@ -63,7 +63,7 @@ def revcomp(cs_tag: str, prefix: bool = False) -&gt; str:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;=AAAA*ag=CTG&#34;
         &gt;&gt;&gt; cstag.revcomp(cs)
-        =CAG*tc=TTTT
+        &#39;=CAG*tc=TTTT&#39;
     &#34;&#34;&#34;
     pattern = r&#34;(\=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})&#34;
     cs_tag_revcomp = []
@@ -117,7 +117,7 @@ def revcomp(cs_tag: str, prefix: bool = False) -&gt; str:
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs = &quot;=AAAA*ag=CTG&quot;
 &gt;&gt;&gt; cstag.revcomp(cs)
-=CAG*tc=TTTT
+'=CAG*tc=TTTT'
 </code></pre></div>
 <details class="source">
 <summary>
@@ -136,7 +136,7 @@ def revcomp(cs_tag: str, prefix: bool = False) -&gt; str:
         &gt;&gt;&gt; import cstag
         &gt;&gt;&gt; cs = &#34;=AAAA*ag=CTG&#34;
         &gt;&gt;&gt; cstag.revcomp(cs)
-        =CAG*tc=TTTT
+        &#39;=CAG*tc=TTTT&#39;
     &#34;&#34;&#34;
     pattern = r&#34;(\=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})&#34;
     cs_tag_revcomp = []

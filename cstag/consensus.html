@@ -174,7 +174,7 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
         &gt;&gt;&gt; cs_tags = [&#34;=ACGT&#34;, &#34;=AC*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=ACT+ccc=T&#34;]
         &gt;&gt;&gt; positions = [1,1,1,2,1]
         &gt;&gt;&gt; cstag.consensus(cs_tags, positions)
-        =AC*gt=T
+        &#39;=AC*gt=T&#39;
     &#34;&#34;&#34;
     if not (len(cs_tags) == len(positions) &gt; 0):
         raise ValueError(&#34;Element numbers of each argument must be the same&#34;)
@@ -241,7 +241,7 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
 &gt;&gt;&gt; cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
 &gt;&gt;&gt; positions = [1,1,1,2,1]
 &gt;&gt;&gt; cstag.consensus(cs_tags, positions)
-=AC*gt=T
+'=AC*gt=T'
 </code></pre></div>
 <details class="source">
 <summary>
@@ -260,7 +260,7 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -&
         &gt;&gt;&gt; cs_tags = [&#34;=ACGT&#34;, &#34;=AC*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=ACT+ccc=T&#34;]
         &gt;&gt;&gt; positions = [1,1,1,2,1]
         &gt;&gt;&gt; cstag.consensus(cs_tags, positions)
-        =AC*gt=T
+        &#39;=AC*gt=T&#39;
     &#34;&#34;&#34;
     if not (len(cs_tags) == len(positions) &gt; 0):
         raise ValueError(&#34;Element numbers of each argument must be the same&#34;)
