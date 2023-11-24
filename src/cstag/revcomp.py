@@ -35,7 +35,7 @@ def revcomp(cs_tag: str, prefix: bool = False) -> str:
         >>> import cstag
         >>> cs = "=AAAA*ag=CTG"
         >>> cstag.revcomp(cs)
-        =CAG*tc=TTTT
+        '=CAG*tc=TTTT'
     """
     pattern = r"(\=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|\-[acgtn]+|\~[acgtn]{2}[0-9]+[acgtn]{2})"
     cs_tag_revcomp = []

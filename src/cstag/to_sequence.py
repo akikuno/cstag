@@ -17,7 +17,7 @@ def to_sequence(cs_tag: str) -> str:
         >>> import cstag
         >>> cs_tag = "=AC*gt=T-gg=C+tt=A"
         >>> cstag.to_sequence(cs_tag)
-        "ACTTCTTA"
+        'ACTTCTTA'
     """
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)

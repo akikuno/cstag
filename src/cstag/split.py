@@ -15,7 +15,7 @@ def split(cs_tag: str, prefix: bool = False) -> list[str]:
         >>> import cstag
         >>> cs = ":4*ag:3"
         >>> cstag.split(cs)
-        [":4", "*ag", ":3"]
+        [':4', '*ag', ':3']
     """
     cs_tag = cs_tag.replace("cs:Z:", "")
 

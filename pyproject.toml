@@ -23,3 +23,16 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 weasyprint = ">=52.5"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--doctest-modules",
+    "--doctest-glob=README.md",
+    "--ignore=examples",
+    "--verbose",
+    "-ra",
+    "--color=yes",
+]
+doctest_optionflags = "NORMALIZE_WHITESPACE"
+pythonpath = "src"
+testpaths = ["tests"]

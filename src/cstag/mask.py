@@ -20,8 +20,8 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
         >>> cs_tag = "=ACGT*ac+gg-cc=T"
         >>> cigar = "5M2I2D1M"
         >>> qual = "AA!!!!AA"
-        >>> cstag.mask(cs_tag, qual)
-        =ACNN*an+ng-cc=T
+        >>> cstag.mask(cs_tag, cigar, qual)
+        '=ACNN*an+ng-cc=T'
     """
     validate_cs_tag(cs_tag)
     validate_long_format(cs_tag)

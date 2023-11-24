@@ -144,7 +144,7 @@ def to_html(cs_tag: str, description: str = "") -> str:
         HTML string
     Example:
         >>> import cstag
-        >>> cs_tag = "=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+        >>> cs_tag = "=AC+ggg=T-acgt*at~gt10cg=GNNN"
         >>> description = "Example"
         >>> html_string = cstag.to_html(cs_tag, description)
     """

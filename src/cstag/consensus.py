@@ -146,7 +146,7 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) ->
         >>> cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
         >>> positions = [1,1,1,2,1]
         >>> cstag.consensus(cs_tags, positions)
-        =AC*gt=T
+        '=AC*gt=T'
     """
     if not (len(cs_tags) == len(positions) > 0):
         raise ValueError("Element numbers of each argument must be the same")

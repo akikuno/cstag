@@ -333,7 +333,7 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
         >>> cs_tag = "=AC*gt=T-gg=C+tt=A"
         >>> chrom = "chr1"
         >>> pos = 1
-        >>> print(cstag.to_vcf(cstag, chrom, pos))
+        >>> print(cstag.to_vcf(cs_tag, chrom, pos))
         ##fileformat=VCFv4.2
         #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
         chr1	3	.	G	T	.	.	.

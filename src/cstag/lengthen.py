@@ -21,7 +21,7 @@ def lengthen(cs_tag: str, cigar: str, seq: str, prefix: bool = False) -> str:
         >>> cigar = "8M"
         >>> seq = "ACGTACGT"
         >>> cstag.lengthen(cs, cigar, seq)
-        =ACGT*ag=CGT
+        '=ACGT*ag=CGT'
     """
     validate_cs_tag(cs_tag)
     validate_short_format(cs_tag)

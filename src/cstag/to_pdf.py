@@ -23,7 +23,7 @@ def to_pdf(cs_tag: str, description: str, path_out: str | Path) -> None:
 
     Examples:
         >>> import cstag
-        >>> cs_tag = "=AC+GGG=T-ACGT*at~gt10cg=GNNN"
+        >>> cs_tag = "=AC+ggg=T-acgt*at~gt10cg=GNNN"
         >>> description = "Example"
         >>> path_out = "report.pdf"
         >>> to_pdf(cs_tag, description, path_out)
