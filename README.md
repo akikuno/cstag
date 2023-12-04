@@ -9,7 +9,7 @@
 
 `cstag` is a Python library tailored for for manipulating and visualizing [minimap2's cs tags](https://github.com/lh3/minimap2#cs).
 
->![NOTE]
+>[!NOTE]
 > To add cs tags to SAM/BAM files, check out [`cstag-cli`](https://github.com/akikuno/cstag-cli).  
 
 ## 🌟 Features
