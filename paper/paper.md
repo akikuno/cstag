@@ -40,7 +40,7 @@ Additionally, `cstag-cli` has been developed as a command-line tool specifically
 
 # Availability
 
-`cstag` and `cstag-cli` are distributed on PyPI under the MIT License. Conda packages are also available in the Bioconda channel [@Grüning2018]. The source code is available in a git repository on GitHub at https://github.com/akikuno/cstag and https://github.com/akikuno/cstag-cli, and features a Continuous Integration workflow to run integration tests on changes. Documentation of `cstag` is hosted on [pdoc3](https://akikuno.github.io/cstag/cstag/) and built for each new release.
+The source code of cstag and cstag-cli is hosted in git repositories on GitHub both under the MIT License, accessible at https://github.com/akikuno/cstag and https://github.com/akikuno/cstag-cli, respectively. These tools are also distributed via PyPI, with `cstag` available at https://pypi.org/project/cstag/ and `cstag-cli` at https://pypi.org/project/cstag-cli/. Additionally, Conda packages for `cstag` and `cstag-cli` can be found in the Bioconda channel [@Grüning2018], at https://anaconda.org/bioconda/cstag and https://anaconda.org/bioconda/cstag-cli, respectively. The development process includes a Continuous Integration workflow, which runs integration tests on any changes. The documentation for `cstag` is hosted on [pdoc3](https://akikuno.github.io/cstag/cstag/) and is updated with each new release.
 
 # Acknowledgements
 
