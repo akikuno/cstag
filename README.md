@@ -3,11 +3,12 @@
 [![Python](https://img.shields.io/pypi/pyversions/cstag.svg?label=Python&color=blue)](https://pypi.org/project/cstag/)
 [![PyPI](https://img.shields.io/pypi/v/cstag.svg?label=PyPI&color=orange)](https://pypi.org/project/cstag/)
 [![Bioconda](https://img.shields.io/conda/v/bioconda/cstag?label=Bioconda&color=orange)](https://anaconda.org/bioconda/cstag)
+[![JOSS](https://joss.theoj.org/papers/10.21105/joss.06066/status.svg)](https://doi.org/10.21105/joss.06066)
 [![DOI](https://zenodo.org/badge/468937655.svg)](https://zenodo.org/badge/latestdoi/468937655)
 
 # cstag
 
-`cstag` is a Python library tailored for for manipulating and visualizing [minimap2's cs tags](https://github.com/lh3/minimap2#cs).
+`cstag` is a Python library tailored for manipulating and visualizing [minimap2's cs tags](https://github.com/lh3/minimap2#cs).
 
 >[!NOTE]
 > To add cs tags to SAM/BAM files, check out [`cstag-cli`](https://github.com/akikuno/cstag-cli).  
@@ -220,3 +221,7 @@ Please refer to [CONTRIBUTING](https://github.com/akikuno/cstag/blob/main/CONTRI
 
 Please note that this project is released with a [Contributor Code of Conduct](https://github.com/akikuno/cstag/blob/main/CODE_OF_CONDUCT.md).  
 By participating in this project you agree to abide by its terms.  
+
+## 📄 Citation
+
+- Kuno, A., (2024). cstag and cstag-cli: tools for manipulating and visualizing cs tags. *Journal of Open Source Software*, 9(93), 6066, https://doi.org/10.21105/joss.06066
