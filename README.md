@@ -6,7 +6,7 @@
 [![JOSS](https://joss.theoj.org/papers/10.21105/joss.06066/status.svg)](https://doi.org/10.21105/joss.06066)
 [![DOI](https://zenodo.org/badge/468937655.svg)](https://zenodo.org/badge/latestdoi/468937655)
 
-# cstag
+ <img src="https://raw.githubusercontent.com/akikuno/logos/main/cstag/cstag-logo-microgramma.png" width="70%" alt="cstag">
 
 `cstag` is a Python library tailored for manipulating and visualizing [minimap2's cs tags](https://github.com/lh3/minimap2#cs).
 
