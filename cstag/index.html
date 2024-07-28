@@ -52,7 +52,6 @@ To add cs tags to SAM/BAM files, check out <a href="https://github.com/akikuno/c
 <li><code><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code>: Reconstruct a reference subsequence from the alignment</li>
 <li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code>: Generate a VCF representation</li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Generate an HTML representation</li>
-<li><code>cstag.to_pdf()</code>: Produce a PDF file</li>
 </ul>
 <p>For comprehensive documentation, please visit <a href="https://akikuno.github.io/cstag/cstag/">our docs</a>.
 </p>
@@ -178,17 +177,6 @@ Path(&quot;report.html&quot;).write_text(cs_tag_html)
 </code></pre>
 <p>You can visualize mutations indicated by the cs tag using the generated <code>report.html</code> file as shown below:</p>
 <p><img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png"></p>
-<h3 id="generating-a-pdf-report">Generating a PDF Report</h3>
-<pre><code class="language-python">import cstag
-
-cs_tag = &quot;=AC+ggg=T-acgt*at~gt10ag=GNNN&quot;
-description = &quot;Example&quot;
-path_out = &quot;report.pdf&quot;
-
-cstag.to_pdf(cs_tag, description, path_out)
-# Output &quot;report.pdf&quot;
-</code></pre>
-<p>You can obtain the same images of <code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code> as a PDF file.</p>
 <h2 id="feedback-and-support">📣 Feedback and Support</h2>
 <p>For questions, bug reports, or other forms of feedback, we'd love to hear from you!<br>
 Please use <a href="https://github.com/akikuno/cstag/issues">GitHub Issues</a> for all reporting purposes.
@@ -275,7 +263,6 @@ By participating in this project you agree to abide by its terms.
 <li><a href="#reconstructing-the-reference-subsequence">Reconstructing the Reference Subsequence</a></li>
 <li><a href="#generating-a-vcf-report">Generating a VCF Report</a></li>
 <li><a href="#generating-an-html-report">Generating an HTML Report</a></li>
-<li><a href="#generating-a-pdf-report">Generating a PDF Report</a></li>
 </ul>
 </li>
 <li><a href="#feedback-and-support">📣 Feedback and Support</a></li>
