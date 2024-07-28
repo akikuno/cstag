@@ -25,7 +25,6 @@
 - `cstag.to_sequence()`: Reconstruct a reference subsequence from the alignment
 - `cstag.to_vcf()`: Generate a VCF representation
 - `cstag.to_html()`: Generate an HTML representation
-- `cstag.to_pdf()`: Produce a PDF file
 
 For comprehensive documentation, please visit [our docs](https://akikuno.github.io/cstag/cstag/).  
 
@@ -191,22 +190,6 @@ Path("report.html").write_text(cs_tag_html)
 You can visualize mutations indicated by the cs tag using the generated `report.html` file as shown below:
 
 <img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png">
-
-
-### Generating a PDF Report
-
-```python
-import cstag
-
-cs_tag = "=AC+ggg=T-acgt*at~gt10ag=GNNN"
-description = "Example"
-path_out = "report.pdf"
-
-cstag.to_pdf(cs_tag, description, path_out)
-# Output "report.pdf"
-```
-
-You can obtain the same images of `cstag.to_html` as a PDF file.
 
 
 ## 📣 Feedback and Support
