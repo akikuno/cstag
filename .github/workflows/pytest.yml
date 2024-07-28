@@ -27,11 +27,6 @@ jobs:
           python -m pip install --upgrade pip pytest
           python -m pip install -e .
 
-      - name: Install weasyprint on macos-latest
-        if: runner.os == 'macOS'
-        run: |
-          brew install weasyprint
-
       - name: Run pytest on Linux🐧, macOS🍎
         env:
           PYTHONPATH: src
