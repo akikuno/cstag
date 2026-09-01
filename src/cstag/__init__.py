@@ -12,3 +12,4 @@ from cstag.revcomp import revcomp
 from cstag.to_html import to_html
 from cstag.to_vcf import to_vcf
 from cstag.to_sequence import to_sequence
+from cstag.to_mutation_percentages import to_mutation_percentages

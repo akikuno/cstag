@@ -25,6 +25,7 @@
 - `cstag.to_sequence()`: Reconstruct a reference subsequence from the alignment
 - `cstag.to_vcf()`: Generate a VCF representation
 - `cstag.to_html()`: Generate an HTML representation
+- `cstag.to_mutation_percentages()`: Report and plot per-position mutation percentages
 
 For comprehensive documentation, please visit [our docs](https://akikuno.github.io/cstag/cstag/).  
 
@@ -190,6 +191,32 @@ Path("report.html").write_text(cs_tag_html)
 You can visualize mutations indicated by the cs tag using the generated `report.html` file as shown below:
 
 <img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png">
+
+### Plotting Mutation Percentages
+
+```python
+from pathlib import Path
+
+import cstag
+
+cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T"]
+regions = [
+    {"name": "crRNA", "start": 1, "end": 2, "color": "lightblue"},
+    {"name": "index", "start": 3, "end": 4, "color": "lightgreen"},
+]
+
+report = cstag.to_mutation_percentages(
+    cs_tags,
+    Path("mutation_percentages.pdf"),
+    regions=regions,
+)
+print(report)
+```
+
+The function accepts short- or long-form cs tags and returns one dictionary per
+1-based relative reference position. Percentages are reported for all mutations,
+insertions, deletions, and substitutions. A PDF is saved as editable vector
+graphics; use a `.png` output path for a raster image.
 
 
 ## 📣 Feedback and Support
