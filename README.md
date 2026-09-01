@@ -95,6 +95,31 @@ print(cstag.consensus(cs_tags, positions))
 # =AC*gt=T
 ```
 
+To require a minimum level of agreement and report consensus quality, set
+`min_agreement` to a value between 0 and 1. The returned dictionary retains the
+candidate consensus even when it does not pass the requirement.
+
+```python
+import cstag
+
+cs_tags = ["=ACGT", "=ACGT", "=ACGT", "=AC*gt=T"]
+positions = [1, 1, 1, 1]
+
+print(cstag.consensus(cs_tags, positions, min_agreement=0.75))
+# {
+#     'consensus': '=ACGT',
+#     'passed': True,
+#     'agreement': 0.75,
+#     'max_edit_distance': 1,
+# }
+```
+
+`agreement` is the lowest modal-token fraction over all covered reference
+positions. `max_edit_distance` is the largest, among all reads, of the
+Levenshtein distance to its nearest overlapping read. Use `return_result=True`
+to obtain the same report without applying an agreement threshold. Calls that
+set neither option continue to return only the consensus string.
+
 ### Masking Low-Quality Bases
 
 ```python

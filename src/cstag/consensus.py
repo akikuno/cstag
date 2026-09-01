@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import math
 import re
-from itertools import chain
 from collections import deque, Counter
+from itertools import chain
+from numbers import Real
 
+from cstag.split import split
 from cstag.utils.validator import validate_cs_tag, validate_long_format
 
 
@@ -104,13 +107,32 @@ def condense_deletions(s: str) -> str:
     return re.sub(pattern, replacement, s)
 
 
-def get_consensus(cs_tags: list[list[str]]) -> str:
+def _is_mutation_tag(tag: str) -> bool:
+    """Return whether a normalized per-position tag represents a mutation."""
+    return re.fullmatch(r"[ACGTN]", tag) is None
+
+
+def _format_consensus(cs_consensus: list[str]) -> str:
+    consensus_string = condense_deletions("".join(cs_consensus))
+    # Append "=" to runs of reference bases.
+    return re.sub(r"([ACGTN]+)", r"=\1", consensus_string)
+
+
+def _get_consensus_and_agreement(cs_tags: list[list[str]]) -> tuple[str, float]:
+    """Return the plurality consensus and its minimum per-position support."""
     cs_consensus = []
+    position_agreements = []
     for cs in zip(*cs_tags):
         # Remove the None that is compensating for the insufficient lead length.
         cs = [c for c in cs if c]
+        # A gap between non-overlapping reads has no consensus information.
+        if not cs:
+            continue
+
         # Get the most common cs tag(s)
         most_common_tags = Counter(cs).most_common()
+        most_common_count = most_common_tags[0][1]
+        position_agreements.append(most_common_count / len(cs))
 
         # If there's a unique most common tag, return it
         most_common_tag, _ = most_common_tags[0]
@@ -118,14 +140,147 @@ def get_consensus(cs_tags: list[list[str]]) -> str:
             cs_consensus.append(most_common_tag)
             continue
         # If the most common tag is not unique (multimodal), return the first *mutated* mode
-        for tag, _ in most_common_tags:
-            if not re.search(r"[ACGT]", tag):
-                cs_consensus.append(tag)
+        tied_modes = [tag for tag, count in most_common_tags if count == most_common_count]
+        selected_tag = next((tag for tag in tied_modes if _is_mutation_tag(tag)), tied_modes[0])
+        cs_consensus.append(selected_tag)
 
-    cs_consensus = "".join(cs_consensus)
-    cs_consensus = condense_deletions(cs_consensus)
-    # Append "=" to [ACGTN]
-    return re.sub(r"([ACGTN]+)", r"=\1", cs_consensus)
+    agreement = min(position_agreements, default=1.0)
+    return _format_consensus(cs_consensus), agreement
+
+
+def get_consensus(cs_tags: list[list[str]]) -> str:
+    cs_consensus, _ = _get_consensus_and_agreement(cs_tags)
+    return cs_consensus
+
+
+def _validate_min_agreement(min_agreement: Real) -> float:
+    if isinstance(min_agreement, bool) or not isinstance(min_agreement, Real):
+        raise TypeError("min_agreement must be a real number")
+
+    min_agreement = float(min_agreement)
+    if not math.isfinite(min_agreement) or not 0 <= min_agreement <= 1:
+        raise ValueError("min_agreement must be a finite number between 0 and 1")
+    return min_agreement
+
+
+def _reference_length(cs_operations: list[str]) -> int:
+    reference_length = 0
+    for operation in cs_operations:
+        if operation.startswith(("=", "-")):
+            reference_length += len(operation) - 1
+        elif operation.startswith("*"):
+            reference_length += 1
+        elif operation.startswith("~"):
+            intron_length = re.search(r"[0-9]+", operation)
+            if intron_length is not None:
+                reference_length += int(intron_length.group())
+    return reference_length
+
+
+def _query_sequence_in_interval(
+    cs_operations: list[str],
+    position: int,
+    interval_start: int,
+    interval_end: int,
+) -> str:
+    """Reconstruct query bases emitted within an inclusive reference interval."""
+    reference_position = position
+    query_sequence = []
+
+    for operation in cs_operations:
+        if operation.startswith("="):
+            matches = operation[1:]
+            operation_end = reference_position + len(matches) - 1
+            overlap_start = max(reference_position, interval_start)
+            overlap_end = min(operation_end, interval_end)
+            if overlap_start <= overlap_end:
+                slice_start = overlap_start - reference_position
+                slice_end = overlap_end - reference_position + 1
+                query_sequence.append(matches[slice_start:slice_end])
+            reference_position = operation_end + 1
+        elif operation.startswith("*"):
+            if interval_start <= reference_position <= interval_end:
+                query_sequence.append(operation[-1].upper())
+            reference_position += 1
+        elif operation.startswith("+"):
+            insertion_anchor = reference_position - 1
+            if interval_start <= insertion_anchor <= interval_end:
+                query_sequence.append(operation[1:].upper())
+            elif reference_position == position == interval_start:
+                # Preserve a leading insertion when both reads start at this interval.
+                query_sequence.append(operation[1:].upper())
+        elif operation.startswith("-"):
+            reference_position += len(operation) - 1
+        elif operation.startswith("~"):
+            intron_length = re.search(r"[0-9]+", operation)
+            if intron_length is not None:
+                reference_position += int(intron_length.group())
+
+    return "".join(query_sequence)
+
+
+def _levenshtein_distance(sequence_1: str, sequence_2: str) -> int:
+    """Calculate unit-cost Levenshtein distance with linear memory."""
+    if sequence_1 == sequence_2:
+        return 0
+    if len(sequence_1) < len(sequence_2):
+        sequence_1, sequence_2 = sequence_2, sequence_1
+    if not sequence_2:
+        return len(sequence_1)
+
+    previous_row = list(range(len(sequence_2) + 1))
+    for row_index, base_1 in enumerate(sequence_1, start=1):
+        current_row = [row_index]
+        for column_index, base_2 in enumerate(sequence_2, start=1):
+            insertion = current_row[column_index - 1] + 1
+            deletion = previous_row[column_index] + 1
+            substitution = previous_row[column_index - 1] + (base_1 != base_2)
+            current_row.append(min(insertion, deletion, substitution))
+        previous_row = current_row
+    return previous_row[-1]
+
+
+def _max_nearest_edit_distance(cs_tags: list[str], positions: list[int]) -> int | None:
+    """Return the largest nearest-neighbor distance among overlapping reads."""
+    if len(cs_tags) == 1:
+        return 0
+
+    operations_by_read = [split(cs_tag) for cs_tag in cs_tags]
+    reference_ends = [
+        position + _reference_length(operations) - 1
+        for operations, position in zip(operations_by_read, positions)
+    ]
+    nearest_distances: list[int | None] = [None] * len(cs_tags)
+
+    for read_1 in range(len(cs_tags) - 1):
+        for read_2 in range(read_1 + 1, len(cs_tags)):
+            overlap_start = max(positions[read_1], positions[read_2])
+            overlap_end = min(reference_ends[read_1], reference_ends[read_2])
+            if overlap_start > overlap_end:
+                continue
+
+            sequence_1 = _query_sequence_in_interval(
+                operations_by_read[read_1],
+                positions[read_1],
+                overlap_start,
+                overlap_end,
+            )
+            sequence_2 = _query_sequence_in_interval(
+                operations_by_read[read_2],
+                positions[read_2],
+                overlap_start,
+                overlap_end,
+            )
+            distance = _levenshtein_distance(sequence_1, sequence_2)
+
+            for read in (read_1, read_2):
+                nearest_distance = nearest_distances[read]
+                if nearest_distance is None or distance < nearest_distance:
+                    nearest_distances[read] = distance
+
+    if any(distance is None for distance in nearest_distances):
+        return None
+    return max(distance for distance in nearest_distances if distance is not None)
 
 
 ###########################################################
@@ -133,20 +288,38 @@ def get_consensus(cs_tags: list[list[str]]) -> str:
 ###########################################################
 
 
-def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) -> str:
-    """generate consensus of cs tags
+def consensus(
+    cs_tags: list[str],
+    positions: list[int],
+    prefix: bool = False,
+    *,
+    min_agreement: Real | None = None,
+    return_result: bool = False,
+) -> str | dict[str, str | bool | float | int | None]:
+    """Generate a consensus of cs tags and optionally report its quality.
+
     Args:
         cs_tags (list): cs tags in the **long** format
         positions (list): 1-based leftmost mapping position (4th column in SAM file)
         prefix (bool, optional): Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False
+        min_agreement (float, optional): Minimum required per-position agreement,
+            between 0 and 1. Specifying this returns a quality-result dictionary.
+        return_result (bool, optional): Return a quality-result dictionary even
+            when ``min_agreement`` is not specified. Defaults to False.
+
     Return:
-        str: a consensus of cs tag in the **long** format
+        str | dict: A long-format consensus string by default. Quality requests
+        return a dictionary containing ``consensus``, ``passed``, ``agreement``,
+        and ``max_edit_distance``.
+
     Example:
         >>> import cstag
         >>> cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=C*gt=T", "=ACT+ccc=T"]
         >>> positions = [1,1,1,2,1]
         >>> cstag.consensus(cs_tags, positions)
         '=AC*gt=T'
+        >>> cstag.consensus(["=ACGT", "=ACGT", "=ACGT", "=AC*gt=T"], [1, 1, 1, 1], min_agreement=0.75)
+        {'consensus': '=ACGT', 'passed': True, 'agreement': 0.75, 'max_edit_distance': 1}
     """
     if not (len(cs_tags) == len(positions) > 0):
         raise ValueError("Element numbers of each argument must be the same")
@@ -155,8 +328,19 @@ def consensus(cs_tags: list[str], positions: list[int], prefix: bool = False) ->
         validate_cs_tag(cs_tag)
         validate_long_format(cs_tag)
 
+    if min_agreement is not None:
+        min_agreement = _validate_min_agreement(min_agreement)
+
     cs_tags_normalized_length = normalize_read_lengths(cs_tags, positions)
+    cs_consensus, agreement = _get_consensus_and_agreement(cs_tags_normalized_length)
+    cs_consensus = f"cs:Z:{cs_consensus}" if prefix else cs_consensus
 
-    cs_consensus = get_consensus(cs_tags_normalized_length)
+    if min_agreement is None and not return_result:
+        return cs_consensus
 
-    return f"cs:Z:{cs_consensus}" if prefix else cs_consensus
+    return {
+        "consensus": cs_consensus,
+        "passed": min_agreement is None or agreement >= min_agreement,
+        "agreement": agreement,
+        "max_edit_distance": _max_nearest_edit_distance(cs_tags, positions),
+    }
