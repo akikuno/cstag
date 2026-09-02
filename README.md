@@ -226,8 +226,8 @@ import cstag
 
 cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T"]
 regions = [
-    {"name": "crRNA", "start": 1, "end": 2, "color": "lightblue"},
-    {"name": "index", "start": 3, "end": 4, "color": "lightgreen"},
+    {"name": "region01", "start": 1, "end": 2, "color": "lightblue"},
+    {"name": "region02", "start": 3, "end": 4, "color": "lightgreen"},
 ]
 
 report = cstag.to_mutation_percentages(
@@ -236,6 +236,32 @@ report = cstag.to_mutation_percentages(
     regions=regions,
 )
 print(report)
+"""
+[{'coverage': 5,
+  'deletion_pct': 0.0,
+  'insertion_pct': 0.0,
+  'position': 1,
+  'substitution_pct': 0.0,
+  'total_pct': 0.0},
+ {'coverage': 5,
+  'deletion_pct': 0.0,
+  'insertion_pct': 0.0,
+  'position': 2,
+  'substitution_pct': 20.0,
+  'total_pct': 20.0},
+ {'coverage': 5,
+  'deletion_pct': 0.0,
+  'insertion_pct': 0.0,
+  'position': 3,
+  'substitution_pct': 40.0,
+  'total_pct': 40.0},
+ {'coverage': 4,
+  'deletion_pct': 0.0,
+  'insertion_pct': 0.0,
+  'position': 4,
+  'substitution_pct': 0.0,
+  'total_pct': 0.0}]
+"""
 ```
 
 The function accepts short- or long-form cs tags and returns one dictionary per
