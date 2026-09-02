@@ -217,8 +217,8 @@ import cstag
 
 cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACGT&quot;, &quot;=AC*gt=T&quot;]
 regions = [
-    {&quot;name&quot;: &quot;crRNA&quot;, &quot;start&quot;: 1, &quot;end&quot;: 2, &quot;color&quot;: &quot;lightblue&quot;},
-    {&quot;name&quot;: &quot;index&quot;, &quot;start&quot;: 3, &quot;end&quot;: 4, &quot;color&quot;: &quot;lightgreen&quot;},
+    {&quot;name&quot;: &quot;region01&quot;, &quot;start&quot;: 1, &quot;end&quot;: 2, &quot;color&quot;: &quot;lightblue&quot;},
+    {&quot;name&quot;: &quot;region02&quot;, &quot;start&quot;: 3, &quot;end&quot;: 4, &quot;color&quot;: &quot;lightgreen&quot;},
 ]
 
 report = cstag.to_mutation_percentages(
@@ -227,6 +227,32 @@ report = cstag.to_mutation_percentages(
     regions=regions,
 )
 print(report)
+&quot;&quot;&quot;
+[{'coverage': 5,
+  'deletion_pct': 0.0,
+  'insertion_pct': 0.0,
+  'position': 1,
+  'substitution_pct': 0.0,
+  'total_pct': 0.0},
+ {'coverage': 5,
+  'deletion_pct': 0.0,
+  'insertion_pct': 0.0,
+  'position': 2,
+  'substitution_pct': 20.0,
+  'total_pct': 20.0},
+ {'coverage': 5,
+  'deletion_pct': 0.0,
+  'insertion_pct': 0.0,
+  'position': 3,
+  'substitution_pct': 40.0,
+  'total_pct': 40.0},
+ {'coverage': 4,
+  'deletion_pct': 0.0,
+  'insertion_pct': 0.0,
+  'position': 4,
+  'substitution_pct': 0.0,
+  'total_pct': 0.0}]
+&quot;&quot;&quot;
 </code></pre>
 <p>The function accepts short- or long-form cs tags and returns one dictionary per
 1-based relative reference position. Percentages are reported for all mutations,
