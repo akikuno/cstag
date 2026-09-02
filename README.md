@@ -264,6 +264,8 @@ print(report)
 """
 ```
 
+<img width="511" alt="image" src="./image/mutation_percentages.png">
+
 The function accepts short- or long-form cs tags and returns one dictionary per
 1-based relative reference position. Percentages are reported for all mutations,
 insertions, deletions, and substitutions. A PDF is saved as editable vector
