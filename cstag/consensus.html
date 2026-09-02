@@ -3,19 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>cstag.consensus API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => {
 hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
 hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
 })</script>
 </head>
 <body>
@@ -37,64 +48,213 @@ hljs.highlightAll();
 <span>def <span class="ident">condense_deletions</span></span>(<span>s: str) ‑> str</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def condense_deletions(s: str) -&gt; str:
+    # Pattern for detecting continuous nucleotide deletions
+    pattern = r&#34;(-[acgtn])+&#34;
+
+    # Function to replace the matched pattern
+    def replacement(match) -&gt; str:
+        # Remove hyphens and concatenate the nucleotides
+        condensed_nucleotides = match.group(0).replace(&#34;-&#34;, &#34;&#34;)
+        return f&#34;-{condensed_nucleotides}&#34;
+
+    # Use the regular expression to substitute the pattern with its condensed form
+    return re.sub(pattern, replacement, s)</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="cstag.consensus.consensus"><code class="name flex">
-<span>def <span class="ident">consensus</span></span>(<span>cs_tags: list[str], positions: list[int], prefix: bool = False) ‑> str</span>
+<span>def <span class="ident">consensus</span></span>(<span>cs_tags: list[str],<br>positions: list[int],<br>prefix: bool = False,<br>*,<br>min_agreement: Real | None = None,<br>return_result: bool = False) ‑> str | dict[str, str | bool | float | int | None]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>generate consensus of cs tags</p>
-<h2 id="args">Args</h2>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def consensus(
+    cs_tags: list[str],
+    positions: list[int],
+    prefix: bool = False,
+    *,
+    min_agreement: Real | None = None,
+    return_result: bool = False,
+) -&gt; str | dict[str, str | bool | float | int | None]:
+    &#34;&#34;&#34;Generate a consensus of cs tags and optionally report its quality.
+
+    Args:
+        cs_tags (list): cs tags in the **long** format
+        positions (list): 1-based leftmost mapping position (4th column in SAM file)
+        prefix (bool, optional): Whether to add the prefix &#39;cs:Z:&#39; to the cs tag. Defaults to False
+        min_agreement (float, optional): Minimum required per-position agreement,
+            between 0 and 1. Specifying this returns a quality-result dictionary.
+        return_result (bool, optional): Return a quality-result dictionary even
+            when ``min_agreement`` is not specified. Defaults to False.
+
+    Return:
+        str | dict: A long-format consensus string by default. Quality requests
+        return a dictionary containing ``consensus``, ``passed``, ``agreement``,
+        and ``max_edit_distance``.
+
+    Example:
+        &gt;&gt;&gt; import cstag
+        &gt;&gt;&gt; cs_tags = [&#34;=ACGT&#34;, &#34;=AC*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=C*gt=T&#34;, &#34;=ACT+ccc=T&#34;]
+        &gt;&gt;&gt; positions = [1,1,1,2,1]
+        &gt;&gt;&gt; cstag.consensus(cs_tags, positions)
+        &#39;=AC*gt=T&#39;
+        &gt;&gt;&gt; cstag.consensus([&#34;=ACGT&#34;, &#34;=ACGT&#34;, &#34;=ACGT&#34;, &#34;=AC*gt=T&#34;], [1, 1, 1, 1], min_agreement=0.75)
+        {&#39;consensus&#39;: &#39;=ACGT&#39;, &#39;passed&#39;: True, &#39;agreement&#39;: 0.75, &#39;max_edit_distance&#39;: 1}
+    &#34;&#34;&#34;
+    if not (len(cs_tags) == len(positions) &gt; 0):
+        raise ValueError(&#34;Element numbers of each argument must be the same&#34;)
+
+    for cs_tag in cs_tags:
+        validate_cs_tag(cs_tag)
+        validate_long_format(cs_tag)
+
+    if min_agreement is not None:
+        min_agreement = _validate_min_agreement(min_agreement)
+
+    cs_tags_normalized_length = normalize_read_lengths(cs_tags, positions)
+    cs_consensus, agreement = _get_consensus_and_agreement(cs_tags_normalized_length)
+    cs_consensus = f&#34;cs:Z:{cs_consensus}&#34; if prefix else cs_consensus
+
+    if min_agreement is None and not return_result:
+        return cs_consensus
+
+    return {
+        &#34;consensus&#34;: cs_consensus,
+        &#34;passed&#34;: min_agreement is None or agreement &gt;= min_agreement,
+        &#34;agreement&#34;: agreement,
+        &#34;max_edit_distance&#34;: _max_nearest_edit_distance(cs_tags, positions),
+    }</code></pre>
+</details>
+<div class="desc"><p>Generate a consensus of cs tags and optionally report its quality.</p>
 <dl>
+<dt>Args</dt>
+<dt>-----=</dt>
 <dt><strong><code>cs_tags</code></strong> :&ensp;<code>list</code></dt>
 <dd>cs tags in the <strong>long</strong> format</dd>
 <dt><strong><code>positions</code></strong> :&ensp;<code>list</code></dt>
 <dd>1-based leftmost mapping position (4th column in SAM file)</dd>
 <dt><strong><code>prefix</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>Whether to add the prefix 'cs:Z:' to the cs tag. Defaults to False</dd>
+<dt><strong><code>min_agreement</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Minimum required per-position agreement,
+between 0 and 1. Specifying this returns a quality-result dictionary.</dd>
+<dt><strong><code>return_result</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Return a quality-result dictionary even
+when <code>min_agreement</code> is not specified. Defaults to False.</dd>
 </dl>
-<h2 id="return">Return</h2>
-<p>str: a consensus of cs tag in the <strong>long</strong> format</p>
-<h2 id="example">Example</h2>
+<p>Return
+-----=
+str | dict: A long-format consensus string by default. Quality requests
+return a dictionary containing <code><a title="cstag.consensus.consensus" href="#cstag.consensus.consensus">consensus()</a></code>, <code>passed</code>, <code>agreement</code>,
+and <code>max_edit_distance</code>.</p>
+<p>Example
+-----=</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; import cstag
 &gt;&gt;&gt; cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACT+ccc=T&quot;]
 &gt;&gt;&gt; positions = [1,1,1,2,1]
 &gt;&gt;&gt; cstag.consensus(cs_tags, positions)
 '=AC*gt=T'
+&gt;&gt;&gt; cstag.consensus([&quot;=ACGT&quot;, &quot;=ACGT&quot;, &quot;=ACGT&quot;, &quot;=AC*gt=T&quot;], [1, 1, 1, 1], min_agreement=0.75)
+{'consensus': '=ACGT', 'passed': True, 'agreement': 0.75, 'max_edit_distance': 1}
 </code></pre></div>
 </dd>
 <dt id="cstag.consensus.expand_deletion_tags"><code class="name flex">
 <span>def <span class="ident">expand_deletion_tags</span></span>(<span>tags_combined: list[str]) ‑> list[str]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def expand_deletion_tags(tags_combined: list[str]) -&gt; list[str]:
+    cs_tags_expand_deletion = []
+    for tag in tags_combined:
+        for tag_splitted in split_deletion(tag):
+            cs_tags_expand_deletion.append(tag_splitted)
+    return cs_tags_expand_deletion</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="cstag.consensus.get_consensus"><code class="name flex">
 <span>def <span class="ident">get_consensus</span></span>(<span>cs_tags: list[list[str]]) ‑> str</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_consensus(cs_tags: list[list[str]]) -&gt; str:
+    cs_consensus, _ = _get_consensus_and_agreement(cs_tags)
+    return cs_consensus</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 <dt id="cstag.consensus.normalize_positions"><code class="name flex">
 <span>def <span class="ident">normalize_positions</span></span>(<span>positions: list[int]) ‑> list[int]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def normalize_positions(positions: list[int]) -&gt; list[int]:
+    &#34;&#34;&#34;
+    Normalize the positions in the given list by shifting them so that the minimum position becomes zero.
+    &#34;&#34;&#34;
+    pos_min = min(positions)
+    return [pos - pos_min for pos in positions]</code></pre>
+</details>
 <div class="desc"><p>Normalize the positions in the given list by shifting them so that the minimum position becomes zero.</p></div>
 </dd>
 <dt id="cstag.consensus.normalize_read_lengths"><code class="name flex">
 <span>def <span class="ident">normalize_read_lengths</span></span>(<span>cs_tags: list[str], positions: list[int]) ‑> list[list[str]]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def normalize_read_lengths(cs_tags: list[str], positions: list[int]) -&gt; list[list[str]]:
+    &#34;&#34;&#34;
+    Normalize the lengths of each read in cs_tags based on their starts positions. If the length is insufficient, fill in with `None`.
+
+    Args:
+        cs_tags (list[str]): list of cs tags.
+        positions (list[int]): Starting positions of each read.
+
+    Returns:
+        list[list[str]]: list of lists representing the reads, now normalized to the same length.
+    &#34;&#34;&#34;
+    cs_tags_split = split_cs_tags(cs_tags)
+    cs_tags_deque = [deque(cs) for cs in cs_tags_split]
+    positions_normalized = normalize_positions(positions)
+    cs_maxlen = max(len(cs) + pos for cs, pos in zip(cs_tags_deque, positions_normalized))
+
+    for i, pos in enumerate(positions_normalized):
+        if pos &gt; 0:
+            cs_tags_deque[i].extendleft([None] * pos)
+        if len(cs_tags_deque[i]) &lt; cs_maxlen:
+            cs_tags_deque[i].extend([None] * (cs_maxlen - len(cs_tags_deque[i])))
+    cs_tags = [list(cs) for cs in cs_tags_deque]
+    return cs_tags</code></pre>
+</details>
 <div class="desc"><p>Normalize the lengths of each read in cs_tags based on their starts positions. If the length is insufficient, fill in with <code>None</code>.</p>
-<h2 id="args">Args</h2>
 <dl>
+<dt>Args</dt>
+<dt>-----=</dt>
 <dt><strong><code>cs_tags</code></strong> :&ensp;<code>list[str]</code></dt>
 <dd>list of cs tags.</dd>
 <dt><strong><code>positions</code></strong> :&ensp;<code>list[int]</code></dt>
 <dd>Starting positions of each read.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
+<dt>Returns</dt>
+<dt>-----=</dt>
 <dt><code>list[list[str]]</code></dt>
 <dd>list of lists representing the reads, now normalized to the same length.</dd>
 </dl></div>
@@ -103,14 +263,51 @@ hljs.highlightAll();
 <span>def <span class="ident">split_cs_tags</span></span>(<span>cs_tags: list[str]) ‑> list[list[str]]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def split_cs_tags(cs_tags: list[str]) -&gt; list[list[str]]:
+    &#34;&#34;&#34;
+    Split and process each cs tag in cs_tags.
+
+    Args:
+        cs_tags (list[str]): list of cs tags in the long format.
+
+    Returns:
+        list[list[str]]: list of processed cs tags.
+    &#34;&#34;&#34;
+    cs_tags_splitted = []
+    for cs_tag in cs_tags:
+        # Remove the prefix &#34;cs:Z:&#34; if present
+        cs_tag = cs_tag.replace(&#34;cs:Z:&#34;, &#34;&#34;)
+
+        # Split the cs tag using special symbols (-, *, ~, =)
+        # insertion symbol (+) is ignored because it is not observed in reference sequence
+        tags_splitted = re.split(r&#34;([-*~=])&#34;, cs_tag)[1:]
+        # Combine the symbol with the corresponding sequence
+        tags_combined = [symbol + seq for symbol, seq in zip(tags_splitted[0::2], tags_splitted[1::2])]
+        tags_combined = expand_deletion_tags(tags_combined)
+
+        # Remove the &#34;=&#34; symbols, as they are not needed for further processing
+        cleaned_tags = [tag.replace(&#34;=&#34;, &#34;&#34;) for tag in tags_combined]
+        # Further split the tags by the base letters (A, C, G, T)
+        further_tags_splitted = [re.split(r&#34;(?=[ACGT])&#34;, tag) for tag in cleaned_tags]
+        # Remove any empty strings generated by the split
+        non_empty_tags = [[elem for elem in tag if elem] for tag in further_tags_splitted]
+        # Flatten the list of lists into a single list
+        flat_tags = list(chain.from_iterable(non_empty_tags))
+        cs_tags_splitted.append(flat_tags)
+    return cs_tags_splitted</code></pre>
+</details>
 <div class="desc"><p>Split and process each cs tag in cs_tags.</p>
-<h2 id="args">Args</h2>
 <dl>
+<dt>Args</dt>
+<dt>-----=</dt>
 <dt><strong><code>cs_tags</code></strong> :&ensp;<code>list[str]</code></dt>
 <dd>list of cs tags in the long format.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
+<dt>Returns</dt>
+<dt>-----=</dt>
 <dt><code>list[list[str]]</code></dt>
 <dd>list of processed cs tags.</dd>
 </dl></div>
@@ -119,6 +316,17 @@ hljs.highlightAll();
 <span>def <span class="ident">split_deletion</span></span>(<span>cs_tag: str) ‑> list[str]</span>
 </code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def split_deletion(cs_tag: str) -&gt; list[str]:
+    match = re.match(r&#34;-(?P&lt;nucleotides&gt;[acgtn]+)$&#34;, cs_tag)
+    if match:
+        nucleotides = match.group(&#34;nucleotides&#34;)
+        return [f&#34;-{n}&#34; for n in nucleotides]
+    return [cs_tag]</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
 </dl>
@@ -152,7 +360,7 @@ hljs.highlightAll();
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>

@@ -3,20 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>cstag API documentation</title>
 <meta name="description" content="[![Licence](https://img.shields.io/badge/License-MIT-9cf.svg)](https://choosealicense.com/licenses/mit/)
 …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
 <style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
 <script>window.addEventListener('DOMContentLoaded', () => {
 hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
 hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
 })</script>
 </head>
 <body>
@@ -52,6 +63,7 @@ To add cs tags to SAM/BAM files, check out <a href="https://github.com/akikuno/c
 <li><code><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code>: Reconstruct a reference subsequence from the alignment</li>
 <li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code>: Generate a VCF representation</li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code>: Generate an HTML representation</li>
+<li><code><a title="cstag.to_mutation_percentages" href="to_mutation_percentages.html">cstag.to_mutation_percentages</a></code>: Report and plot per-position mutation percentages</li>
 </ul>
 <p>For comprehensive documentation, please visit <a href="https://akikuno.github.io/cstag/cstag/">our docs</a>.
 </p>
@@ -103,6 +115,27 @@ positions = [1, 1, 2, 2, 1]
 print(cstag.consensus(cs_tags, positions))
 # =AC*gt=T
 </code></pre>
+<p>To require a minimum level of agreement and report consensus quality, set
+<code>min_agreement</code> to a value between 0 and 1. The returned dictionary retains the
+candidate consensus even when it does not pass the requirement.</p>
+<pre><code class="language-python">import cstag
+
+cs_tags = [&quot;=ACGT&quot;, &quot;=ACGT&quot;, &quot;=ACGT&quot;, &quot;=AC*gt=T&quot;]
+positions = [1, 1, 1, 1]
+
+print(cstag.consensus(cs_tags, positions, min_agreement=0.75))
+# {
+#     'consensus': '=ACGT',
+#     'passed': True,
+#     'agreement': 0.75,
+#     'max_edit_distance': 1,
+# }
+</code></pre>
+<p><code>agreement</code> is the lowest modal-token fraction over all covered reference
+positions. <code>max_edit_distance</code> is the largest, among all reads, of the
+Levenshtein distance to its nearest overlapping read. Use <code>return_result=True</code>
+to obtain the same report without applying an agreement threshold. Calls that
+set neither option continue to return only the consensus string.</p>
 <h3 id="masking-low-quality-bases">Masking Low-Quality Bases</h3>
 <pre><code class="language-python">import cstag
 
@@ -177,6 +210,28 @@ Path(&quot;report.html&quot;).write_text(cs_tag_html)
 </code></pre>
 <p>You can visualize mutations indicated by the cs tag using the generated <code>report.html</code> file as shown below:</p>
 <p><img width="511" alt="image" src="https://user-images.githubusercontent.com/15861316/265405607-a3cc1b76-f6a2-441d-b282-6f2dc06fc03d.png"></p>
+<h3 id="plotting-mutation-percentages">Plotting Mutation Percentages</h3>
+<pre><code class="language-python">from pathlib import Path
+
+import cstag
+
+cs_tags = [&quot;=ACGT&quot;, &quot;=AC*gt=T&quot;, &quot;=C*gt=T&quot;, &quot;=ACGT&quot;, &quot;=AC*gt=T&quot;]
+regions = [
+    {&quot;name&quot;: &quot;crRNA&quot;, &quot;start&quot;: 1, &quot;end&quot;: 2, &quot;color&quot;: &quot;lightblue&quot;},
+    {&quot;name&quot;: &quot;index&quot;, &quot;start&quot;: 3, &quot;end&quot;: 4, &quot;color&quot;: &quot;lightgreen&quot;},
+]
+
+report = cstag.to_mutation_percentages(
+    cs_tags,
+    Path(&quot;mutation_percentages.pdf&quot;),
+    regions=regions,
+)
+print(report)
+</code></pre>
+<p>The function accepts short- or long-form cs tags and returns one dictionary per
+1-based relative reference position. Percentages are reported for all mutations,
+insertions, deletions, and substitutions. A PDF is saved as editable vector
+graphics; use a <code>.png</code> output path for a raster image.</p>
 <h2 id="feedback-and-support">📣 Feedback and Support</h2>
 <p>For questions, bug reports, or other forms of feedback, we'd love to hear from you!<br>
 Please use <a href="https://github.com/akikuno/cstag/issues">GitHub Issues</a> for all reporting purposes.
@@ -227,6 +282,10 @@ By participating in this project you agree to abide by its terms.
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="cstag.to_mutation_percentages" href="to_mutation_percentages.html">cstag.to_mutation_percentages</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -263,6 +322,7 @@ By participating in this project you agree to abide by its terms.
 <li><a href="#reconstructing-the-reference-subsequence">Reconstructing the Reference Subsequence</a></li>
 <li><a href="#generating-a-vcf-report">Generating a VCF Report</a></li>
 <li><a href="#generating-an-html-report">Generating an HTML Report</a></li>
+<li><a href="#plotting-mutation-percentages">Plotting Mutation Percentages</a></li>
 </ul>
 </li>
 <li><a href="#feedback-and-support">📣 Feedback and Support</a></li>
@@ -281,6 +341,7 @@ By participating in this project you agree to abide by its terms.
 <li><code><a title="cstag.shorten" href="shorten.html">cstag.shorten</a></code></li>
 <li><code><a title="cstag.split" href="split.html">cstag.split</a></code></li>
 <li><code><a title="cstag.to_html" href="to_html.html">cstag.to_html</a></code></li>
+<li><code><a title="cstag.to_mutation_percentages" href="to_mutation_percentages.html">cstag.to_mutation_percentages</a></code></li>
 <li><code><a title="cstag.to_sequence" href="to_sequence.html">cstag.to_sequence</a></code></li>
 <li><code><a title="cstag.to_vcf" href="to_vcf.html">cstag.to_vcf</a></code></li>
 <li><code><a title="cstag.utils" href="utils/index.html">cstag.utils</a></code></li>
@@ -290,7 +351,7 @@ By participating in this project you agree to abide by its terms.
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>

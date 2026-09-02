@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>cstag.to_mutation_percentages API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>cstag.to_mutation_percentages</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="cstag.to_mutation_percentages.plot_mutation_percentages"><code class="name flex">
+<span>def <span class="ident">plot_mutation_percentages</span></span>(<span>records: Sequence[dict[str, int | float]],<br>output_path: Path | None = None,<br>regions: Sequence[Mapping[str, object]] | None = None) ‑> tuple[typing.Any, typing.Any]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_mutation_percentages(
+    records: Sequence[dict[str, int | float]],
+    output_path: Path | None = None,
+    regions: Sequence[Mapping[str, object]] | None = None,
+) -&gt; tuple[Any, Any]:
+    &#34;&#34;&#34;Create four mutation plots and an optional bottom region track.&#34;&#34;&#34;
+    if isinstance(records, (str, bytes)) or not isinstance(records, Sequence):
+        raise TypeError(&#34;records must be a non-empty sequence of dictionaries&#34;)
+    if not records:
+        raise ValueError(&#34;records must not be empty&#34;)
+    if output_path is not None and not isinstance(output_path, Path):
+        raise TypeError(&#34;output_path must be a pathlib.Path or None&#34;)
+
+    for record_index, record in enumerate(records):
+        if not isinstance(record, dict):
+            raise TypeError(f&#34;records[{record_index}] must be a dictionary&#34;)
+        missing = set(PROFILE_KEYS) - set(record)
+        if missing:
+            missing_list = &#34;, &#34;.join(sorted(missing))
+            raise ValueError(f&#34;records[{record_index}] is missing keys: {missing_list}&#34;)
+
+    positions = [record[&#34;position&#34;] for record in records]
+    series = (
+        (&#34;total_pct&#34;, &#34;Total mutations&#34;, &#34;#1f77b4&#34;),
+        (&#34;insertion_pct&#34;, &#34;Insertions&#34;, &#34;#ff7f0e&#34;),
+        (&#34;deletion_pct&#34;, &#34;Deletions&#34;, &#34;#d62728&#34;),
+        (&#34;substitution_pct&#34;, &#34;Substitutions&#34;, &#34;#2ca02c&#34;),
+    )
+    validated_regions = _validate_regions(regions, int(positions[-1]))
+    if validated_regions:
+        region_height = max(0.45, 0.22 * len(validated_regions))
+        figure, axes = plt.subplots(
+            5,
+            1,
+            figsize=(12, 11 + 0.25 * len(validated_regions)),
+            sharex=True,
+            constrained_layout=True,
+            gridspec_kw={&#34;height_ratios&#34;: [1, 1, 1, 1, region_height]},
+        )
+        mutation_axes = axes[:4]
+        region_axis = axes[4]
+    else:
+        figure, axes = plt.subplots(
+            4,
+            1,
+            figsize=(12, 10),
+            sharex=True,
+            constrained_layout=True,
+        )
+        mutation_axes = axes
+        region_axis = None
+
+    for axis, (key, title, color) in zip(mutation_axes, series):
+        values = [record[key] for record in records]
+        axis.bar(
+            positions,
+            values,
+            width=1.0,
+            align=&#34;center&#34;,
+            color=color,
+            edgecolor=&#34;none&#34;,
+            alpha=0.85,
+        )
+        axis.set_title(title)
+        axis.set_ylabel(&#34;Mutation (%)&#34;)
+        axis.set_ylim(0, 100)
+        axis.grid(axis=&#34;both&#34;, alpha=0.25)
+
+    if region_axis is not None:
+        for row, region in enumerate(validated_regions):
+            start = int(region[&#34;start&#34;])
+            end = int(region[&#34;end&#34;])
+            region_axis.barh(
+                row,
+                end - start + 1,
+                left=start - 0.5,
+                height=0.7,
+                color=str(region[&#34;color&#34;]),
+                edgecolor=&#34;none&#34;,
+                alpha=0.85,
+            )
+        region_axis.set_yticks(
+            range(len(validated_regions)),
+            labels=[str(region[&#34;name&#34;]) for region in validated_regions],
+        )
+        region_axis.set_ylim(-0.5, len(validated_regions) - 0.5)
+        region_axis.invert_yaxis()
+        region_axis.set_ylabel(&#34;Regions&#34;)
+        region_axis.grid(axis=&#34;x&#34;, alpha=0.25)
+        x_axis = region_axis
+    else:
+        x_axis = mutation_axes[-1]
+
+    x_axis.set_xlabel(&#34;Reference position (1-based)&#34;)
+    x_axis.set_xlim(positions[0] - 0.5, positions[-1] + 0.5)
+
+    if output_path is not None:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        if output_path.suffix.lower() == &#34;.pdf&#34;:
+            # Keep plot elements vector-based and embed editable TrueType text.
+            with plt.rc_context({&#34;pdf.fonttype&#34;: 42}):
+                figure.savefig(output_path, bbox_inches=&#34;tight&#34;)
+        else:
+            figure.savefig(output_path, dpi=150, bbox_inches=&#34;tight&#34;)
+
+    return figure, axes</code></pre>
+</details>
+<div class="desc"><p>Create four mutation plots and an optional bottom region track.</p></div>
+</dd>
+<dt id="cstag.to_mutation_percentages.summarize_cs"><code class="name flex">
+<span>def <span class="ident">summarize_cs</span></span>(<span>cs_tags: Sequence[str]) ‑> list[dict[str, int | float]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def summarize_cs(cs_tags: Sequence[str]) -&gt; list[dict[str, int | float]]:
+    &#34;&#34;&#34;Calculate mutation percentages at each relative reference position.
+
+    Short- and long-form cs tags are accepted, with or without the ``cs:Z:``
+    prefix. All tags are assumed to begin at relative reference position 1.
+    Each percentage uses the number of tags covering that position as its
+    denominator. ``total_pct`` is the union of reads with any mutation at the
+    position, so it cannot exceed 100 percent.
+
+    Args:
+        cs_tags: Non-empty sequence of minimap2 cs tag strings.
+
+    Returns:
+        One dictionary per 1-based reference position. Each dictionary contains
+        ``position``, ``coverage``, ``total_pct``, ``insertion_pct``,
+        ``deletion_pct``, and ``substitution_pct``.
+    &#34;&#34;&#34;
+    if isinstance(cs_tags, (str, bytes)) or not isinstance(cs_tags, Sequence):
+        raise TypeError(&#34;cs_tags must be a non-empty sequence of strings&#34;)
+    if not cs_tags:
+        raise ValueError(&#34;cs_tags must not be empty&#34;)
+
+    coverage_reads: dict[int, set[int]] = defaultdict(set)
+    event_reads: dict[str, dict[int, set[int]]] = {
+        &#34;insertion&#34;: defaultdict(set),
+        &#34;deletion&#34;: defaultdict(set),
+        &#34;substitution&#34;: defaultdict(set),
+    }
+
+    for tag_index, cs_tag in enumerate(cs_tags):
+        coverage, events = _events_for_tag(cs_tag, tag_index)
+        for position in coverage:
+            coverage_reads[position].add(tag_index)
+        for category, positions in events.items():
+            for position in positions:
+                event_reads[category][position].add(tag_index)
+
+    max_position = max(coverage_reads)
+    profile: list[dict[str, int | float]] = []
+    for position in range(1, max_position + 1):
+        covered = coverage_reads[position]
+        coverage_count = len(covered)
+        insertion_reads = event_reads[&#34;insertion&#34;][position]
+        deletion_reads = event_reads[&#34;deletion&#34;][position]
+        substitution_reads = event_reads[&#34;substitution&#34;][position]
+        total_reads = insertion_reads | deletion_reads | substitution_reads
+
+        def percentage(reads: set[int]) -&gt; float:
+            return 100.0 * len(reads) / coverage_count
+
+        profile.append(
+            {
+                &#34;position&#34;: position,
+                &#34;coverage&#34;: coverage_count,
+                &#34;total_pct&#34;: percentage(total_reads),
+                &#34;insertion_pct&#34;: percentage(insertion_reads),
+                &#34;deletion_pct&#34;: percentage(deletion_reads),
+                &#34;substitution_pct&#34;: percentage(substitution_reads),
+            }
+        )
+    return profile</code></pre>
+</details>
+<div class="desc"><p>Calculate mutation percentages at each relative reference position.</p>
+<p>Short- and long-form cs tags are accepted, with or without the <code>cs:Z:</code>
+prefix. All tags are assumed to begin at relative reference position 1.
+Each percentage uses the number of tags covering that position as its
+denominator. <code>total_pct</code> is the union of reads with any mutation at the
+position, so it cannot exceed 100 percent.</p>
+<dl>
+<dt>Args</dt>
+<dt>-----=</dt>
+<dt><strong><code>cs_tags</code></strong></dt>
+<dd>Non-empty sequence of minimap2 cs tag strings.</dd>
+</dl>
+<p>Returns
+-----=
+One dictionary per 1-based reference position. Each dictionary contains
+<code>position</code>, <code>coverage</code>, <code>total_pct</code>, <code>insertion_pct</code>,
+<code>deletion_pct</code>, and <code>substitution_pct</code>.</p></div>
+</dd>
+<dt id="cstag.to_mutation_percentages.to_mutation_percentages"><code class="name flex">
+<span>def <span class="ident">to_mutation_percentages</span></span>(<span>cs_tags: Sequence[str],<br>output_path: Path,<br>regions: Sequence[Mapping[str, object]] | None = None) ‑> list[dict[str, int | float]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_mutation_percentages(
+    cs_tags: Sequence[str],
+    output_path: Path,
+    regions: Sequence[Mapping[str, object]] | None = None,
+) -&gt; list[dict[str, int | float]]:
+    &#34;&#34;&#34;Report and plot mutation percentages at each reference position.
+
+    Args:
+        cs_tags: Python sequence containing short- or long-form cs tag strings.
+        output_path: Path of the plot file to create. The format is inferred
+            from its extension. Use ``.pdf`` for an editable vector PDF with
+            embedded TrueType fonts, or ``.png`` for a raster image.
+        regions: Optional sequence of dictionaries describing regions to annotate
+            below the mutation plots. Each dictionary must contain ``name``
+            (the displayed label), ``start`` and ``end`` (1-based, inclusive
+            reference positions), and ``color`` (a Matplotlib-compatible color).
+            For example::
+
+                [
+                    {&#34;name&#34;: &#34;crRNA&#34;, &#34;start&#34;: 80, &#34;end&#34;: 99,
+                     &#34;color&#34;: &#34;lightblue&#34;},
+                    {&#34;name&#34;: &#34;index&#34;, &#34;start&#34;: 207, &#34;end&#34;: 214,
+                     &#34;color&#34;: &#34;lightgreen&#34;},
+                ]
+
+            Each region is drawn as a separate horizontal bar, so overlapping
+            regions remain visible. Supplying one or more regions adds a fifth
+            annotation track below the four mutation panels; ``None`` or an
+            empty sequence keeps the original four-panel plot.
+
+    Returns:
+        One dictionary per 1-based relative reference position containing
+        coverage and total, insertion, deletion, and substitution percentages.
+    &#34;&#34;&#34;
+    if not isinstance(output_path, Path):
+        raise TypeError(&#34;output_path must be a pathlib.Path&#34;)
+
+    profile = summarize_cs(cs_tags)
+    figure, _ = plot_mutation_percentages(profile, output_path, regions=regions)
+    plt.close(figure)
+    return profile</code></pre>
+</details>
+<div class="desc"><p>Report and plot mutation percentages at each reference position.</p>
+<dl>
+<dt>Args</dt>
+<dt>-----=</dt>
+<dt><strong><code>cs_tags</code></strong></dt>
+<dd>Python sequence containing short- or long-form cs tag strings.</dd>
+<dt><strong><code>output_path</code></strong></dt>
+<dd>Path of the plot file to create. The format is inferred
+from its extension. Use <code>.pdf</code> for an editable vector PDF with
+embedded TrueType fonts, or <code>.png</code> for a raster image.</dd>
+<dt><strong><code>regions</code></strong></dt>
+<dd>
+<p>Optional sequence of dictionaries describing regions to annotate
+below the mutation plots. Each dictionary must contain <code>name</code>
+(the displayed label), <code>start</code> and <code>end</code> (1-based, inclusive
+reference positions), and <code>color</code> (a Matplotlib-compatible color).
+For example::</p>
+<pre><code>[
+    {"name": "crRNA", "start": 80, "end": 99,
+     "color": "lightblue"},
+    {"name": "index", "start": 207, "end": 214,
+     "color": "lightgreen"},
+]
+</code></pre>
+<p>Each region is drawn as a separate horizontal bar, so overlapping
+regions remain visible. Supplying one or more regions adds a fifth
+annotation track below the four mutation panels; <code>None</code> or an
+empty sequence keeps the original four-panel plot.</p>
+</dd>
+</dl>
+<p>Returns
+-----=
+One dictionary per 1-based relative reference position containing
+coverage and total, insertion, deletion, and substitution percentages.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="cstag" href="index.html">cstag</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="cstag.to_mutation_percentages.plot_mutation_percentages" href="#cstag.to_mutation_percentages.plot_mutation_percentages">plot_mutation_percentages</a></code></li>
+<li><code><a title="cstag.to_mutation_percentages.summarize_cs" href="#cstag.to_mutation_percentages.summarize_cs">summarize_cs</a></code></li>
+<li><code><a title="cstag.to_mutation_percentages.to_mutation_percentages" href="#cstag.to_mutation_percentages.to_mutation_percentages">to_mutation_percentages</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
