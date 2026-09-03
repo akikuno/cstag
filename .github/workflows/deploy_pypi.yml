@@ -1,32 +1,28 @@
-name: Publish Python 🐍 distributions 📦 to PyPI
+name: Publish Python distributions to PyPI
 
 on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to PyPI
+  build-and-publish:
+    name: Build and publish distributions
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
-
-    - name: Set up Python
-      uses: actions/setup-python@v7
-      with:
-        python-version: 3.x
-
-    - name: Install pip
-      run: python -m pip install --upgrade pip
-
-    - name: Install setuptools and wheel
-      run: python -m pip install --upgrade setuptools build
-
-    - name: Build source and wheel distributions
-      run: python -m build --sdist --wheel
-
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Build wheel and source distribution
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "build>=1.6,<2"
+          python -m build
+      - name: Publish distributions
+        uses: pypa/gh-action-pypi-publish@v1.14.2
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}

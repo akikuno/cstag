@@ -2,30 +2,59 @@ name: GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.x'
-      - name: Build
-        run: |
-          python -m pip install -U pip
-          python -m pip install -e .
-          python -m pip install pdoc3
-          pdoc --html --output-dir tmp --force src/cstag
+permissions:
+  contents: read
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.ref == 'refs/heads/main' }}
+concurrency:
+  group: docs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-docs:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Build documentation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . "pdoc>=16,<17"
+          pdoc -o tmp cstag
+          cp .github/cstag-docs-redirect.html tmp/cstag/index.html
+          test -f tmp/index.html
+          test -f tmp/cstag.html
+          test -f tmp/cstag/index.html
+
+  deploy-docs:
+    name: Deploy documentation
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate-docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Build documentation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . "pdoc>=16,<17"
+          pdoc -o tmp cstag
+          cp .github/cstag-docs-redirect.html tmp/cstag/index.html
+      - name: Deploy documentation
+        uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./tmp

@@ -1,6 +1,7 @@
 from pathlib import Path
-from src.cstag.split import split
-from src.cstag.to_html import append_mark_to_n, to_html
+
+from cstag.split import split
+from cstag.to_html import append_mark_to_n, to_html
 
 
 def test_append_mark_to_n():
@@ -51,7 +52,11 @@ def test_html_repeat_substitution():
     cs_html = to_html(cs_tag, description)
     test = [h for h in cs_html.split("\n") if h.count("<p class='p_seq'>")]
     test = test[0].split()
-    answer = Path("tests", "data", "to_html", "report_substitution.html").read_text().split("\n")
+    answer = (
+        Path("tests", "data", "to_html", "report_substitution.html")
+        .read_text()
+        .split("\n")
+    )
     answer = [h for h in answer if h.count(r"<p class='p_seq'>")]
     answer = answer[0].split()
     assert test == answer
@@ -63,7 +68,11 @@ def test_html_repeat_substitution_start():
     cs_html = to_html(cs_tag, description)
     test = [h for h in cs_html.split("\n") if h.count("<p class='p_seq'>")]
     test = test[0].split()
-    answer = Path("tests", "data", "to_html", "report_substitution_start.html").read_text().split("\n")
+    answer = (
+        Path("tests", "data", "to_html", "report_substitution_start.html")
+        .read_text()
+        .split("\n")
+    )
     answer = [h for h in answer if h.count(r"<p class='p_seq'>")]
     answer = answer[0].split()
     assert test == answer
@@ -75,7 +84,11 @@ def test_html_repeat_substitution_end():
     cs_html = to_html(cs_tag, description)
     test = [h for h in cs_html.split("\n") if h.count("<p class='p_seq'>")]
     test = test[0].split()
-    answer = Path("tests", "data", "to_html", "report_substitution_end.html").read_text().split("\n")
+    answer = (
+        Path("tests", "data", "to_html", "report_substitution_end.html")
+        .read_text()
+        .split("\n")
+    )
     answer = [h for h in answer if h.count(r"<p class='p_seq'>")]
     answer = answer[0].split()
     assert test == answer
@@ -104,8 +117,7 @@ def test_html_deletion_with_N():
     cs_tag = "=T-acgt=NNNG"
     description = "Example"
     cs_html = to_html(cs_tag, description)
-    test = [h for h in cs_html.split("\n") if h.count("<p class='p_seq'>")]
-    test = test[0]
+    test = next(h for h in cs_html.split("\n") if h.count("<p class='p_seq'>"))
     answer = "<p class='p_seq'>T<span class='Del'>ACGT</span><span class='Unknown'>NNN</span>G</p>"
     assert test == answer
 
@@ -114,7 +126,7 @@ def test_html_N_within_deletions():
     cs_tag = "=T-acgt=NNN-acgt=G"
     description = "Example"
     cs_html = to_html(cs_tag, description)
-    test = [h for h in cs_html.split("\n") if h.count("<p class='p_seq'>")][0]
+    test = next(h for h in cs_html.split("\n") if h.count("<p class='p_seq'>"))
     answer = "<p class='p_seq'>T<span class='Del'>ACGT</span><span class='Unknown'>NNN</span><span class='Del'>ACGT</span>G</p>"
     assert test == answer
 
@@ -123,6 +135,6 @@ def test_html_N_within_insertions():
     cs_tag = "=T+acgt=NNN+acgt=G"
     description = "Example"
     cs_html = to_html(cs_tag, description)
-    test = [h for h in cs_html.split("\n") if h.count("<p class='p_seq'>")][0]
+    test = next(h for h in cs_html.split("\n") if h.count("<p class='p_seq'>"))
     answer = "<p class='p_seq'>T<span class='Ins'>ACGT</span><span class='Unknown'>NNN</span><span class='Ins'>ACGT</span>G</p>"
     assert test == answer

@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-from src.cstag.to_vcf import (
+from cstag.to_vcf import (
     CsInfo,
     Vcf,
     VcfInfo,
+    add_vcf_fields,
+    call_reference_depth,
     chrom_sort_key,
-    find_ref_for_insertion,
     find_ref_for_deletion,
-    get_variant_annotations,
-    get_pos_end,
+    find_ref_for_insertion,
     format_cs_tags,
+    get_pos_end,
+    get_variant_annotations,
     group_by_chrom,
     group_by_overlapping_intervals,
-    call_reference_depth,
-    add_vcf_fields,
     process_cs_tag,
     process_cs_tags,
 )
@@ -40,9 +40,15 @@ def test_find_ref_for_deletion():
 def test_get_variant_annotations():
     default_info = VcfInfo()
     # single mutation
-    assert get_variant_annotations(["=AC", "*ga", "=AC"], 1) == [Vcf(None, 3, "G", "A", info=default_info)]
-    assert get_variant_annotations(["=AC", "+a", "=AC"], 1) == [Vcf(None, 2, "C", "CA", info=default_info)]
-    assert get_variant_annotations(["=AC", "-a", "=AC"], 1) == [Vcf(None, 2, "CA", "C", info=default_info)]
+    assert get_variant_annotations(["=AC", "*ga", "=AC"], 1) == [
+        Vcf(None, 3, "G", "A", info=default_info)
+    ]
+    assert get_variant_annotations(["=AC", "+a", "=AC"], 1) == [
+        Vcf(None, 2, "C", "CA", info=default_info)
+    ]
+    assert get_variant_annotations(["=AC", "-a", "=AC"], 1) == [
+        Vcf(None, 2, "CA", "C", info=default_info)
+    ]
 
     # double mutations
     assert get_variant_annotations(["=AC", "*ga", "=AC", "*ct"], 1) == [
@@ -181,13 +187,33 @@ def test_call_reference_depth():
 
 def test_add_vcf_fields():
     sample_variant_annotations = [
-        Vcf(chrom=None, pos=1, ref="A", alt="T", info=VcfInfo(dp=None, rd=None, ad=None, vaf=None)),
-        Vcf(chrom=None, pos=1, ref="A", alt="T", info=VcfInfo(dp=None, rd=None, ad=None, vaf=None)),
-        Vcf(chrom=None, pos=2, ref="G", alt="C", info=VcfInfo(dp=None, rd=None, ad=None, vaf=None)),
+        Vcf(
+            chrom=None,
+            pos=1,
+            ref="A",
+            alt="T",
+            info=VcfInfo(dp=None, rd=None, ad=None, vaf=None),
+        ),
+        Vcf(
+            chrom=None,
+            pos=1,
+            ref="A",
+            alt="T",
+            info=VcfInfo(dp=None, rd=None, ad=None, vaf=None),
+        ),
+        Vcf(
+            chrom=None,
+            pos=2,
+            ref="G",
+            alt="C",
+            info=VcfInfo(dp=None, rd=None, ad=None, vaf=None),
+        ),
     ]
     sample_chrom = "chr1"
     sample_reference_depth = {("A", 1): 10, ("G", 2): 5}
-    result = add_vcf_fields(sample_variant_annotations, sample_chrom, sample_reference_depth)
+    result = add_vcf_fields(
+        sample_variant_annotations, sample_chrom, sample_reference_depth
+    )
     result = sorted(result, key=lambda x: (chrom_sort_key(x.chrom), x.pos))
     assert result[0].chrom == "chr1"
     assert result[0].info.ad == 2
@@ -236,7 +262,7 @@ def test_process_cs_tags_simple_case():
     chroms = ["chr1", "chr1", "chr1", "chr2", "chr2"]
     positions = [2, 2, 3, 10, 100]
 
-    expected_output="""##fileformat=VCFv4.2
+    expected_output = """##fileformat=VCFv4.2
     ##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
     ##INFO=<ID=RD,Number=1,Type=Integer,Description="Depth of Ref allele">
     ##INFO=<ID=AD,Number=1,Type=Integer,Description="Depth of Alt allele">
@@ -246,6 +272,7 @@ def test_process_cs_tags_simple_case():
     chr2\t102\t.\tG\tT\t.\t.\tDP=1;RD=0;AD=1;VAF=1.0
     """.replace("    ", "").strip()
     assert process_cs_tags(cs_tags, chroms, positions) == expected_output
+
 
 def test_process_cs_tags_with_splice():
     cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T", "=AC~nn10nn=GT"]

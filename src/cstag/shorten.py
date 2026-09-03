@@ -17,14 +17,17 @@ def shorten(cs_tag: str, prefix: bool = False) -> str:
         'cs:Z::4*ag:3'
     """
     cstags = re.split(r"([-+*~=])", cs_tag.replace("cs:Z:", ""))[1:]
-    cstags = [i + j for i, j in zip(cstags[0::2], cstags[1::2])]
+    cstags = [
+        operation + value
+        for operation, value in zip(cstags[0::2], cstags[1::2], strict=False)
+    ]
 
-    csshort = []
+    short_operations: list[str] = []
     for cs in cstags:
         if cs[0] == "=":
-            csshort.append(":" + str(len(cs) - 1))
+            short_operations.append(":" + str(len(cs) - 1))
             continue
-        csshort.append(cs)
-    csshort = "".join(csshort)
+        short_operations.append(cs)
+    cs_short = "".join(short_operations)
 
-    return f"cs:Z:{csshort}" if prefix else csshort
+    return f"cs:Z:{cs_short}" if prefix else cs_short

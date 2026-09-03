@@ -1,5 +1,6 @@
-import src.cstag as cstag
 import pytest
+
+import cstag
 
 
 def test_basic():
@@ -58,9 +59,8 @@ def test_error_cstag_short():
     CIGAR = "5M2I2D1M"
     QUAL = "AA!!!!AA"
     THRESHOLD = 10
-    with pytest.raises(Exception) as e:
-        _ = cstag.mask(CSTAG, CIGAR, QUAL, THRESHOLD)
-        assert str(e.value) == "Error: cs tag must be a long format"
+    with pytest.raises(ValueError, match="cs tag must be in long format"):
+        cstag.mask(CSTAG, CIGAR, QUAL, THRESHOLD)
 
 
 def test_error_threshold_float():
@@ -68,9 +68,8 @@ def test_error_threshold_float():
     CIGAR = "5M2I2D1M"
     QUAL = "AA!!!!AA"
     THRESHOLD = 9.9
-    with pytest.raises(Exception) as e:
-        _ = cstag.mask(CSTAG, CIGAR, QUAL, THRESHOLD)
-        assert str(e.value) == "Error: threshold must be an integer"
+    with pytest.raises(ValueError, match="threshold must be an integer"):
+        cstag.mask(CSTAG, CIGAR, QUAL, THRESHOLD)
 
 
 def test_error_threshold_45():
@@ -78,6 +77,8 @@ def test_error_threshold_45():
     CIGAR = "5M2I2D1M"
     QUAL = "AA!!!!AA"
     THRESHOLD = 45
-    with pytest.raises(Exception) as e:
-        _ = cstag.mask(CSTAG, CIGAR, QUAL, THRESHOLD)
-        assert str(e.value) == "Error: threshold must be within a range between 0 to 40"
+    with pytest.raises(
+        ValueError,
+        match="threshold must be within a range between 0 to 40",
+    ):
+        cstag.mask(CSTAG, CIGAR, QUAL, THRESHOLD)

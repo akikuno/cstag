@@ -1,10 +1,11 @@
 import pytest
-from src.cstag.call import (
+
+from cstag.call import (
+    call,
+    join_cigar,
     parse_cigar,
     parse_md,
-    join_cigar,
     trim_clips,
-    call,
 )
 
 ###########################################################
@@ -13,7 +14,7 @@ from src.cstag.call import (
 
 
 @pytest.mark.parametrize(
-    "cigar, expected",
+    ("cigar", "expected"),
     [
         ("5S10M3S", [("S", 5), ("M", 10), ("S", 3)]),
         ("10M", [("M", 10)]),
@@ -26,18 +27,27 @@ def testparse_cigar(cigar, expected):
 
 
 @pytest.mark.parametrize(
-    "md_input,expected_output",
+    ("md_input", "expected_output"),
     [
-        ("6^ATA14A3", [("=", 6), ("^ATA", 3), ("=", 14), ("A", 1), ("=", 3)]),  # Basic Test
+        (
+            "6^ATA14A3",
+            [("=", 6), ("^ATA", 3), ("=", 14), ("A", 1), ("=", 3)],
+        ),  # Basic Test
         ("", []),  # Empty string
         ("10", [("=", 10)]),  # Only matches
         ("^ACGT", [("^ACGT", 4)]),  # Only deletions
         ("AGCT", [("A", 1), ("G", 1), ("C", 1), ("T", 1)]),  # Only mismatches
-        ("5^AC5T2", [("=", 5), ("^AC", 2), ("=", 5), ("T", 1), ("=", 2)]),  # Mixed Cases
+        (
+            "5^AC5T2",
+            [("=", 5), ("^AC", 2), ("=", 5), ("T", 1), ("=", 2)],
+        ),  # Mixed Cases
         ("1A1^T1", [("=", 1), ("A", 1), ("=", 1), ("^T", 1), ("=", 1)]),  # Mixed Cases
         ("100", [("=", 100)]),  # Large Numbers
         ("^ACGTACGT", [("^ACGTACGT", 8)]),  # No Matches
-        ("1ATGC1", [("=", 1), ("A", 1), ("T", 1), ("G", 1), ("C", 1), ("=", 1)]),  # Multiple adjacent mismatches
+        (
+            "1ATGC1",
+            [("=", 1), ("A", 1), ("T", 1), ("G", 1), ("C", 1), ("=", 1)],
+        ),  # Multiple adjacent mismatches
     ],
 )
 def testparse_md(md_input, expected_output):
@@ -45,7 +55,7 @@ def testparse_md(md_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "cigar_tuples, expected",
+    ("cigar_tuples", "expected"),
     [
         ([("H", 5), ("M", 10), ("S", 5)], "5H10M5S"),
         ([("M", 10)], "10M"),
@@ -53,7 +63,6 @@ def testparse_md(md_input, expected_output):
         ([("H", 5), ("M", 10), ("H", 5)], "5H10M5H"),
         ([("S", 5), ("M", 10)], "5S10M"),
         ([("M", 10), ("S", 5)], "10M5S"),
-        ([("H", 5), ("M", 10), ("S", 5)], "5H10M5S"),
         ([("S", 5), ("M", 10), ("H", 5)], "5S10M5H"),
     ],
 )
@@ -62,7 +71,7 @@ def testjoin_cigar(cigar_tuples, expected):
 
 
 @pytest.mark.parametrize(
-    "cigar, seq, expected_cigar, expected_seq",
+    ("cigar", "seq", "expected_cigar", "expected_seq"),
     [
         ("5S10M3S", "AAAAATTTTTGGGGGCCC", "10M", "TTTTTGGGGG"),
         ("10M", "TTTTTTTTTT", "10M", "TTTTTTTTTT"),
@@ -85,7 +94,7 @@ def test_trim_clips(cigar, seq, expected_cigar, expected_seq):
 
 
 @pytest.mark.parametrize(
-    "cigar, md, seq, expected",
+    ("cigar", "md", "seq", "expected"),
     [
         ("8M2D4M2I", "8^AG6", "ACGTACGTACGTAC", "=ACGTACGT-ag=ACGT+ac"),
         ("5M", "5", "ACGTA", "=ACGTA"),
@@ -94,10 +103,14 @@ def test_trim_clips(cigar, seq, expected_cigar, expected_seq):
         ("5M1D4M", "5^A4", "ACGTGGCTA", "=ACGTG-a=GCTA"),
         ("3M1D1M1D4M", "3^C1^A4", "ACGGCTAG", "=ACG-c=G-a=CTAG"),
         ("3S5M", "5", "NNNACGTA", "=ACGTA"),
-        ("8M2D4M2I3N1M", "2A5^AG7", "ACGTACGTACGTACG", "=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G"),
+        (
+            "8M2D4M2I3N1M",
+            "2A5^AG7",
+            "ACGTACGTACGTACG",
+            "=AC*ag=TACGT-ag=ACGT+ac~nn3nn=G",
+        ),
         ("5M", "0C4", "ACGTA", "*ca=CGTA"),
         ("5M", "4C0", "ACGTA", "=ACGT*ca"),
-        ("5M", "0C3C0", "ACGTA", "*ca=CGT*ca"),
         ("5M", "0C3C0", "ACGTA", "*ca=CGT*ca"),
         ("5M", "2CC1", "ACGTA", "=AC*cg*ct=A"),
         ("3M2D1M2I1M3N1M", "3^GG0A2", "AAATCCTT", "=AAA-gg*at+cc=T~nn3nn=T"),
@@ -109,7 +122,7 @@ def test_generate_cs_tag_long_form(cigar, md, seq, expected):
 
 
 @pytest.mark.parametrize(
-    "cigar, md, seq, expected",
+    ("cigar", "md", "seq", "expected"),
     [
         ("8M2D4M2I", "8^AG6", "ACGTACGTACGTAC", ":8-ag:4+ac"),
         ("5M", "5", "ACGTA", ":5"),

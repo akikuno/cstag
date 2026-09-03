@@ -9,7 +9,6 @@ from typing import Any
 import matplotlib.pyplot as plt
 from matplotlib.colors import is_color_like
 
-
 CS_PREFIX = "cs:Z:"
 CS_TOKEN_PATTERN = re.compile(
     r"=[ACGTN]+|:[0-9]+|\*[acgtn][acgtn]|\+[acgtn]+|-[acgtn]+"
@@ -23,6 +22,10 @@ PROFILE_KEYS = (
     "substitution_pct",
 )
 REGION_KEYS = ("name", "start", "end", "color")
+
+
+def _percentage(reads: set[int], coverage_count: int) -> float:
+    return 100.0 * len(reads) / coverage_count
 
 
 def _tokenize_cs(cs_tag: str, tag_index: int) -> list[str]:
@@ -67,7 +70,7 @@ def _events_for_tag(
     tokens = _tokenize_cs(cs_tag, tag_index)
     reference_position = 1
     coverage: set[int] = set()
-    events = {
+    events: dict[str, set[int]] = {
         "insertion": set(),
         "deletion": set(),
         "substitution": set(),
@@ -77,8 +80,8 @@ def _events_for_tag(
         operation = token[0]
         if operation in {":", "="}:
             length = int(token[1:]) if operation == ":" else len(token) - 1
-            positions = range(reference_position, reference_position + length)
-            coverage.update(positions)
+            covered_positions = range(reference_position, reference_position + length)
+            coverage.update(covered_positions)
             reference_position += length
         elif operation == "*":
             coverage.add(reference_position)
@@ -94,9 +97,11 @@ def _events_for_tag(
             events["insertion"].add(anchor_position)
         elif operation == "-":
             length = len(token) - 1
-            positions = set(range(reference_position, reference_position + length))
-            coverage.update(positions)
-            events["deletion"].update(positions)
+            deleted_positions = set(
+                range(reference_position, reference_position + length)
+            )
+            coverage.update(deleted_positions)
+            events["deletion"].update(deleted_positions)
             reference_position += length
 
     if not coverage:
@@ -151,17 +156,14 @@ def summarize_cs(cs_tags: Sequence[str]) -> list[dict[str, int | float]]:
         substitution_reads = event_reads["substitution"][position]
         total_reads = insertion_reads | deletion_reads | substitution_reads
 
-        def percentage(reads: set[int]) -> float:
-            return 100.0 * len(reads) / coverage_count
-
         profile.append(
             {
                 "position": position,
                 "coverage": coverage_count,
-                "total_pct": percentage(total_reads),
-                "insertion_pct": percentage(insertion_reads),
-                "deletion_pct": percentage(deletion_reads),
-                "substitution_pct": percentage(substitution_reads),
+                "total_pct": _percentage(total_reads, coverage_count),
+                "insertion_pct": _percentage(insertion_reads, coverage_count),
+                "deletion_pct": _percentage(deletion_reads, coverage_count),
+                "substitution_pct": _percentage(substitution_reads, coverage_count),
             }
         )
     return profile
@@ -261,7 +263,7 @@ def plot_mutation_percentages(
         mutation_axes = axes
         region_axis = None
 
-    for axis, (key, title, color) in zip(mutation_axes, series):
+    for axis, (key, title, color) in zip(mutation_axes, series, strict=True):
         values = [record[key] for record in records]
         axis.bar(
             positions,

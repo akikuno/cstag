@@ -2,38 +2,32 @@ name: Doctest
 
 on:
   push:
+  pull_request:
   schedule:
-    - cron: "0 2 * * 1" # The task runs at 2 a.m. every Monday.
+    - cron: "0 2 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: doctest-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      max-parallel: 2
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.x"]
-    name: Python ${{ matrix.python-version }} ${{ matrix.os }}
-
+  doctest:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install test environment
         run: |
-          python -m pip install --upgrade pip pytest
-          python -m pip install -e .
-
-      - name: Install weasyprint on macos-latest
-        if: runner.os == 'macOS'
-        run: |
-          brew install weasyprint
-
-      - name: Run pytest on Linux🐧, macOS🍎
-        env:
-          PYTHONPATH: src
-        run: |
-          python -m pytest --doctest-modules
+          python -m pip install --upgrade pip
+          python -m pip install -e . "pytest>=9.1.1,<10"
+      - name: Run source doctests
+        run: >-
+          python -m pytest --doctest-modules --doctest-glob=README.md
+          README.md src/cstag -W error

@@ -1,5 +1,7 @@
 import re
-from src.cstag import lengthen
+
+from cstag import lengthen
+
 
 def test_mutation():
     CSTAG = ":4*ag:3"
@@ -34,9 +36,7 @@ def test_deletion():
 
 
 def test_insertion():
-    SEQ = (
-        "ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTCCCCCCCCCCAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
-    )
+    SEQ = "ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTCCCCCCCCCCAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     CSTAG = ":49+cccccccccc:51"
     CIGAR = "49M10I51M"
     cslong = "=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCT+cccccccccc=AGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
@@ -55,9 +55,7 @@ def test_5bpIns_3bp_Del():
     SEQ = "ACTGTGCGGCATACTTAATGGGGGTATACATTTGAAACGCGCCCTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     CSTAG = ":19+ggggg:20-aag:58"
     CIGAR = "19M5I20M3D58M"
-    cslong = (
-        "=ACTGTGCGGCATACTTAAT+ggggg=TATACATTTGAAACGCGCCC-aag=TGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
-    )
+    cslong = "=ACTGTGCGGCATACTTAAT+ggggg=TATACATTTGAAACGCGCCC-aag=TGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     assert lengthen(CSTAG, CIGAR, SEQ) == cslong
 
 
@@ -79,9 +77,7 @@ def test_softclip_plus_5nt():
 
 def test_softclip_plusminus_10nt():
     CSTAG = ":100"
-    SEQ = (
-        "TTTTTACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTCTTTTT"
-    )
+    SEQ = "TTTTTACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTCTTTTT"
     CIGAR = "5S100M5S"
     cslong = "=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     assert lengthen(CSTAG, CIGAR, SEQ) == cslong
@@ -102,8 +98,9 @@ def test_real():
             "SEQ",
             "QUAL",
         ]
-        content_dict = {n: c for n, c in zip(names, content.split("\t"))}
-        content_dict.update({"CS": c for c in content.split("\t") if re.search(r"^cs:Z", c)})
+        fields = content.split("\t")
+        content_dict = dict(zip(names, fields[:11], strict=True))
+        content_dict["CS"] = next(c for c in fields if re.search(r"^cs:Z", c))
         return content_dict["CS"], content_dict["CIGAR"], content_dict["SEQ"]
 
     with open("tests/data/real/tyr_cs.sam") as f:

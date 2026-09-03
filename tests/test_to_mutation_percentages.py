@@ -3,16 +3,14 @@ from __future__ import annotations
 import matplotlib
 import pytest
 
-
 matplotlib.use("Agg")
 
-import cstag  # noqa: E402
-from cstag.to_mutation_percentages import (  # noqa: E402
+import cstag
+from cstag.to_mutation_percentages import (
     plot_mutation_percentages,
     summarize_cs,
     to_mutation_percentages,
 )
-
 
 SHORT_EXAMPLE_CS_TAGS = [
     "cs:Z::20*ag:15+tt:30-ac:10",
@@ -228,5 +226,5 @@ def test_to_mutation_percentages_writes_editable_pdf(tmp_path):
 
 
 def test_to_mutation_percentages_requires_pathlib_path():
-    with pytest.raises(TypeError, match="pathlib.Path"):
+    with pytest.raises(TypeError, match=r"pathlib\.Path"):
         to_mutation_percentages(LONG_EXAMPLE_CS_TAGS, "profile.png")

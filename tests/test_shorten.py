@@ -1,5 +1,7 @@
 import re
-from src.cstag import shorten
+
+from cstag import shorten
+
 
 def test_mutation():
     CSTAG = "=ACGT*ag=CGT"
@@ -22,7 +24,6 @@ def test_substitution():
 
 
 def test_deletion():
-
     csshort = ":39-aagtgacgct:51"
 
     CSTAG = "=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCC-aagtgacgct=AGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
@@ -30,7 +31,6 @@ def test_deletion():
 
 
 def test_insertion():
-
     csshort = ":49+cccccccccc:51"
 
     CSTAG = "=ACTGTGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCT+cccccccccc=AGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
@@ -38,7 +38,6 @@ def test_insertion():
 
 
 def test_splicing():
-
     csshort = ":250~gc1001ag:249"
 
     CSTAG = "=GTAGGTTGTGAGATGCGGGAGAGGTTCTCGATCTTCCCGTGGGACGTCAACCTTTCCCTTGATAAAGCATCCCGCTCGGGTATGGCAGTGAGTACGCCTTCTGAATTGTGCTATCCTTCGTCCTTATCAAAGCTTGCTACCAATAATTAGGATTATTGCCTTGCGACAGACTTCCTACTCACACTCCCTCACATTGAGCTACTCGATGGGCGATTAGCTTGACCCGCTCTGTAGGGTCGCGACTACGTGA~gc1001ag=CTAAGAGTAGGCCGGGAGTGTAGACCTTTGGGGTTGAATAAATCTATTGTACTAATCGGCTTCAACGAGCCGTACAGGTGGCACCTCAGGAGGGGCCCGCAGGGAGGAAGTAAACTGCTATTCGTCGCCGTTGGTGGTAACTAATTGTGTTCCTTGCCACTACAATTGTATCTAAGCCGTGTAATGAGAACAACCACACCTTAGCGAATTGATGCGCCGCTTCGGAATACCGTTTTGGCTACCCGTTAC"
@@ -46,17 +45,13 @@ def test_splicing():
 
 
 def test_5bpIns_3bp_Del():
-
     csshort = ":19+ggggg:20-aag:58"
 
-    CSTAG = (
-        "=ACTGTGCGGCATACTTAAT+ggggg=TATACATTTGAAACGCGCCC-aag=TGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
-    )
+    CSTAG = "=ACTGTGCGGCATACTTAAT+ggggg=TATACATTTGAAACGCGCCC-aag=TGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
     assert shorten(CSTAG) == csshort
 
 
 def test_first_5nt_del_softclip_5nt():
-
     csshort = ":96"
 
     CSTAG = "=TGCGGCATACTTAATTATACATTTGAAACGCGCCCAAGTGACGCTAGGCAAGTCAGAGCAGGTTCCCGTGTTAGCTTAAGGGTAAACATACAAGTC"
@@ -92,8 +87,9 @@ def test_real():
             "SEQ",
             "QUAL",
         ]
-        content_dict = {n: c for n, c in zip(names, content.split("\t"))}
-        content_dict.update({"CS": c for c in content.split("\t") if re.search(r"^cs:Z", c)})
+        fields = content.split("\t")
+        content_dict = dict(zip(names, fields[:11], strict=True))
+        content_dict["CS"] = next(c for c in fields if re.search(r"^cs:Z", c))
         return content_dict["CS"], content_dict["CIGAR"], content_dict["SEQ"]
 
     with open("tests/data/real/tyr_cs.sam") as f:
@@ -106,12 +102,12 @@ def test_real():
 
     cs_shortened = []
     for content in contents_long:
-        cs, cigar, seq = call_cs_cigar_seq(content)
+        cs, _, _ = call_cs_cigar_seq(content)
         cs_shortened.append(shorten(cs, prefix=True))
 
     cs_short = []
     for content in contents_short:
-        cs, cigar, seq = call_cs_cigar_seq(content)
+        cs, _, _ = call_cs_cigar_seq(content)
         cs_short.append(cs)
 
     for i in range(len(cs_shortened)):
