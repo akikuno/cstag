@@ -1,5 +1,6 @@
 import pytest
-from src.cstag.revcomp import revcomp
+
+from cstag.revcomp import revcomp
 
 
 # Normal Cases

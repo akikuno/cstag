@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 
-from cstag.split import split
-from cstag.utils.validator import validate_cs_tag, validate_long_format
+from .split import split
+from .utils.validator import validate_cs_tag, validate_long_format
 
 HTML_HEADER = """<!DOCTYPE html>
     <html>
@@ -93,7 +93,9 @@ def append_mark_to_n(cs_tag: str) -> str:
         return cs
 
     cs_tag = cs_tag.replace("=N", "N")
-    cs_tag_processed = [append_mark(cs) for cs in re.split(r"(N+)", cs_tag) if cs and cs != "="]
+    cs_tag_processed = [
+        append_mark(cs) for cs in re.split(r"(N+)", cs_tag) if cs and cs != "="
+    ]
 
     return "".join(cs_tag_processed)
 
@@ -108,7 +110,7 @@ def process_cs_tag(cs_tag: str) -> str:
     cs_tag_marked = append_mark_to_n(cs_tag)
     cs_tag_split = split(cs_tag_marked)
     # Build html
-    html_parts = []
+    html_parts: list[str] = []
     idx = 0
     while idx < len(cs_tag_split):
         cs = cs_tag_split[idx]

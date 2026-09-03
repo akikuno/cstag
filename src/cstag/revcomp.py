@@ -54,11 +54,8 @@ def revcomp(cs_tag: str, prefix: bool = False) -> str:
             )
         else:
             op = cs[0]
-            cs_revcomp = "".join([map_revcomp[c] for c in cs[1:]])[::-1]
+            cs_revcomp = "".join(map_revcomp[c] for c in cs[1:])[::-1]
             cs_tag_revcomp.append(f"{op}{cs_revcomp}")
-    cs_tag_revcomp = "".join(cs_tag_revcomp)
+    reverse_complement = "".join(cs_tag_revcomp)
 
-    if prefix is True:
-        return "cs:Z:" + cs_tag_revcomp
-    else:
-        return cs_tag_revcomp
+    return f"cs:Z:{reverse_complement}" if prefix else reverse_complement

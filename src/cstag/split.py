@@ -23,6 +23,5 @@ def split(cs_tag: str, prefix: bool = False) -> list[str]:
     cs_split = [cs for cs in re.split(pattern, cs_tag) if cs]
 
     if prefix is True:
-        return ["cs:Z:"] + cs_split
-    else:
-        return cs_split
+        return ["cs:Z:", *cs_split]
+    return cs_split

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from cstag.shorten import shorten
-
+from .shorten import shorten
 
 ###########################################################
 # Trim soft and hard clips from the CIGAR and sequence
@@ -12,7 +11,7 @@ def parse_cigar(cigar: str) -> list[tuple[str, int]]:
     """
     Parse a CIGAR string into a list of tuples containing operation and length.
     """
-    parsed_cigar = []
+    parsed_cigar: list[tuple[str, int]] = []
     start_idx = 0
     for idx, operation in enumerate(cigar):
         if operation.isdigit():
@@ -27,7 +26,7 @@ def parse_md(md: str) -> list[tuple[str, int]]:
     """
     Parse an MD tag into a list of tuples containing operation and length.
     """
-    parsed_md = []
+    parsed_md: list[tuple[str, int]] = []
     idx = 0
     while idx < len(md):
         if md[idx].isdigit():
@@ -80,7 +79,7 @@ def trim_clips(cigar: str, seq: str) -> tuple[str, str]:
 
 def expand_cigar_operations(cigar: str) -> list[str]:
     parsed_cigar = parse_cigar(cigar)
-    expanded_list = []
+    expanded_list: list[str] = []
     for op, num in parsed_cigar:
         if op in ["D", "N", "I"]:
             expanded_list.append(op * num)
@@ -91,7 +90,7 @@ def expand_cigar_operations(cigar: str) -> list[str]:
 
 def expand_md_operations(md: str) -> list[str]:
     parsed_md = parse_md(md)
-    expanded_list = []
+    expanded_list: list[str] = []
     for op, num in parsed_md:
         if op.startswith("^"):
             expanded_list.append(op)
@@ -119,7 +118,7 @@ def generate_cs_long(cigar: str, md: str, seq: str) -> str:
     cigar_list = expand_cigar_operations(cigar)
     md_list = expand_md_operations(md)
     idx_cigar, idx_md, idx_seq = 0, 0, 0
-    cs_long = []
+    cs_long: list[str] = []
     while idx_seq < len(seq) and idx_cigar < len(cigar_list) and idx_md < len(md_list):
         if cigar_list[idx_cigar] == "M":
             if md_list[idx_md] == "=":
@@ -158,7 +157,9 @@ def add_prefix(cs_tag: str) -> str:
 ###########################################################
 
 
-def call(cigar: str, md: str, seq: str, long: bool = False, prefix: bool = False) -> str:
+def call(
+    cigar: str, md: str, seq: str, long: bool = False, prefix: bool = False
+) -> str:
     """
     Generate a cs tag based on CIGAR, MD, and SEQ information.
 

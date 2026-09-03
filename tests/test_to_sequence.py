@@ -1,4 +1,4 @@
-from src.cstag import to_sequence
+from cstag import to_sequence
 
 
 def test_to_sequence_normal_cases():

@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import re
 
-from cstag.utils.validator import validate_cs_tag, validate_long_format, validate_threshold
+from .utils.validator import validate_cs_tag, validate_long_format, validate_threshold
 
 
-def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False) -> str:
+def mask(
+    cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool = False
+) -> str:
     """Mask low-quality bases to 'N'
     Args:
         cs_tag (str): cs tag in the **long** format
@@ -27,31 +29,33 @@ def mask(cs_tag: str, cigar: str, qual: str, threshold: int = 10, prefix: bool =
     validate_long_format(cs_tag)
     validate_threshold(threshold)
 
-    mask_symbols = [chr(th + 33) for th in range(threshold + 1)]
-    mask_symbols = set(mask_symbols)
+    mask_symbols = {chr(th + 33) for th in range(threshold + 1)}
 
     cs = cs_tag.replace("cs:Z:", "")
     list_cs = re.split(r"([-+*~=])", cs)[1:]
-    list_cs = [i + j for i, j in zip(list_cs[0::2], list_cs[1::2])]
+    list_cs = [
+        operation + value
+        for operation, value in zip(list_cs[0::2], list_cs[1::2], strict=True)
+    ]
 
     if cigar.split("S")[0].isdigit():
         softclip = int(cigar.split("S")[0])
         qual = qual[softclip:]
 
-    cs_masked = []
+    masked_operations: list[str] = []
     idx = 0
-    for cs in list_cs:
-        cs = list(cs)
-        if cs[0] == "*":
+    for operation in list_cs:
+        operation_chars = list(operation)
+        if operation_chars[0] == "*":
             if qual[idx] in mask_symbols:
-                cs[-1] = "n"
+                operation_chars[-1] = "n"
             idx += 1
-        elif cs[0] == "=" or cs[0] == "+":
-            for i in range(len(cs) - 1):
+        elif operation_chars[0] in {"=", "+"}:
+            for i in range(len(operation_chars) - 1):
                 if qual[idx + i] in mask_symbols:
-                    cs[i + 1] = "N" if cs[0] == "=" else "n"
-            idx += i + 1
-        cs_masked.append("".join(cs))
-    cs_masked = "".join(cs_masked)
+                    operation_chars[i + 1] = "N" if operation_chars[0] == "=" else "n"
+            idx += len(operation_chars) - 1
+        masked_operations.append("".join(operation_chars))
+    cs_masked = "".join(masked_operations)
 
     return f"cs:Z:{cs_masked}" if prefix else cs_masked

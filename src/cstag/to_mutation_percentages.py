@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import is_color_like
-
+from matplotlib.colors import is_color_like, to_rgb
+from matplotlib.ticker import MaxNLocator
 
 CS_PREFIX = "cs:Z:"
 CS_TOKEN_PATTERN = re.compile(
@@ -23,6 +23,10 @@ PROFILE_KEYS = (
     "substitution_pct",
 )
 REGION_KEYS = ("name", "start", "end", "color")
+
+
+def _percentage(reads: set[int], coverage_count: int) -> float:
+    return 100.0 * len(reads) / coverage_count
 
 
 def _tokenize_cs(cs_tag: str, tag_index: int) -> list[str]:
@@ -67,7 +71,7 @@ def _events_for_tag(
     tokens = _tokenize_cs(cs_tag, tag_index)
     reference_position = 1
     coverage: set[int] = set()
-    events = {
+    events: dict[str, set[int]] = {
         "insertion": set(),
         "deletion": set(),
         "substitution": set(),
@@ -77,8 +81,8 @@ def _events_for_tag(
         operation = token[0]
         if operation in {":", "="}:
             length = int(token[1:]) if operation == ":" else len(token) - 1
-            positions = range(reference_position, reference_position + length)
-            coverage.update(positions)
+            covered_positions = range(reference_position, reference_position + length)
+            coverage.update(covered_positions)
             reference_position += length
         elif operation == "*":
             coverage.add(reference_position)
@@ -94,9 +98,11 @@ def _events_for_tag(
             events["insertion"].add(anchor_position)
         elif operation == "-":
             length = len(token) - 1
-            positions = set(range(reference_position, reference_position + length))
-            coverage.update(positions)
-            events["deletion"].update(positions)
+            deleted_positions = set(
+                range(reference_position, reference_position + length)
+            )
+            coverage.update(deleted_positions)
+            events["deletion"].update(deleted_positions)
             reference_position += length
 
     if not coverage:
@@ -151,17 +157,14 @@ def summarize_cs(cs_tags: Sequence[str]) -> list[dict[str, int | float]]:
         substitution_reads = event_reads["substitution"][position]
         total_reads = insertion_reads | deletion_reads | substitution_reads
 
-        def percentage(reads: set[int]) -> float:
-            return 100.0 * len(reads) / coverage_count
-
         profile.append(
             {
                 "position": position,
                 "coverage": coverage_count,
-                "total_pct": percentage(total_reads),
-                "insertion_pct": percentage(insertion_reads),
-                "deletion_pct": percentage(deletion_reads),
-                "substitution_pct": percentage(substitution_reads),
+                "total_pct": _percentage(total_reads, coverage_count),
+                "insertion_pct": _percentage(insertion_reads, coverage_count),
+                "deletion_pct": _percentage(deletion_reads, coverage_count),
+                "substitution_pct": _percentage(substitution_reads, coverage_count),
             }
         )
     return profile
@@ -214,7 +217,7 @@ def plot_mutation_percentages(
     output_path: Path | None = None,
     regions: Sequence[Mapping[str, object]] | None = None,
 ) -> tuple[Any, Any]:
-    """Create four mutation plots and an optional bottom region track."""
+    """Create four mutation plots with optional region highlights."""
     if isinstance(records, (str, bytes)) or not isinstance(records, Sequence):
         raise TypeError("records must be a non-empty sequence of dictionaries")
     if not records:
@@ -238,72 +241,63 @@ def plot_mutation_percentages(
         ("substitution_pct", "Substitutions", "#2ca02c"),
     )
     validated_regions = _validate_regions(regions, int(positions[-1]))
-    if validated_regions:
-        region_height = max(0.45, 0.22 * len(validated_regions))
-        figure, axes = plt.subplots(
-            5,
-            1,
-            figsize=(12, 11 + 0.25 * len(validated_regions)),
-            sharex=True,
-            constrained_layout=True,
-            gridspec_kw={"height_ratios": [1, 1, 1, 1, region_height]},
-        )
-        mutation_axes = axes[:4]
-        region_axis = axes[4]
-    else:
-        figure, axes = plt.subplots(
-            4,
-            1,
-            figsize=(12, 10),
-            sharex=True,
-            constrained_layout=True,
-        )
-        mutation_axes = axes
-        region_axis = None
+    figure, axes = plt.subplots(
+        4,
+        1,
+        figsize=(12, 10),
+        sharex=True,
+        constrained_layout=True,
+    )
 
-    for axis, (key, title, color) in zip(mutation_axes, series):
+    for axis, (key, title, color) in zip(axes, series, strict=True):
         values = [record[key] for record in records]
         axis.bar(
             positions,
             values,
-            width=1.0,
+            width=0.8,
             align="center",
             color=color,
             edgecolor="none",
             alpha=0.85,
+            zorder=3,
         )
+        for region_index, region in enumerate(validated_regions):
+            start = int(region["start"])
+            end = int(region["end"])
+            region_color = str(region["color"])
+            highlight = axis.axvspan(
+                start - 0.5,
+                end + 0.5,
+                color=region_color,
+                alpha=0.18,
+                linewidth=0,
+                zorder=0.5,
+            )
+            highlight.set_gid(f"cstag-region-{region_index}")
+            red, green, blue = to_rgb(region_color)
+            axis.text(
+                (start + end) / 2,
+                0.97,
+                str(region["name"]),
+                transform=axis.get_xaxis_transform(),
+                ha="center",
+                va="top",
+                color=(red * 0.65, green * 0.65, blue * 0.65),
+                fontsize="small",
+                clip_on=True,
+                zorder=3,
+            )
         axis.set_title(title)
         axis.set_ylabel("Mutation (%)")
         axis.set_ylim(0, 100)
         axis.grid(axis="both", alpha=0.25)
 
-    if region_axis is not None:
-        for row, region in enumerate(validated_regions):
-            start = int(region["start"])
-            end = int(region["end"])
-            region_axis.barh(
-                row,
-                end - start + 1,
-                left=start - 0.5,
-                height=0.7,
-                color=str(region["color"]),
-                edgecolor="none",
-                alpha=0.85,
-            )
-        region_axis.set_yticks(
-            range(len(validated_regions)),
-            labels=[str(region["name"]) for region in validated_regions],
-        )
-        region_axis.set_ylim(-0.5, len(validated_regions) - 0.5)
-        region_axis.invert_yaxis()
-        region_axis.set_ylabel("Regions")
-        region_axis.grid(axis="x", alpha=0.25)
-        x_axis = region_axis
+    axes[-1].set_xlabel("Reference position (1-based)")
+    axes[-1].set_xlim(positions[0] - 0.5, positions[-1] + 0.5)
+    if len(positions) <= 20:
+        axes[-1].set_xticks(positions)
     else:
-        x_axis = mutation_axes[-1]
-
-    x_axis.set_xlabel("Reference position (1-based)")
-    x_axis.set_xlim(positions[0] - 0.5, positions[-1] + 0.5)
+        axes[-1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
     if output_path is not None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -329,8 +323,8 @@ def to_mutation_percentages(
         output_path: Path of the plot file to create. The format is inferred
             from its extension. Use ``.pdf`` for an editable vector PDF with
             embedded TrueType fonts, or ``.png`` for a raster image.
-        regions: Optional sequence of dictionaries describing regions to annotate
-            below the mutation plots. Each dictionary must contain ``name``
+        regions: Optional sequence of dictionaries describing regions to highlight
+            in the mutation plots. Each dictionary must contain ``name``
             (the displayed label), ``start`` and ``end`` (1-based, inclusive
             reference positions), and ``color`` (a Matplotlib-compatible color).
             For example::
@@ -342,10 +336,9 @@ def to_mutation_percentages(
                      "color": "lightgreen"},
                 ]
 
-            Each region is drawn as a separate horizontal bar, so overlapping
-            regions remain visible. Supplying one or more regions adds a fifth
-            annotation track below the four mutation panels; ``None`` or an
-            empty sequence keeps the original four-panel plot.
+            Each region is drawn as a translucent vertical band behind the data
+            in all four mutation panels, with its name shown at the top of the
+            band. Overlapping regions remain visible through blended colors.
 
     Returns:
         One dictionary per 1-based relative reference position containing

@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import re
-from itertools import chain
-from collections import deque, defaultdict, Counter
-
+from collections import Counter, defaultdict, deque
+from collections.abc import Iterable
 from dataclasses import dataclass
+from itertools import chain
+from typing import cast, overload
 
-from cstag.split import split
-from cstag.consensus import normalize_read_lengths
-from cstag.utils.validator import validate_cs_tag, validate_long_format, validate_pos
+from .consensus import normalize_read_lengths
+from .split import split
+from .utils.validator import validate_cs_tag, validate_long_format, validate_pos
 
 
 @dataclass(frozen=True)
@@ -73,7 +74,7 @@ def find_ref_for_deletion(cs_tag_split: list[str], idx: int) -> str:
 
 
 def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[Vcf]:
-    variant_annotations = []
+    variant_annotations: list[Vcf] = []
     pos = position
     for idx, cs in enumerate(cs_tag_split):
         if cs.startswith("="):
@@ -83,7 +84,7 @@ def get_variant_annotations(cs_tag_split: list[str], position: int) -> list[Vcf]
             variant_annotations.append(Vcf(pos=pos, ref=ref, alt=alt))
             pos += 1
         elif cs.startswith("+"):
-            ref = find_ref_for_insertion(cs_tag_split, idx)
+            ref = cast(str, find_ref_for_insertion(cs_tag_split, idx))
             alt = ref + cs[1:].upper()
             variant_annotations.append(Vcf(pos=pos - 1, ref=ref, alt=alt))
         elif cs.startswith("-"):
@@ -113,7 +114,11 @@ def get_pos_end(cs_tag: str, pos: int) -> int:
     return pos_end
 
 
-def format_cs_tags(cs_tags: list[str], chroms: list[str] | list[int], positions: list[int]) -> list[CsInfo]:
+def format_cs_tags(
+    cs_tags: list[str],
+    chroms: list[str] | list[int],
+    positions: list[int],
+) -> list[CsInfo]:
     """Format and filter cs_tags, and create a list of CsInfo objects.
 
     This function takes lists of cs_tags, chromosomes, and positions. It filters
@@ -130,11 +135,11 @@ def format_cs_tags(cs_tags: list[str], chroms: list[str] | list[int], positions:
     """
 
     # Convert all chromosomes to string type
-    chroms = [str(chrom) for chrom in chroms]
+    chrom_strings = [str(chrom) for chrom in chroms]
     # Create a list of CsInfo objects, filtering out any with a splicing ("~") in the cs_tag
     cs_info_list = [
         CsInfo(cs_tag=cs, chrom=chrom, pos_start=pos, pos_end=get_pos_end(cs, pos))
-        for cs, chrom, pos in zip(cs_tags, chroms, positions)
+        for cs, chrom, pos in zip(cs_tags, chrom_strings, positions, strict=False)
         if "~" not in cs
     ]
     return cs_info_list
@@ -145,21 +150,30 @@ def format_cs_tags(cs_tags: list[str], chroms: list[str] | list[int], positions:
 ###########################################################
 
 
-def group_by_chrom(cs_tags_formatted: list[tuple]) -> dict[str, tuple]:
+def group_by_chrom(
+    cs_tags_formatted: list[CsInfo],
+) -> dict[str | None, list[CsInfo]]:
     """Group cs tags by chromosomes"""
-    cs_tags_grouped = defaultdict(list)
+    cs_tags_grouped: defaultdict[str | None, list[CsInfo]] = defaultdict(list)
     for cs in cs_tags_formatted:
         cs_tags_grouped[cs.chrom].append(
-            CsInfo(cs_tag=cs.cs_tag, pos_start=cs.pos_start, pos_end=cs.pos_end, chrom=cs.chrom)
+            CsInfo(
+                cs_tag=cs.cs_tag,
+                pos_start=cs.pos_start,
+                pos_end=cs.pos_end,
+                chrom=cs.chrom,
+            )
         )
     return dict(cs_tags_grouped)
 
 
-def group_by_overlapping_intervals(cs_tags_grouped: CsInfo) -> list[CsInfo]:
+def group_by_overlapping_intervals(
+    cs_tags_grouped: list[CsInfo],
+) -> list[list[CsInfo]]:
     # Sort the list by the starting point
     sorted_data = sorted(cs_tags_grouped, key=lambda x: x.pos_start)
     # Initialize the list of grouped intervals
-    grouped_intervals = []
+    grouped_intervals: list[list[CsInfo]] = []
     # Initialize the first group with the first element
     current_group = [sorted_data[0]]
     # Loop through the sorted list starting from the second element
@@ -167,7 +181,10 @@ def group_by_overlapping_intervals(cs_tags_grouped: CsInfo) -> list[CsInfo]:
         overlaps = False
         for j in current_group:
             # Check if the intervals overlap
-            if sorted_data[i].pos_start <= j.pos_end and sorted_data[i].pos_end >= j.pos_start:
+            if (
+                sorted_data[i].pos_start <= j.pos_end
+                and sorted_data[i].pos_end >= j.pos_start
+            ):
                 overlaps = True
                 break
         if overlaps:
@@ -189,36 +206,46 @@ def group_by_overlapping_intervals(cs_tags_grouped: CsInfo) -> list[CsInfo]:
 ###########################################################
 
 
-def replace_mutation_to_atmark(cs_tags: str) -> str:
+def replace_mutation_to_atmark(cs_tags: Iterable[str | None]) -> str:
     """Replaces mutations with '@'."""
     return "".join(cs if cs in {"A", "C", "G", "T"} else "@" for cs in cs_tags)
 
 
-def call_reference_depth(variant_annotations, cs_tags_list, positions_list) -> dict[tuple[str, int], int]:
+def call_reference_depth(
+    variant_annotations: list[Vcf],
+    cs_tags_list: list[str],
+    positions_list: list[int],
+) -> dict[tuple[str, int], int]:
     cs_tags_normalized_length = normalize_read_lengths(cs_tags_list, positions_list)
-    cs_replaced = [replace_mutation_to_atmark(cs_tags) for cs_tags in cs_tags_normalized_length]
+    cs_replaced = [
+        replace_mutation_to_atmark(cs_tags) for cs_tags in cs_tags_normalized_length
+    ]
 
-    reference_depth = defaultdict(int)
+    reference_depth: defaultdict[tuple[str, int], int] = defaultdict(int)
     unique_variants = set(variant_annotations)
     for v in unique_variants:
-        v_idx = v.pos - min(positions_list)
+        variant_pos = cast(int, v.pos)
+        variant_ref = cast(str, v.ref)
+        v_idx = variant_pos - min(positions_list)
         for cs in cs_replaced:
-            if v.ref == cs[v_idx : v_idx + len(v.ref)]:
-                reference_depth[(v.ref, v.pos)] += 1
+            if variant_ref == cs[v_idx : v_idx + len(variant_ref)]:
+                reference_depth[(variant_ref, variant_pos)] += 1
 
     return dict(reference_depth)
 
 
 def add_vcf_fields(
-    variant_annotations: list[Vcf], chrom: str, reference_depth: dict[tuple[str, int], int]
+    variant_annotations: list[Vcf],
+    chrom: str,
+    reference_depth: dict[tuple[str, int], int],
 ) -> list[Vcf]:
     """Add Chrom and VCF info (AD, RD, DP, and VAF) to immutable Vcf dataclass"""
     variant_counter = Counter((v.pos, v.ref, v.alt) for v in variant_annotations)
 
-    updated_annotations = []
+    updated_annotations: list[Vcf] = []
     for v in set(variant_annotations):
         ad = variant_counter[(v.pos, v.ref, v.alt)]
-        rd = reference_depth.get((v.ref, v.pos), 0)
+        rd = reference_depth.get((cast(str, v.ref), cast(int, v.pos)), 0)
         dp = rd + ad
         vaf = round(ad / dp, 3) if dp else 0
 
@@ -226,7 +253,9 @@ def add_vcf_fields(
         updated_info = VcfInfo(dp=dp, rd=rd, ad=ad, vaf=vaf)
 
         # Creating a new Vcf object
-        updated_variant = Vcf(chrom=chrom, pos=v.pos, ref=v.ref, alt=v.alt, info=updated_info)
+        updated_variant = Vcf(
+            chrom=chrom, pos=v.pos, ref=v.ref, alt=v.alt, info=updated_info
+        )
 
         updated_annotations.append(updated_variant)
 
@@ -268,31 +297,47 @@ def chrom_sort_key(chrom: str) -> int:
     return int(chrom.replace("chr", ""))
 
 
-def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int]) -> str:
+def process_cs_tags(
+    cs_tags: list[str],
+    chroms: list[str] | list[int],
+    positions: list[int],
+) -> str:
     # validate inputs
-    _ = [validate_cs_tag(cs_tag) for cs_tag in cs_tags]
-    _ = [validate_long_format(cs_tag) for cs_tag in cs_tags]
-    _ = [validate_pos(pos) for pos in positions]
+    for cs_tag in cs_tags:
+        validate_cs_tag(cs_tag)
+        validate_long_format(cs_tag)
+    for pos in positions:
+        validate_pos(pos)
 
     cs_tags_formatted = format_cs_tags(cs_tags, chroms, positions)
     cs_tags_grouped_by_chrom = group_by_chrom(cs_tags_formatted)
 
-    vcf_info = []
-    for chrom, cs_tags_grouped in cs_tags_grouped_by_chrom.items():
+    vcf_info: list[Vcf] = []
+    for maybe_chrom, cs_tags_grouped in cs_tags_grouped_by_chrom.items():
+        chrom = cast(str, maybe_chrom)
         for csinfo in group_by_overlapping_intervals(cs_tags_grouped):
             cs_tags_list = [cs.cs_tag for cs in csinfo]
             positions_list = [cs.pos_start for cs in csinfo]
-            variant_annotations = [
-                get_variant_annotations(split(cs), pos) for cs, pos in zip(cs_tags_list, positions_list)
+            annotations_by_tag = [
+                get_variant_annotations(split(cs), pos)
+                for cs, pos in zip(cs_tags_list, positions_list, strict=True)
             ]
-            variant_annotations = list(chain.from_iterable(variant_annotations))
+            variant_annotations = list(chain.from_iterable(annotations_by_tag))
             if not variant_annotations:
                 continue
-            reference_depth = call_reference_depth(variant_annotations, cs_tags_list, positions_list)
+            reference_depth = call_reference_depth(
+                variant_annotations, cs_tags_list, positions_list
+            )
             vcf_info += add_vcf_fields(variant_annotations, chrom, reference_depth)
 
     # Sort by chrom and pos
-    variants = sorted(vcf_info, key=lambda x: (chrom_sort_key(x.chrom), x.pos))
+    variants = sorted(
+        vcf_info,
+        key=lambda variant: (
+            chrom_sort_key(cast(str, variant.chrom)),
+            cast(int, variant.pos),
+        ),
+    )
 
     # Write VCF
     HEADER = """##fileformat=VCFv4.2
@@ -317,7 +362,23 @@ def process_cs_tags(cs_tags: list[str], chroms: list[str], positions: list[int])
 ###########################################################
 
 
-def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], positions: int | list[int]) -> str:
+@overload
+def to_vcf(cs_tags: str, chroms: str | int, positions: int) -> str: ...
+
+
+@overload
+def to_vcf(
+    cs_tags: list[str],
+    chroms: list[str] | list[int],
+    positions: list[int],
+) -> str: ...
+
+
+def to_vcf(
+    cs_tags: str | list[str],
+    chroms: str | int | list[str] | list[int],
+    positions: int | list[int],
+) -> str:
     """
     Convert cs tag(s) to VCF (Variant Call Format) string.
 
@@ -341,8 +402,16 @@ def to_vcf(cs_tags: str | list[str], chroms: str | int | list[str] | list[int], 
         chr1	5	.	C	CTT	.	.	.
     """
     if isinstance(cs_tags, str):
-        return process_cs_tag(cs_tags, chroms, positions)
+        return process_cs_tag(
+            cs_tags,
+            cast(str | int, chroms),
+            cast(int, positions),
+        )
     elif isinstance(cs_tags, list):
-        return process_cs_tags(cs_tags, chroms, positions)
+        return process_cs_tags(
+            cs_tags,
+            cast(list[str] | list[int], chroms),
+            cast(list[int], positions),
+        )
     else:
         raise TypeError(f"cs_tags must be str or list, not {type(cs_tags)}")

@@ -27,10 +27,12 @@
 - `cstag.to_html()`: Generate an HTML representation
 - `cstag.to_mutation_percentages()`: Report and plot per-position mutation percentages
 
-For comprehensive documentation, please visit [our docs](https://akikuno.github.io/cstag/cstag/).  
+For comprehensive documentation, please visit [our docs](https://akikuno.github.io/cstag/).
 
 
 ## 🛠 Installation
+
+`cstag` requires Python 3.11 or later.
 
 Using [PyPI](https://pypi.org/project/cstag/):
 
@@ -42,6 +44,21 @@ Using [Bioconda](https://anaconda.org/bioconda/cstag):
 
 ```bash
 conda install -c bioconda cstag
+```
+
+### Development
+
+Install the package and its development dependency group, then run the local
+quality checks:
+
+```bash
+python -m pip install -e . --group dev --group docs
+ruff format --check .
+ruff check .
+mypy
+python -m pytest tests -W error
+python -m pytest --doctest-modules --doctest-glob=README.md README.md src/cstag -W error
+python -m build
 ```
 
 ## 💡 Usage
@@ -157,6 +174,7 @@ print(cstag.revcomp(cs_tag))
 
 ```python
 import cstag
+
 cs_tag = "=AC*gt=T-gg=C+tt=A"
 print(cstag.to_sequence(cs_tag))
 # ACTTCTTA
@@ -166,6 +184,7 @@ print(cstag.to_sequence(cs_tag))
 
 ```python
 import cstag
+
 cs_tag = "=AC*gt=T-gg=C+tt=A"
 chrom = "chr1"
 pos = 1
@@ -183,6 +202,7 @@ The multiple cs tags enable reporting of the variant allele frequency (VAF).
 
 ```python
 import cstag
+
 cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T"]
 chroms = ["chr1", "chr1", "chr1", "chr2", "chr2"]
 positions = [2, 2, 3, 10, 100]
@@ -226,8 +246,8 @@ import cstag
 
 cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T"]
 regions = [
-    {"name": "region01", "start": 1, "end": 2, "color": "lightblue"},
-    {"name": "region02", "start": 3, "end": 4, "color": "lightgreen"},
+    {"name": "Region01", "start": 1, "end": 1, "color": "lightblue"},
+    {"name": "Region02", "start": 3, "end": 4, "color": "lightgreen"},
 ]
 
 report = cstag.to_mutation_percentages(
@@ -268,8 +288,11 @@ print(report)
 
 The function accepts short- or long-form cs tags and returns one dictionary per
 1-based relative reference position. Percentages are reported for all mutations,
-insertions, deletions, and substitutions. A PDF is saved as editable vector
-graphics; use a `.png` output path for a raster image.
+insertions, deletions, and substitutions. Each panel uses separate vertical bars
+centered on discrete, 1-based reference positions; x-axis labels are integers.
+Optional regions are shown as labeled, translucent vertical bands behind the data
+in all four panels. A PDF is saved as editable vector graphics; use a `.png`
+output path for a raster image.
 
 
 ## 📣 Feedback and Support

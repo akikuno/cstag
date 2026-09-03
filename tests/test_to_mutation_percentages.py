@@ -3,16 +3,14 @@ from __future__ import annotations
 import matplotlib
 import pytest
 
-
 matplotlib.use("Agg")
 
-import cstag  # noqa: E402
-from cstag.to_mutation_percentages import (  # noqa: E402
+import cstag
+from cstag.to_mutation_percentages import (
     plot_mutation_percentages,
     summarize_cs,
     to_mutation_percentages,
 )
-
 
 SHORT_EXAMPLE_CS_TAGS = [
     "cs:Z::20*ag:15+tt:30-ac:10",
@@ -123,7 +121,7 @@ def test_invalid_or_unsupported_inputs_raise(cs_tags, error_type):
         summarize_cs(cs_tags)
 
 
-def test_plot_has_four_ordered_filled_bar_panels(tmp_path):
+def test_plot_has_four_ordered_discrete_bar_panels(tmp_path):
     records = summarize_cs([":2*ag+tt:2", ":5"])
     output_path = tmp_path / "profile.png"
     figure, axes = plot_mutation_percentages(records, output_path)
@@ -146,7 +144,18 @@ def test_plot_has_four_ordered_filled_bar_panels(tmp_path):
         0.0,
         0.0,
     ]
-    assert all(bar.get_width() == 1.0 for axis in axes for bar in axis.patches)
+    assert all(len(axis.patches) == 5 for axis in axes)
+    assert all(
+        bar.get_width() == pytest.approx(0.8) for axis in axes for bar in axis.patches
+    )
+    assert list(axes[-1].get_xticks()) == [1, 2, 3, 4, 5]
+    assert [label.get_text() for label in axes[-1].get_xticklabels()] == [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+    ]
     assert output_path.is_file()
 
     import matplotlib.pyplot as plt
@@ -154,25 +163,29 @@ def test_plot_has_four_ordered_filled_bar_panels(tmp_path):
     plt.close(figure)
 
 
-def test_plot_adds_bottom_region_track(tmp_path):
+def test_plot_overlays_regions_on_every_panel(tmp_path):
     records = summarize_cs([":40"])
     regions = [
-        {"name": "hoge", "start": 10, "end": 20, "color": "orange"},
-        {"name": "fuga", "start": 20, "end": 30, "color": "skyblue"},
+        {"name": "Region01", "start": 1, "end": 1, "color": "orange"},
+        {"name": "Region02", "start": 20, "end": 30, "color": "skyblue"},
     ]
     output_path = tmp_path / "annotated_profile.png"
     figure, axes = plot_mutation_percentages(records, output_path, regions=regions)
 
-    assert len(axes) == 5
-    region_axis = axes[-1]
-    assert [label.get_text() for label in region_axis.get_yticklabels()] == [
-        "hoge",
-        "fuga",
-    ]
-    assert [bar.get_x() for bar in region_axis.patches] == [9.5, 19.5]
-    assert [bar.get_width() for bar in region_axis.patches] == [11, 11]
-    assert region_axis.get_ylabel() == "Regions"
-    assert region_axis.get_xlabel() == "Reference position (1-based)"
+    assert len(axes) == 4
+    for axis in axes:
+        highlights = [
+            patch
+            for patch in axis.patches
+            if patch.get_gid() and patch.get_gid().startswith("cstag-region-")
+        ]
+        assert [highlight.get_x() for highlight in highlights] == [0.5, 19.5]
+        assert [highlight.get_width() for highlight in highlights] == [1, 11]
+        assert [highlight.get_alpha() for highlight in highlights] == [0.18, 0.18]
+        assert [text.get_text() for text in axis.texts] == ["Region01", "Region02"]
+        assert all(highlight.get_zorder() < 1 for highlight in highlights)
+    assert axes[-1].get_xlabel() == "Reference position (1-based)"
+    assert all(float(tick).is_integer() for tick in axes[-1].get_xticks())
     assert output_path.is_file()
 
     import matplotlib.pyplot as plt
@@ -228,5 +241,5 @@ def test_to_mutation_percentages_writes_editable_pdf(tmp_path):
 
 
 def test_to_mutation_percentages_requires_pathlib_path():
-    with pytest.raises(TypeError, match="pathlib.Path"):
+    with pytest.raises(TypeError, match=r"pathlib\.Path"):
         to_mutation_percentages(LONG_EXAMPLE_CS_TAGS, "profile.png")

@@ -1,11 +1,11 @@
 import pytest
 
 import cstag
-from src.cstag.consensus import (
-    split_cs_tags,
-    normalize_read_lengths,
-    get_consensus,
+from cstag.consensus import (
     consensus,
+    get_consensus,
+    normalize_read_lengths,
+    split_cs_tags,
 )
 
 
@@ -47,7 +47,11 @@ def test_get_consensus():
     assert get_consensus(cs_tags) == "=ACGT"
 
     # Test with different cs tags
-    cs_tags = [(["A", "C", "*ga", "T"]), (["A", "C", "G", "*tc"]), (["A", "C", "*ga", "T"])]
+    cs_tags = [
+        (["A", "C", "*ga", "T"]),
+        (["A", "C", "G", "*tc"]),
+        (["A", "C", "*ga", "T"]),
+    ]
     assert get_consensus(cs_tags) == "=AC*ga=T"
 
     # Test with empty cs
@@ -222,7 +226,9 @@ def test_max_edit_distance_is_none_when_a_read_has_no_overlapping_neighbor():
     }
 
 
-@pytest.mark.parametrize("min_agreement", [-0.01, 1.01, float("nan"), float("inf"), -float("inf")])
+@pytest.mark.parametrize(
+    "min_agreement", [-0.01, 1.01, float("nan"), float("inf"), -float("inf")]
+)
 def test_invalid_min_agreement_values_raise_value_error(min_agreement):
     with pytest.raises(ValueError, match="finite number between 0 and 1"):
         consensus(["=ACGT"], [1], min_agreement=min_agreement)
