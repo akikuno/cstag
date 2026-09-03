@@ -246,8 +246,8 @@ import cstag
 
 cs_tags = ["=ACGT", "=AC*gt=T", "=C*gt=T", "=ACGT", "=AC*gt=T"]
 regions = [
-    {"name": "region01", "start": 1, "end": 2, "color": "lightblue"},
-    {"name": "region02", "start": 3, "end": 4, "color": "lightgreen"},
+    {"name": "Region01", "start": 1, "end": 1, "color": "lightblue"},
+    {"name": "Region02", "start": 3, "end": 4, "color": "lightgreen"},
 ]
 
 report = cstag.to_mutation_percentages(
@@ -288,8 +288,11 @@ print(report)
 
 The function accepts short- or long-form cs tags and returns one dictionary per
 1-based relative reference position. Percentages are reported for all mutations,
-insertions, deletions, and substitutions. A PDF is saved as editable vector
-graphics; use a `.png` output path for a raster image.
+insertions, deletions, and substitutions. Each panel uses separate vertical bars
+centered on discrete, 1-based reference positions; x-axis labels are integers.
+Optional regions are shown as labeled, translucent vertical bands behind the data
+in all four panels. A PDF is saved as editable vector graphics; use a `.png`
+output path for a raster image.
 
 
 ## 📣 Feedback and Support
